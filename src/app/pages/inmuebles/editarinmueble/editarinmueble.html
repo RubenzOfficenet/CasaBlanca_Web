@@ -1,0 +1,162 @@
+<mat-dialog-content>
+    <!-- CONTENIDO DE EDICION -->
+    <main class="main-content">
+        <div class="form-container container-fluid">
+            <div class="form-header mb-4">
+                <h1>Editar Inmueble</h1>
+            </div>
+
+            <div class="form-cardx">
+                <form [formGroup]="inmuebleForm">
+                    <div class="form-sectio">
+                        <div class="form-section-title">Información del Inmueble</div>
+
+                        <div class="row row-cols-1 row-cols-md-3 g-3">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="NumeroCasa">Número de Casa <span class="mensaje-error">*</span> </label>
+                                    <input type="text" id="NumeroCasa" formControlName="NumeroCasa" placeholder="Ej. A99" />
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="Ubicación">Ubicación / Dirección</label>
+                                    <input type="text" id="Ubicación" formControlName="Ubicacion"
+                                        placeholder="Ej. Sección I" />
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="CuotaDeMantenimientoBase">Cuota de Mantenimiento</label>
+                                    <div class="input-wrapper has-prefix">
+                                        <span class="input-prefix">$</span>
+                                        <input type="number" id="CuotaDeMantenimientoBase"
+                                            formControlName="CuotaDeMantenimientoBase" step="0.01" placeholder="0.00" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <option [value]="-1" disabled>
+                                        Seleccione un estado
+                                    </option>
+                                    <select id="EstadoOcupacion" formControlName="EstadoOcupacion">
+                                        <option value="-1" disabled selected>Seleccione un estado</option>
+                                        @for (estado of estadosOcupacion; track estado.id) {
+                                        <option [value]="estado.id">
+                                            {{ estado.estadoInicialOcupacion }}
+                                        </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="NuneroHabitantes">Número de Habitantes</label>
+                                    <input type="number" id="NuneroHabitantes" formControlName="NumeroHabitantes"
+                                        placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">Datos del Titular / Propietario</div>
+                        <div class="row row-cols-1 row-cols-md-3 g-3">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="NombreTitular">Nombre(s)</label>
+                                    <input type="text" id="NombreTitular" formControlName="NombreTitular" />
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="ApellidosTitular">Apellidos</label>
+                                    <input type="text" id="ApellidosTitular" formControlName="ApellidosTitular" />
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="CelularTitular">Celular</label>
+                                    <input type="tel" id="CelularTitular" formControlName="CelularTitular"
+                                        placeholder="Ej. 5534567890" />
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="EmailTitular">Correo Electrónico</label>
+                                    <input type="email" id="EmailTitular" formControlName="EmailTitular"
+                                        placeholder="titular@correo.com" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">Datos del Ocupante (Si aplica)</div>
+                        <div class="row row-cols-1 row-cols-md-3 g-3">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="NombreOcupante">Nombre(s)</label>
+                                    <input type="text" id="NombreOcupante" formControlName="NombreOcupante" />
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="ApellidosOcupante">Apellidos</label>
+                                    <input type="text" id="ApellidosOcupante" formControlName="ApellidosOcupante" />
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="CelularOcupante">Celular</label>
+                                    <input type="tel" id="CelularOcupante" formControlName="CelularOcupante" placeholder="Ej. 5534567890" />
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="EmailOcupante">Correo Electrónico</label>
+                                    <input type="email" id="EmailOcupante" formControlName="EmailOcupante"  placeholder="titular@correo.com"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-section-title">Adicionales</div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="Observaciones">Observaciones</label>
+                                    <textarea id="Observaciones" formControlName="Observaciones" rows="3"
+                                        placeholder="Notas o comentarios relevantes..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</mat-dialog-content>
+
+
+<mat-dialog-actions align="end">
+    <button mat-raised-button (click)="cancelar()">Cancelar</button>
+    <button mat-raised-button (click)="mostrarConfirmacion()" color="primary">Actualizar Datos</button>
+</mat-dialog-actions>
+
+
+<app-confirm-dialog #modalConfirmacion [titulo]="'Guardar Datos'" [mensaje]="'¿Estás seguro de actualizar los datos?'"
+    (confirmado)="guardar()" (cancelado)="onCancelar()">
+</app-confirm-dialog>

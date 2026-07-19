@@ -1,0 +1,177 @@
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+
+
+/* --- TUS VARIABLES (Asegúrate de tenerlas definidas) --- */
+:root {
+    --bg-surface: #ffffff;
+    --border-color: #E2E8F0;
+    --text-main: #1E293B;
+    --text-muted: #64748B;
+    --color-brand: #2563EB;
+}
+
+/* --- TU CÓDIGO CSS ORIGINAL --- */
+.main-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 960px;
+}
+
+/* Ajustado a 960px para acomodar mejor las 3 columnas */
+
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.btn-back {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    background-color: var(--bg-surface);
+    transition: all 0.15s;
+    text-decoration: none;
+}
+
+.btn-back:hover {
+    color: var(--text-main);
+    border-color: #CBD5E1;
+}
+
+.form-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.form-card {
+    background-color: var(--bg-surface);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 32px;
+    box-shadow: 7px 9px 28px -14px rgba(0, 0, 0, 0.75);
+    -webkit-box-shadow: 7px 9px 28px -14px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 7px 9px 28px -14px rgba(0, 0, 0, 0.75);
+}
+
+.form-section {
+    margin-bottom: 28px;
+}
+
+.form-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 6px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 1rem;
+}
+
+label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.875rem;
+    color: var(--text-main);
+    outline: none;
+    background-color: #FFFFFF;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Símbolos y sufijos */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    pointer-events: none;
+}
+
+.has-prefix input {
+    padding-left: 28px;
+}
+
+/* Botón de envío personalizado */
+.btn-submit {
+    background-color: var(--color-brand);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.btn-submit:hover {
+    background-color: #1d4ed8;
+}
+
+
+.mensaje-error {
+    text-align: left;
+    color: red;
+    font-size: 12px;
+    margin-right: 25px;
+}
+
+
+input:read-only {
+    background-color: #f0f0f0;
+    color: #555555;
+    cursor: not-allowed;
+}

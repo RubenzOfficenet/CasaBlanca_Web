@@ -1,0 +1,109 @@
+  <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        <header>
+            <div>
+                <h1>Control y Gestión de Egresos</h1>
+            </div>
+            <div class="header-actions">
+                <select class="filter-select">
+                    <option value="this-month">Mes Actual (Mayo)</option>
+                    <option value="last-month">Mes Anterior</option>
+                    <option value="full-year">Año Fiscal 2026</option>
+                </select>
+                
+                <button matButton="elevated" style="width: 250px;">
+                    Registrar Salida
+                </button>
+            </div>
+
+            
+        </header>
+
+        <!-- TARJETAS DE MÉTRICAS ESPECÍFICAS -->
+        <section class="analytics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Gasto Consolidado (Mes)</div>
+                <div class="metric-value negative">-$42,500.00</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Cuentas por Liquidar</div>
+                <div class="metric-value" style="color: #D97706;">$12,800.00</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Categoría Mayor Gasto</div>
+                <div class="metric-value" style="color: #0F172A; font-size: 1.25rem; padding-top: 4px;">Seguridad Privada</div>
+            </div>
+        </section>
+
+        <!-- CONTENEDOR DE TABLA DE AUDITORÍA -->
+        <section class="table-container">
+            <div class="table-header-area">
+                <div class="table-title">Historial de Salidas de Caja</div>
+                <select class="filter-select" style="padding: 6px 12px; font-size: 0.8rem;">
+                    <option value="all">Todas las categorías</option>
+                    <option value="servicios">Servicios Públicos</option>
+                    <option value="nomina">Nómina y Proveedores</option>
+                    <option value="mantenimiento">Mantenimiento Infraestructura</option>
+                </select>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Pago</th>
+                        <th>Fecha</th>
+                        <th>Beneficiario / Proveedor</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                        <th>Monto Neto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-family: monospace; color: var(--text-muted);">#EGR-0942</td>
+                        <td>26 May, 2026</td>
+                        <td>
+                            <strong>Seguritek SA</strong>
+                            <span class="sub-text">Pago Seguridad Privada Quincenal</span>
+                        </td>
+                        <td>Nómina y Proveedores</td>
+                        <td><span class="badge paid">Liquidado</span></td>
+                        <td style="font-weight: 600; color: var(--text-egreso);">-$18,000.00</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; color: var(--text-muted);">#EGR-0941</td>
+                        <td>22 May, 2026</td>
+                        <td>
+                            <strong>Eléctrica Gral.</strong>
+                            <span class="sub-text">Reparación Luminaria Entrada</span>
+                        </td>
+                        <td>Mantenimiento</td>
+                        <td><span class="badge paid">Liquidado</span></td>
+                        <td style="font-weight: 600; color: var(--text-egreso);">-$3,200.00</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; color: var(--text-muted);">#EGR-0940</td>
+                        <td>18 May, 2026</td>
+                        <td>
+                            <strong>Compañía de Agua Local</strong>
+                            <span class="sub-text">Consumo Áreas Comunes Periodo Abril</span>
+                        </td>
+                        <td>Servicios Públicos</td>
+                        <td><span class="badge pending">Pendiente de Pago</span></td>
+                        <td style="font-weight: 600; color: #475569;">-$12,800.00</td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace; color: var(--text-muted);">#EGR-0939</td>
+                        <td>15 May, 2026</td>
+                        <td>
+                            <strong>Limpieza & Brillo Inc</strong>
+                            <span class="sub-text">Insumos mantenimiento alberca</span>
+                        </td>
+                        <td>Mantenimiento</td>
+                        <td><span class="badge paid">Liquidado</span></td>
+                        <td style="font-weight: 600; color: var(--text-egreso);">-$8,500.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>

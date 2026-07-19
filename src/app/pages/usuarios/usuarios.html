@@ -1,0 +1,143 @@
+<main class="main-content">
+
+    <!-- ENCABEZADO -->
+    <header class="page-header">
+        <div>
+            <h1>Administración de Usuarios</h1>
+            <p class="sub-text">
+                Gestiona los niveles de acceso del personal interno y los permisos de los residentes titulares.
+            </p>
+        </div>
+
+        <button class="btn btn-primary" style="width: 150px;" (click)="abrirPopup()">
+            Nuevo Usuario
+        </button>
+    </header>
+
+    <!-- CONTENEDOR ESTILIZADO -->
+    <section class="table-container">
+
+        <!-- Loader con Angular Material -->
+        @if(isLoading){
+        <div class="loader-container">
+            <mat-progress-spinner mode="indeterminate" diameter="60" color="primary">
+            </mat-progress-spinner>
+            <p>Cargando datos...</p>
+        </div>
+        }
+
+
+        <!-- HEADER DE TABLA -->
+        <div class="table-header-area">
+            <div class="table-title">Listado de usuarios</div>
+            <!-- Campo de búsqueda -->
+
+            <mat-form-field appearance="outline" class="campo-busqueda">
+                <mat-label>Buscar</mat-label>
+                <input matInput (keyup)="applyFilter($event)" placeholder="Escribe para filtrar">
+                <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+        </div>
+
+        <!-- TABLA -->
+        <table mat-table [dataSource]="dataSource" matSort>
+
+            <!-- Nombre -->
+            <ng-container matColumnDef="nombreUsuario">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">
+                    Nombre
+                </th>
+                <td mat-cell *matCellDef="let usuario" class="table-td-text">
+                    {{ usuario.nombreUsuario || 'No registrado' }}
+                </td>
+            </ng-container>
+
+            <!-- Apellidos -->
+            <ng-container matColumnDef="apellidosUsuario">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">
+                    Apellidos
+                </th>
+                <td mat-cell *matCellDef="let usuario" class="table-td-text">
+                    {{ usuario.apellidosUsuario || 'No registrado' }}
+                </td>
+            </ng-container>
+
+            <!-- Correo -->
+            <ng-container matColumnDef="emailUsuario">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Correo
+                </th>
+                <td mat-cell *matCellDef="let usuario" class="table-td-text">
+                    {{ usuario.emailUsuario || 'No registrado' }}
+                    <span class="sub-text">Email de contacto</span>
+                </td>
+            </ng-container>
+
+            <!-- Celular -->
+            <ng-container matColumnDef="celularUsuario">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Celular
+                </th>
+                <td mat-cell *matCellDef="let usuario" class="table-td-text">
+                    {{ usuario.celularUsuario || 'No registrado' }}
+                </td>
+            </ng-container>
+
+            <!-- Rol -->
+            <ng-container matColumnDef="rol">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    Rol
+                </th>
+                <td mat-cell *matCellDef="let usuario" class="table-td-text">
+                    {{ usuario.rol || 'No registrado' }}
+                </td>
+            </ng-container>            
+
+            <!-- Casa -->
+            <ng-container matColumnDef="numeroCasa">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">
+                    Casa
+                </th>
+                <td mat-cell *matCellDef="let usuario" class="table-td-text" > 
+                    {{ usuario.numeroCasa || 'Sin asignar' }}
+                </td>
+            </ng-container>
+
+            <!-- Estatus -->
+            <ng-container matColumnDef="estatus">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">
+                    Estatus
+                </th>
+                <td mat-cell *matCellDef="let usuario" class="table-td-text">
+                    {{ usuario.estatus || 'No registrado' }}
+                </td>
+            </ng-container>                 
+
+            <!-- Acciones -->
+            <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>
+                    Acciones
+                </th>
+
+                <td mat-cell *matCellDef="let usuario" style="text-align:center">
+                    <button mat-icon-button color="primary"
+                        matTooltip="Editar usuario"
+                        (click)="editarUsuario(usuario.idUsuario)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <!-- FILAS -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        </table>
+
+                <!-- ✅ Paginador -->
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+        </mat-paginator>
+
+    </section>
+
+</main>

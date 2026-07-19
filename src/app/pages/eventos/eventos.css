@@ -1,0 +1,362 @@
+:root {
+    /* Paleta Corporativa Base */
+    --bg-main: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-sidebar: #0F172A;
+    
+    --text-main: #1E293B;
+    --text-muted: #64748B;
+    --border-color: #E2E8F0;
+    
+    --color-brand: #2563EB;
+    --color-brand-hover: #1D4ED8;
+    
+    /* Estados de Reserva (Badges) */
+    --bg-badge-success: #DFFCE7;
+    --text-badge-success: #166534;
+    
+    --bg-badge-warning: #FFF9E6;
+    --text-badge-warning: #92400E;
+    
+    --bg-badge-neutral: #F1F5F9;
+    --text-badge-neutral: #475569;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- SIDEBAR CORPORATIVO --- */
+.sidebar {
+    width: 260px;
+    background-color: var(--bg-sidebar);
+    display: flex;
+    flex-direction: column;
+    padding: 32px 20px;
+    justify-content: space-between;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.5px;
+}
+
+.brand-icon {
+    width: 18px;
+    height: 18px;
+    background-color: var(--color-brand);
+    border-radius: 4px;
+}
+
+.menu-list {
+    list-style: none;
+    margin-top: 36px;
+    flex-grow: 1;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    color: #94A3B8;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.15s;
+}
+
+.menu-item a:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: #F1F5F9;
+}
+
+.menu-item.active a {
+    background-color: rgba(37, 99, 213, 0.15);
+    color: #38BDF8;
+    font-weight: 600;
+}
+
+/* --- MAIN CONTENT AREA --- */
+.main-content {
+    flex-grow: 1;
+    padding: 40px 48px;
+    overflow-y: auto;
+}
+
+/* --- ENCABEZADO --- */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+}
+
+.page-header p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* --- CONTROLES / FILTROS --- */
+.filter-select {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--text-main);
+    outline: none;
+    cursor: pointer;
+}
+
+/* --- BOTONES --- */
+.btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: var(--color-brand);
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-brand-hover);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    font-size: 0.825rem;
+}
+
+.btn-secondary:hover {
+    background-color: #F1F5F9;
+    color: var(--text-main);
+}
+
+.btn-action-approve {
+    background-color: #10B981;
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.825rem;
+}
+
+.btn-action-approve:hover {
+    background-color: #059669;
+}
+
+/* --- METRICAS --- */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.metric-card {
+    background-color: var(--bg-surface);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* --- TABLA DE DATOS --- */
+.table-container {
+    background-color: var(--bg-surface);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.table-header-area {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #F8FAFC;
+    padding: 14px 24px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 16px 24px;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Detalles internos de celdas */
+.event-date-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.event-date {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.sub-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.resident-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.resident-name {
+    font-weight: 500;
+    color: #334155;
+}
+
+.unit-tag {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--color-brand);
+    background-color: rgba(37, 99, 235, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.event-type {
+    font-weight: 500;
+    color: #475569;
+}
+
+/* --- BADGES DE ESTADOS --- */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Estados principales */
+.badge-approved {
+    background-color: var(--bg-badge-success);
+    color: var(--text-badge-success);
+}
+
+.badge-pending {
+    background-color: var(--bg-badge-warning);
+    color: var(--text-badge-warning);
+}
+
+.badge-finished {
+    background-color: var(--bg-badge-neutral);
+    color: var(--text-badge-neutral);
+}
+
+/* Estados de Garantía/Pago */
+.badge-paid {
+    background-color: #EFF6FF;
+    color: #1E40AF;
+}
+
+.badge-unpaid {
+    background-color: #FEF2F2;
+    color: #991B1B;
+}
+
+.badge-refunded {
+    background-color: #F8FAFC;
+    color: #64748B;
+    border: 1px solid var(--border-color);
+}
+
+/* Acciones */
+.row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

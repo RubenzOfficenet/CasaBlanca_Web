@@ -1,0 +1,150 @@
+<!-- CONTENIDO PRINCIPAL -->
+<main class="main-content">
+    <header>
+        <div>
+            <h1>Gestión de Inmuebles</h1>
+        </div>
+        <div class="header-actions">
+            <button mat-raised-button color="primary" (click)="abrirPopup()">
+                Dar de Alta Unidad
+            </button>
+        </div>
+    </header>
+
+    <!-- INDICADORES CLAVE DEL PARQUE INMOBILIARIO -->
+    <section class="analytics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Total de Casas</div>
+            <div class="metric-value">{{ totalRegistros }}</div>
+        </div>
+        <div class="metric-card card-total-ingresos">
+            <div class="metric-label ">Tasa de Ocupación</div>
+            <div class="metric-value" style="color: var(--text-badge-success);">94.1%</div>
+        </div>
+        <div class="metric-card card-total-ingresos">
+            <div class="metric-label">Unidades con Adeudos</div>
+            <div class="metric-value" style="color: var(--text-badge-danger);">7</div>
+        </div>
+    </section>
+
+    <!-- TABLA DE CONTROL OPERATIVO -->
+
+    <section class="table-container">
+        <div class="table-header-area">
+            <div class="table-title">Directorio de Casas</div>
+            <!-- Campo de búsqueda -->
+            <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
+                <mat-label>Buscar</mat-label>
+                <input matInput (keyup)="applyFilter($event)" placeholder="Escribe para filtrar">
+            </mat-form-field>
+        </div>
+
+        <!-- Loader con Angular Material -->
+        @if(isLoading){
+        <div class="loader-container">
+            <mat-progress-spinner mode="indeterminate" diameter="60" color="primary">
+            </mat-progress-spinner>
+            <p>Cargando datos...</p>
+        </div>
+        }
+
+
+        <!-- TABLA DE DATOS DE INMUEBLES -->
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+
+            <!-- Número de Casa -->
+            <ng-container matColumnDef="numeroCasa">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Número de Casa</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.numeroCasa }} </td>
+            </ng-container>
+
+            <!-- Cuota de Mantenimiento -->
+            <ng-container matColumnDef="cuotaDeMantenimientoBase">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Cuota de Mantenimiento </th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text">
+                    {{ casa.cuotaDeMantenimientoBase | currency:'':'symbol':'1.2-2' }}
+                </td>
+            </ng-container>
+
+            <!-- Estado -->
+            <ng-container matColumnDef="estadoInicialOcupacion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado de Ocupación </th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.estadoInicialOcupacion }} </td>
+            </ng-container>
+
+            <!-- Titular -->
+            <ng-container matColumnDef="nombreTitular">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita"> Titular </th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.nombreTitular || 'Sin titular' }}
+                </td>
+            </ng-container>
+
+            <!-- Email Titular -->
+            <ng-container matColumnDef="emailTitular">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Correo Titular </th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.emailTitular || 'No registrado' }}
+                </td>
+            </ng-container>
+
+            <!-- Celular Titular -->
+            <ng-container matColumnDef="celularTitular">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Celular Titular </th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.celularTitular || 'No registrado' }}
+                </td>
+            </ng-container>
+
+            <!-- Ocupante -->
+            <ng-container matColumnDef="nombreOcupante">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita"> Ocupante </th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.nombreOcupante || 'N/A' }} </td>
+            </ng-container>
+
+            <!-- Email Ocupante -->
+            <ng-container matColumnDef="emailOcupante">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Correo Ocupante </th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.emailOcupante || 'N/A' }} </td>
+            </ng-container>
+
+            <!-- Celular Ocupante -->
+            <ng-container matColumnDef="celularOcupante">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Celular Ocupante </th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.celularOcupante || 'N/A' }} </td>
+            </ng-container>
+
+            <!-- Habitantes -->
+            <ng-container matColumnDef="numeroHabitantes">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Habitantes </th>
+                <td mat-cell *matCellDef="let casa" style="text-align: center;" class="table-td-text">
+                    {{ casa.numeroHabitantes ?? 0 }}
+                </td>
+            </ng-container>
+
+            <!-- Acciones -->
+            <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>
+                    Acciones
+                </th>
+
+                <td mat-cell *matCellDef="let casa" style="text-align: center;">
+                    <button
+                        mat-icon-button
+                        color="primary"
+                        matTooltip="Editar"
+                        (click)="editarCasa(casa.id)">
+                        <mat-icon>edit</mat-icon>
+
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        </table>
+
+        <!-- ✅ Paginador -->
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+        </mat-paginator>
+
+    </section>
+</main>

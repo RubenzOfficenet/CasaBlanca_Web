@@ -1,0 +1,175 @@
+
+/* 1. Modificación al contenedor PADRE (ej. el body) */
+.principal {
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: center;     /* Centrado vertical */
+    min-height: 100vh;       /* Fuerza al body a medir el 100% de la altura de la pantalla */
+    background-color: #160f24; /* Opcional: un fondo para contrastar */
+}
+
+
+
+/* --- CONTENEDOR DE AUTENTICACIÓN --- */
+.login-container {
+    width: 100%;
+    max-width: 420px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    padding: 40px;
+}
+
+/* --- IDENTIDAD DE LA MARCA --- */
+/* .brand-header {
+    text-align: center;
+    margin-bottom: 32px;
+} */
+
+.brand-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0F172A;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+}
+
+.brand-icon {
+    width: 24px;
+    height: 24px;
+    background-color: var(--color-brand);
+    border-radius: 6px;
+}
+
+.brand-header h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-main);
+    margin-bottom: 6px;
+}
+
+.brand-header p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* --- ESTRUCTURA DEL FORMULARIO --- */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.label-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.forgot-link {
+    font-size: 0.815rem;
+    color: var(--color-brand);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-link:hover {
+    color: var(--color-brand-hover);
+    text-decoration: underline;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.875rem;
+    color: var(--text-main);
+    outline: none;
+    background-color: #FFFFFF;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* --- OPCIONES DE SESIÓN (RECUÉRDAME) --- */
+.form-options {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+.form-options input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.form-options label {
+    font-size: 0.815rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    cursor: pointer;
+}
+
+/* --- BOTÓN DE ACCIÓN --- */
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--color-brand);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    margin-top: 4px;
+}
+
+.btn-submit:hover {
+    background-color: var(--color-brand-hover);
+}
+
+/* --- PIE DE PÁGINA DE SOPORTE --- */
+.login-footer {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 0.815rem;
+    color: var(--text-muted);
+}
+
+.login-footer a {
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}

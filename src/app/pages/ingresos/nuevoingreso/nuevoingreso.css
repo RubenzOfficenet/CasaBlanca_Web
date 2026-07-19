@@ -1,0 +1,254 @@
+
+/* --- MAIN CONTENT AREA --- */
+.main-content {
+    flex-grow: 1;
+    padding-top: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centramos el formulario para dar aire de captura en pantallas grandes */
+}
+
+.form-container {
+    width: 100%;
+    max-width: 680px; /* Ancho ideal y legible para formularios */
+}
+
+/* --- ENCABEZADO DE ACCIÓN --- */
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    width: 100%;
+}
+
+.btn-back {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    background-color: var(--bg-surface);
+    transition: all 0.15s;
+}
+
+.btn-back:hover {
+    color: var(--text-main);
+    border-color: #CBD5E1;
+}
+
+.form-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* --- TARJETA DEL FORMULARIO --- */
+
+
+.form-section {
+    margin-bottom: 28px;
+}
+
+.form-section:last-of-type {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.form-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 6px;
+}
+
+/* --- FILAS Y COLUMNAS --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+/* --- INPUTS Y CONTROLES --- */
+input[type="text"],
+input[type="date"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.875rem;
+    color: var(--text-main);
+    outline: none;
+    background-color: #FFFFFF;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* --- INPUT CON PREFIJO (SÍMBOLO DE PESOS) --- */
+.amount-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.amount-prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    pointer-events: none;
+}
+
+.amount-input-wrapper input {
+    padding-left: 28px;
+    font-weight: 600;
+}
+
+/* --- SELECTOR DE TIPO (INGRESO / EGRESO) --- */
+.type-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.type-option {
+    position: relative;
+}
+
+.type-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.type-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    text-align: center;
+    background-color: var(--bg-surface);
+}
+
+/* Cambios de estado basados en la selección del Radio Button */
+/* Nota: Se corrigieron las variables para que coincidan con la declaración del :root */
+#type-ingreso:checked + .type-label {
+    background-color: var(--bg-ingreso);
+    color: var(--text-ingreso);
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 1px var(--color-brand);
+}
+
+#type-egreso:checked + .type-label {
+    background-color: var(--bg-egreso);
+    color: var(--text-egreso);
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 1px var(--color-brand);
+}
+
+/* --- BOTONES DE ACCIÓN --- */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+}
+
+.btn-secondary:hover {
+    background-color: #F1F5F9;
+    color: var(--text-main);
+}
+
+.btn-primary {
+    background-color: var(--color-brand);
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-brand-hover);
+}
+
+
+.btn-success {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+.btn-info {
+  background-color: #17a2b8 !important;
+  color: white !important;
+}
+
+.btn-orange {
+  background-color: #fd7e14 !important;
+  color: white !important;
+}
+

@@ -1,0 +1,153 @@
+<main class="main-content">
+        
+        <header class="page-header">
+            <div>
+                <h1>Reservas y Eventos - Palapa</h1>
+                <p>Calendario y control de ocupación del área común del fraccionamiento.</p>
+            </div>
+            <div class="header-actions">
+                <select class="filter-select">
+                    <option value="all-months">Este Mes (Junio)</option>
+                    <option value="next-month">Próximo Mes</option>
+                    <option value="history">Historial Completo</option>
+                </select>
+                <!-- <button class="btn btn-primary">＋ Agendar Evento / Reserva</button> -->
+            <button matButton="elevated" style="width: 250px;">
+                Agendar Evento / Reservar
+            </button>                
+            </div>
+        </header>
+
+        <section class="analytics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Reservas este Mes</div>
+                <div class="metric-value">12</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Por Aprobar</div>
+                <div class="metric-value" style="color: var(--text-badge-warning);">3</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Depósitos en Garantía</div>
+                <div class="metric-value" style="color: var(--text-badge-success);">$4,500.00</div>
+            </div>
+        </section>
+
+        <div class="table-container">
+            <div class="table-header-area">
+                <div class="table-title">Próximos Eventos Programados</div>
+                <select class="filter-select" style="padding: 6px 12px; font-size: 0.8rem;">
+                    <option value="all">Todos los estados</option>
+                    <option value="approved">Aprobados</option>
+                    <option value="pending">Pendientes</option>
+                </select>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fecha y Hora</th>
+                        <th>Residente / Unidad</th>
+                        <th>Tipo de Evento</th>
+                        <th>Estado Reserva</th>
+                        <th>Depósito</th>
+                        <th style="text-align: right;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="event-date-block">
+                                <span class="event-date">Sáb, 06 Jun 2026</span>
+                                <span class="sub-text">14:00 - 22:00 hrs</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="resident-info">
+                                <span class="resident-name">Carlos Mendoza</span>
+                                <span class="unit-tag">TORRE A - U-14B</span>
+                            </div>
+                        </td>
+                        <td><span class="event-type">Cumpleaños Infantil</span></td>
+                        <td><span class="badge badge-approved">Aprobado</span></td>
+                        <td><span class="badge badge-paid">Cubierto</span></td>
+                        <td>
+                            <div class="row-actions">
+                                <button class="btn btn-secondary">Detalles</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="event-date-block">
+                                <span class="event-date">Dom, 07 Jun 2026</span>
+                                <span class="sub-text">10:00 - 16:00 hrs</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="resident-info">
+                                <span class="resident-name">Ana María Silva</span>
+                                <span class="unit-tag">TORRE A - U-08A</span>
+                            </div>
+                        </td>
+                        <td><span class="event-type">Reunión Familiar / Barbacoa</span></td>
+                        <td><span class="badge badge-pending">Pendiente de Revisión</span></td>
+                        <td><span class="badge badge-unpaid">Pendiente</span></td>
+                        <td>
+                            <div class="row-actions">
+                                <button class="btn btn-action-approve">Aprobar</button>
+                                <button class="btn btn-secondary">Rechazar</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="event-date-block">
+                                <span class="event-date">Vie, 12 Jun 2026</span>
+                                <span class="sub-text">18:00 - 23:30 hrs</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="resident-info">
+                                <span class="resident-name">Elena Rostova</span>
+                                <span class="unit-tag">VILLAS - V-03</span>
+                            </div>
+                        </td>
+                        <td><span class="event-type">Cena / Aniversario</span></td>
+                        <td><span class="badge badge-approved">Aprobado</span></td>
+                        <td><span class="badge badge-paid">Cubierto</span></td>
+                        <td>
+                            <div class="row-actions">
+                                <button class="btn btn-secondary">Detalles</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="event-date-block">
+                                <span class="event-date">Dom, 24 May 2026</span>
+                                <span class="sub-text">Concluido</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="resident-info">
+                                <span class="resident-name">Roberto Gómez</span>
+                                <span class="unit-tag">VILLAS - V-05</span>
+                            </div>
+                        </td>
+                        <td><span class="event-type">Reunión Vecinal</span></td>
+                        <td><span class="badge badge-finished">Finalizado</span></td>
+                        <td><span class="badge badge-refunded">Devuelto</span></td>
+                        <td>
+                            <div class="row-actions">
+                                <button class="btn btn-secondary">Ver Notas</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>

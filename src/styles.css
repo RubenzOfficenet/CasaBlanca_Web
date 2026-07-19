@@ -1,0 +1,134 @@
+/* You can add global styles to this file, and also import other style files */
+/* src/styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+
+:root {
+    /* Paleta Corporativa / Enterprise */
+    --bg-main: #F8FAFC;
+    /* Gris pizarra muy claro */
+    --bg-surface: #FFFFFF;
+    /* Contenedores y tarjetas limpias */
+    --bg-sidebar: #0F172A;
+    /* Azul Slate muy oscuro */
+
+    --text-main: #1E293B;
+    /* Slate oscuro para legibilidad máxima */
+    --text-muted: #64748B;
+    /* Gris medio para etiquetas */
+    --border-color: #E2E8F0;
+    /* Líneas de división sutiles */
+
+    /* Colores de Estado Profesionales */
+    --color-brand: #2563EB;
+    /* Azul Royal Intenso */
+    --color-brand-hover: #1D4ED8;
+
+    --bg-ingreso: #F0FDF4;
+    /* Esmeralda muy suave */
+    --text-ingreso: #166534;
+    /* Esmeralda oscuro */
+    --border-ingreso: #DCFCE7;
+
+    --bg-egreso: #FEF2F2;
+    /* Carmesí/Rojo muy suave */
+    --text-egreso: #991B1B;
+    /* Carmesí oscuro */
+    --border-egreso: #FEE2E2;
+    --border-color: #858585;
+    /* Gris claro para bordes y divisores */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+.layout-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.view-content {
+    flex-grow: 1;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin-top: 1rem 0;
+}
+
+
+
+
+/* CARDS */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.card {
+    background-color: var(--bg-surface);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-total-ingresos {
+    background-color: var(--bg-ingreso);
+}
+
+.card-total-egresos {
+    background-color: var(--bg-egreso);
+}
+
+.card-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+
+.btn-confirm {
+    background-color: rgb(34, 126, 26) !important;
+    color: white !important;
+}
+
+.form-card {
+    background-color: var(--bg-surface);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 32px;
+    box-shadow: 7px 9px 28px -14px rgba(0, 0, 0, 0.75);
+    -webkit-box-shadow: 7px 9px 28px -14px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 7px 9px 28px -14px rgba(0, 0, 0, 0.75);
+}
+

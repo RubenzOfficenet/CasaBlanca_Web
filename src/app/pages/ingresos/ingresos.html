@@ -1,0 +1,121 @@
+<main class="main-content">
+    <header>
+        <div>
+            <h1>Control y Registro de Ingresos</h1>
+        </div>
+        <div class="header-actions">
+            <select class="filter-select">
+                <option value="this-month">Mes Actual (Mayo)</option>
+                <option value="last-month">Mes Anterior</option>
+                <option value="full-year">Año Fiscal 2026</option>
+            </select>
+            <button mat-raised-button color="primary" (click)="abrirPopup()">
+                Registrar Ingreso
+            </button>
+            <!-- <button matButton="elevated" style="width: 250px;">
+                Registrar Ingreso
+            </button> -->
+
+        </div>
+    </header>
+
+    <section class="analytics-grid ">
+        <div class="metric-card">
+            <div class="metric-label">Recaudación Total (Mes)</div>
+            <div class="metric-value positive">+$145,200.00</div>
+        </div>
+        <div class="metric-card card-total-ingresos">
+            <div class="metric-label">Cartera Vencida (Morosidad)</div>
+            <div class="metric-value" style="color: #DC2626;">$18,500.00</div>
+        </div>
+        <div class="metric-card card-total-ingresos">
+            <div class="metric-label">Efectividad de Cobro</div>
+            <div class="metric-value" style="color: #0F172A; font-size: 1.5rem;">88.7%</div>
+        </div>
+    </section>
+
+    <section class="table-container">
+        <div class="table-header-area">
+            <div class="table-title">Historial de Entradas de Caja</div>
+            <select class="filter-select" style="padding: 6px 12px; font-size: 0.8rem;">
+                <option value="all">Todos los conceptos</option>
+                <option value="mantenimiento">Cuotas de Mantenimiento</option>
+                <option value="extraordinaria">Cuotas Extraordinarias</option>
+                <option value="amenidades">Reserva de Amenidades</option>
+            </select>
+
+      
+
+            <button mat-raised-button color="primary">
+                <mat-icon>table_chart</mat-icon>
+                Exportrar a Excel
+            </button>
+
+
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Recibo</th>
+                    <th>Fecha</th>
+                    <th>Casa</th>
+                    <th>Concepto</th>
+                    <th>Categoria</th>
+                    <th>Estado</th>
+                    <th>Monto Neto</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-family: monospace; color: var(--text-muted);">#ING-2415</td>
+                    <td>28 May, 2026</td>
+                    <td>
+                        <strong>Carlos Mendoza</strong>
+                        <span class="sub-text">Casa 42 - Paseo de los Lirios</span>
+                    </td>
+                    <td>Cuota Mantenimiento Mayo</td>
+                    <td>Cuota de Mantenimiento</td>
+                    <td><span class="badge ingreso">Pagado</span></td>
+                    <td style="font-weight: 600; color: var(--text-ingreso);">+$2,500.00</td>
+                </tr>
+                <tr>
+                    <td style="font-family: monospace; color: var(--text-muted);">#ING-2414</td>
+                    <td>25 May, 2026</td>
+                    <td>
+                        <strong>Diana Peralta</strong>
+                        <span class="sub-text">Depto B-104 - Torre Olivos</span>
+                    </td>
+                    <td>Reserva Salón de Eventos</td>
+                    <td>Cuota de Mantenimiento</td>
+                    <td><span class="badge ingreso">Pagado</span></td>
+                    <td style="font-weight: 600; color: var(--text-ingreso);">+$1,200.00</td>
+                </tr>
+                <tr>
+                    <td style="font-family: monospace; color: var(--text-muted);">#ING-2413</td>
+                    <td>20 May, 2026</td>
+                    <td>
+                        <strong>Familia Gómez Ruiz</strong>
+                        <span class="sub-text">Casa 11 - Paseo de los Lirios</span>
+                    </td>
+                    <td>Tag de Acceso Vehicular (x2)</td>
+                    <td>Cuota de Mantenimiento</td>
+                    <td><span class="badge ingreso">Pagado</span></td>
+                    <td style="font-weight: 600; color: var(--text-ingreso);">+$600.00</td>
+                </tr>
+                <tr>
+                    <td style="font-family: monospace; color: var(--text-muted);">#ING-2412</td>
+                    <td>10 May, 2026</td>
+                    <td>
+                        <strong>Ricardo Treviño</strong>
+                        <span class="sub-text">Casa 88 - Paseo de los Lirios</span>
+                    </td>
+                    <td>Cuota Extraordinaria (Pavimentación)</td>
+                    <td>Cuota de Mantenimiento</td>
+                    <td><span class="badge overdue">Vencido / Atrasado</span></td>
+                    <td style="font-weight: 600; color: #94A3B8;">$5,000.00</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</main>

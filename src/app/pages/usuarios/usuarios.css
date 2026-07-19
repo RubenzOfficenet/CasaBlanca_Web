@@ -1,0 +1,218 @@
+
+
+
+
+/* --- MAIN CONTENT AREA --- */
+.main-content {
+    flex-grow: 1;
+    padding: 40px 48px;
+    overflow-y: auto;
+}
+
+/* --- ENCABEZADO DE CONTROL --- */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+}
+
+.page-header p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* --- BOTONES --- */
+.btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: var(--color-brand);
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-brand-hover);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    font-size: 0.825rem;
+}
+
+.btn-secondary:hover {
+    background-color: #F1F5F9;
+    color: var(--text-main);
+}
+
+/* --- TABLA DE DATOS MAESTRA --- */
+.table-container {
+    background-color: var(--bg-surface);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #F8FAFC;
+    padding: 14px 24px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 16px 24px;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Bloque de Identidad de Usuario */
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.user-email {
+    font-size: 0.825rem;
+    color: var(--text-muted);
+}
+
+/* Elementos Monospace para Nomenclaturas */
+.meta-text {
+    font-family: monospace;
+    color: #475569;
+    font-weight: 500;
+}
+
+/* --- BADGES DE ROLES Y ESTADOS --- */
+.badge1 {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: -0.1px;
+}
+
+.badge-admin1 {
+    background-color: var(--bg-badge-admin);
+    color: var(--text-badge-admin);
+}
+
+.badge-titular {
+    background-color: var(--bg-badge-titular);
+    color: var(--text-badge-titular);
+}
+
+.status-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: #1E293B;
+}
+
+.status-dot::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background-color: #10B981;
+    border-radius: 50%;
+}
+
+/* Acciones de Fila */
+.row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+
+
+
+/* Ajuste fino para buscador Material */
+.campo-busqueda .mat-mdc-text-field-wrapper {
+    border-radius: 12px;
+    background-color: var(--bg-surface);
+}
+
+.campo-busqueda .mat-mdc-form-field-flex {
+    height: 40px;
+    align-items: center;
+}
+
+.campo-busqueda .mat-mdc-form-field-infix {
+    padding: 6px 0;
+}
+
+.table-header-area {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.texto-negrita {
+    font-weight: bold;
+    color: rgb(168, 1, 15);
+}

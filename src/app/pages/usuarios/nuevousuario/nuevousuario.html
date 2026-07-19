@@ -1,0 +1,233 @@
+<mat-dialog-content>
+
+    <main class="main-content">
+        <div class="form-container container-fluid">
+
+            <div class="form-header mb-4">
+                <h1>Registrar Nuevo Usuario</h1>
+            </div>
+
+            <div class="form-cardx">
+
+                <form [formGroup]="usuarioForm">
+
+                    <!-- Información del Usuario -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            Información del Usuario
+                        </div>
+
+                        <div class="row row-cols-1 row-cols-md-3 g-3">
+
+                            <!-- Nombre -->
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="nombreUsuario">
+                                        Nombre(s)
+                                        <span class="mensaje-error">*</span>
+                                    </label>
+
+                                    <input type="text" id="nombreUsuario" formControlName="nombreUsuario"
+                                        placeholder="Nombre(s)" />
+
+                                    @if (
+                                    usuarioForm.get('nombreUsuario')?.invalid &&
+                                    usuarioForm.get('nombreUsuario')?.touched
+                                    ) {
+                                    <small class="text-danger">
+                                        El nombre es obligatorio.
+                                    </small>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Apellidos -->
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="apellidosUsuario">
+                                        Apellidos
+                                        <span class="mensaje-error">*</span>
+                                    </label>
+
+                                    <input type="text" id="apellidosUsuario" formControlName="apellidosUsuario"
+                                        placeholder="Apellidos" />
+
+                                    @if (
+                                    usuarioForm.get('apellidosUsuario')?.invalid &&
+                                    usuarioForm.get('apellidosUsuario')?.touched
+                                    ) {
+                                    <small class="text-danger">
+                                        Los apellidos son obligatorios.
+                                    </small>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Celular -->
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="celularUsuario">
+                                        Celular
+                                    </label>
+
+                                    <input type="tel" id="celularUsuario" formControlName="celularUsuario"
+                                        placeholder="5512345678" />
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="emailUsuario">
+                                        Correo Electrónico
+                                        <span class="mensaje-error">*</span>
+                                    </label>
+
+                                    <input type="email" id="emailUsuario" formControlName="emailUsuario"
+                                        placeholder="correo@dominio.com" />
+
+                                    @if (
+                                    usuarioForm.get('emailUsuario')?.invalid &&
+                                    usuarioForm.get('emailUsuario')?.touched
+                                    ) {
+                                    <small class="text-danger">
+                                        Correo electrónico inválido.
+                                    </small>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="password">
+                                        Contraseña
+                                        <span class="mensaje-error">*</span>
+                                    </label>
+
+                                    <input type="password" id="password" formControlName="password"
+                                        placeholder="********" />
+
+                                    @if (
+                                    usuarioForm.get('password')?.invalid &&
+                                    usuarioForm.get('password')?.touched
+                                    ) {
+                                    <small class="text-danger">
+                                        La contraseña es obligatoria.
+                                    </small>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Confirmar Password -->
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="confirmarPassword">
+                                        Confirmar Contraseña
+                                        <span class="mensaje-error">*</span>
+                                    </label>
+
+                                    <input type="password" id="confirmarPassword" formControlName="confirmarPassword"
+                                        placeholder="********" />
+
+                                    @if (
+                                    usuarioForm.get('confirmarPassword')?.invalid &&
+                                    usuarioForm.get('confirmarPassword')?.touched
+                                    ) {
+                                    <small class="text-danger">
+                                        Debe confirmar la contraseña.
+                                    </small>
+                                    }
+
+                                    @if (
+                                    usuarioForm.hasError('passwordMismatch') &&
+                                    usuarioForm.get('confirmarPassword')?.touched
+                                    ) {
+                                    <small class="text-danger">
+                                        Las contraseñas no coinciden.
+                                    </small>
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Configuración -->
+                    <div class="form-section">
+
+                        <div class="form-section-title">
+                            Configuración del Usuario
+                        </div>
+
+                        <div class="row row-cols-1 row-cols-md-3 g-3">
+
+                            <!-- Rol -->
+                            <div class="col">
+                                <div class="form-group">
+
+                                    <label for="idRol">
+                                        Rol
+                                    </label>
+
+                                    <select id="idRol" formControlName="idRol">
+                                        @for (rol of roles; track rol.id) {
+                                        <option [value]="rol.id">
+                                            {{ rol.rol }}
+                                        </option>
+                                        }
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <!-- Inmueble -->
+                            <div class="col">
+                                <div class="form-group">
+
+                                    <label for="idInmueble">
+                                        Inmueble
+                                    </label>
+
+                                    <select id="idInmueble" formControlName="idInmueble">
+                                        @for (inmueble of inmuebles; track inmueble.id) {
+                                        <option [value]="inmueble.id">
+                                            {{ inmueble.numeroCasa }}
+                                        </option>
+                                        }
+
+                                    </select>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+
+    <button mat-raised-button (click)="onCancelar()">
+        Cancelar
+    </button>
+
+    <button mat-raised-button color="primary" (click)="mostrarConfirmacion()">
+        Guardar Usuario
+    </button>
+
+</mat-dialog-actions>
+
+<app-confirm-dialog #modalConfirmacion [titulo]="'Guardar Usuario'"
+    [mensaje]="'¿Estás seguro de guardar los datos del usuario?'" (confirmado)="guardar()" (cancelado)="onCancelar()">
+</app-confirm-dialog>
