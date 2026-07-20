@@ -12,7 +12,14 @@ export interface InmuebleEditarDTO {
     apellidosOcupante?: string;
     emailOcupante?: string;
     celularOcupante?: string;
+    
+    Usuario: string;
+    Password? : string;
+    ConfirmPassword? : string;
+    Observaciones? : string;
+
     numeroHabitantes?: number;
     observaciones?: string;
+
 
 }
