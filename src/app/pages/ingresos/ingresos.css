@@ -211,3 +211,8 @@ tr:last-child td {
     color: var(--text-muted);
     margin-top: 2px;
 }
+
+.textCasa {
+    font-size: 12px;
+    color: rgb(62, 65, 206);
+}

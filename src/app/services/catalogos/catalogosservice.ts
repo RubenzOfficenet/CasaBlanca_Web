@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { APP_CONSTANTS } from '../../Constants/app.constants';
 import { Observable } from 'rxjs';
 import { IRol } from '../../pages/catalogo/interface/IRol.interfase.';
+import { ConceptoIngreso } from '../../pages/ingresos/nuevoingreso/DTO/conceptoIngresos.model';
 
 
 @Injectable({
@@ -21,6 +22,10 @@ export class catalogosservice {
     return this._http.get<IRol[]>(url);
   }
 
+  getConceptoIngresos() : Observable<ConceptoIngreso[]> {
+    var url = this._apiUrl + 'GetConceptoIngreso';
+    return this._http.get<ConceptoIngreso[]>(url);
+  }
 
 
 }

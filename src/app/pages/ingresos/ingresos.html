@@ -12,9 +12,6 @@
             <button mat-raised-button color="primary" (click)="abrirPopup()">
                 Registrar Ingreso
             </button>
-            <!-- <button matButton="elevated" style="width: 250px;">
-                Registrar Ingreso
-            </button> -->
 
         </div>
     </header>
@@ -34,7 +31,110 @@
         </div>
     </section>
 
-    <section class="table-container">
+
+    <div class="mat-elevation-z8">
+
+    <table mat-table [dataSource]="dataSource">
+
+        <!-- Casa -->
+        <ng-container matColumnDef="casa">
+            <th mat-header-cell *matHeaderCellDef> Casa </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.numeroCasa }}
+                <br>
+            </td>
+        </ng-container>
+
+        <!-- nombre titular -->
+        <ng-container matColumnDef="nombreTitular">
+            <th mat-header-cell *matHeaderCellDef> Titular </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.nombreTitular }}
+            </td>
+        </ng-container>
+
+        <!-- Fecha Recepción -->
+        <ng-container matColumnDef="fechaRecepcion">
+            <th mat-header-cell *matHeaderCellDef> Fecha Recepción </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.fechaRecepcion | date:'dd-MMM-yyyy' }}
+            </td>
+        </ng-container>
+
+        <!-- Número Recibo -->
+        <ng-container matColumnDef="numeroRecibo">
+            <th mat-header-cell *matHeaderCellDef> No. Recibo </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.numeroRecibo }}
+            </td>
+        </ng-container>
+
+        <!-- Concepto -->
+        <ng-container matColumnDef="concepto">
+            <th mat-header-cell *matHeaderCellDef> Concepto </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.concepto }}
+            </td>
+        </ng-container>
+
+        <!-- Fecha Concepto -->
+        <ng-container matColumnDef="fechaConcepto">
+            <th mat-header-cell *matHeaderCellDef> Fecha Concepto </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.fechaConcepto | date:'dd-MMM-yyyy' }}
+            </td>
+        </ng-container>
+
+        <!-- Monto -->
+        <ng-container matColumnDef="monto">
+            <th mat-header-cell *matHeaderCellDef> Monto </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.monto | currency:'MXN':'symbol':'1.2-2' }}
+            </td>
+        </ng-container>
+
+        <!-- Observaciones -->
+        <ng-container matColumnDef="observaciones">
+            <th mat-header-cell *matHeaderCellDef> Observaciones </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.observaciones || '-' }}
+            </td>
+        </ng-container>
+
+        <!-- Acciones -->
+        <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+            <td mat-cell *matCellDef="let element">
+
+                <button
+                    mat-icon-button
+                    color="primary"
+                    (click)="editar(element)"
+                    matTooltip="Editar">
+
+                    <mat-icon>edit</mat-icon>
+
+                </button>
+
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    </table>
+
+    <mat-paginator
+        [pageSize]="10"
+        [pageSizeOptions]="[5,10,20,50]"
+        showFirstLastButtons>
+    </mat-paginator>
+
+</div>
+
+
+    <!-- <section class="table-container">
         <div class="table-header-area">
             <div class="table-title">Historial de Entradas de Caja</div>
             <select class="filter-select" style="padding: 6px 12px; font-size: 0.8rem;">
@@ -117,5 +217,5 @@
                 </tr>
             </tbody>
         </table>
-    </section>
+    </section> -->
 </main>
