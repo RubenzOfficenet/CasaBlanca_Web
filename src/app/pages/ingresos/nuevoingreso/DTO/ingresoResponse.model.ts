@@ -1,6 +1,6 @@
 export interface IIngresoResponse {
-  numerocasa: string;
-  nombretitular: string;
+  numeroCasa: string;
+  nombreTitular: string;
   fechaRecepcion: string;
   numeroRecibo: string;
   concepto: string;

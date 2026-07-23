@@ -16,4 +16,10 @@ export class Ingresoservice {
     var url = this._apiUrl + 'GetIngresos';
     return this._http.get<IIngreso[]>(url);
   }
+
+    addIngreso(ingreso: IIngreso): Observable<IIngreso> {
+    var url = this._apiUrl + 'AddIngreso'
+    return this._http.post<IIngreso>(url, ingreso);
+  }
+
 }

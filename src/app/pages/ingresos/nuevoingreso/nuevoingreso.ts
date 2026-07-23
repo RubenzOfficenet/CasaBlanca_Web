@@ -14,6 +14,8 @@ import { ConceptoIngreso } from './DTO/conceptoIngresos.model';
 import { catalogosservice } from '../../../services/catalogos/catalogosservice';
 import { ConfirmDialog } from "../../shared/confirm-dialog/confirm-dialog";
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { IIngresoDTO } from './DTO/ingresoDTO.model';
+import { IngresosService } from './services/ingresoService';
 
 @Component({
   selector: 'app-nuevoingreso',
@@ -35,6 +37,7 @@ export class Nuevoingreso implements OnInit {
   private conceptoIngresosService = inject(catalogosservice)
   private cdr = inject(ChangeDetectorRef);
   private snackBar = inject(MatSnackBar);
+  private ingresoService = inject(IngresosService)
 
   modalConfirmacion = viewChild<ConfirmDialog>('modalConfirmacion');
   casas: ICasas[] = [];
@@ -42,13 +45,21 @@ export class Nuevoingreso implements OnInit {
   ingresoForm!: FormGroup;
   casasFiltradas: CasaDTO[] = [];
   conceptoIngreso: ConceptoIngreso[] = [];
-
+  ingresoDto: IIngresoDTO = {
+    idCasa: '',
+    fechaRecepcion: '',
+    numeroRecibo: '',
+    idConcepto: 0,
+    fechaConcepto: '',
+    monto: 0,
+    observaciones: ''
+  };
   casaControl = new FormControl<string>('');
 
   ngOnInit(): void {
     this.leerConoceptoIngreso();
     this.leerDatosCasa();
-    
+
     this.casaDatos = this.casas.map(casa => this.mapToCasaDTO(casa));
     this.casasFiltradas = [...this.casaDatos];
     this.cdr.detectChanges();
@@ -65,6 +76,9 @@ export class Nuevoingreso implements OnInit {
       monto: [null, [Validators.required, Validators.min(0.01)]],
       observaciones: ['']
     });
+
+
+
 
     this.casaControl.valueChanges.subscribe(texto => {
       this.filtrarCasas(texto ?? '');
@@ -102,9 +116,34 @@ export class Nuevoingreso implements OnInit {
       this.ingresoForm.markAllAsTouched();
       return;
     }
+
     const datos = this.ingresoForm.getRawValue();
-    console.log(datos);
-    // aqui va el servicio para guardar el ingreso
+
+    this.ingresoDto = {
+      idCasa: datos.casa,
+      fechaRecepcion: datos.fechaRecepcion,
+      numeroRecibo: datos.numeroRecibo,
+      idConcepto: datos.concepto,
+      fechaConcepto: datos.fechaConcepto,
+      monto: datos.monto,
+      observaciones: datos.observaciones
+    };
+    
+    this.ingresoService.agregaIngreso(this.ingresoDto).subscribe({
+      next: (respuesta) => {
+        console.log('Ingreso creado correctamente:', respuesta);
+
+        // Opcional: limpiar formulario
+        this.ingresoForm.reset({
+          casa: null,
+          concepto: null,
+          fechaRecepcion: this.obtenerFechaActual()
+        });
+      },
+      error: (error) => {
+        console.error('Error al crear el ingreso:', error);
+      }
+    });
   }
 
   obtenerFechaActual(): string {
@@ -163,7 +202,7 @@ export class Nuevoingreso implements OnInit {
 
   mostrarConfirmacion(): void {
 
-    if (this.ingresoForm.get('casa')?.invalid) {      
+    if (this.ingresoForm.get('casa')?.invalid) {
       this.snackBar.open(
         'Debe capturar el Número de Casa.',
         'Cerrar',
@@ -172,11 +211,11 @@ export class Nuevoingreso implements OnInit {
           horizontalPosition: 'center',
           verticalPosition: 'bottom'
         }
-      );            
+      );
       return;
     }
 
-    if (this.ingresoForm.get('numeroRecibo')?.invalid) {      
+    if (this.ingresoForm.get('numeroRecibo')?.invalid) {
       this.snackBar.open(
         'Debe capturar el Número de Recibo.',
         'Cerrar',
@@ -185,11 +224,11 @@ export class Nuevoingreso implements OnInit {
           horizontalPosition: 'center',
           verticalPosition: 'bottom'
         }
-      );            
+      );
       return;
     }
 
-    if (this.ingresoForm.get('concepto')?.invalid) {      
+    if (this.ingresoForm.get('concepto')?.invalid) {
       this.snackBar.open(
         'Debe capturar el Concepto.',
         'Cerrar',
@@ -198,12 +237,12 @@ export class Nuevoingreso implements OnInit {
           horizontalPosition: 'center',
           verticalPosition: 'bottom'
         }
-      );            
+      );
       return;
     }
 
 
-  if (this.ingresoForm.get('fechaConcepto')?.invalid) {      
+    if (this.ingresoForm.get('fechaConcepto')?.invalid) {
       this.snackBar.open(
         'Debe capturar la fecha del Concepto.',
         'Cerrar',
@@ -212,11 +251,11 @@ export class Nuevoingreso implements OnInit {
           horizontalPosition: 'center',
           verticalPosition: 'bottom'
         }
-      );            
+      );
       return;
-    }    
+    }
 
-  if (this.ingresoForm.get('monto')?.invalid) {      
+    if (this.ingresoForm.get('monto')?.invalid) {
       this.snackBar.open(
         'Debe capturar el monto del ingreso.',
         'Cerrar',
@@ -225,15 +264,15 @@ export class Nuevoingreso implements OnInit {
           horizontalPosition: 'center',
           verticalPosition: 'bottom'
         }
-      );            
+      );
       return;
-    }    
+    }
 
 
     this.modalConfirmacion()?.abrir();
   }
 
 
- 
+
 
 }

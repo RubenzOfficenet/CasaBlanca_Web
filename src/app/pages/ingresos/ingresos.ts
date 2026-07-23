@@ -18,6 +18,8 @@ import { DatePipe, CurrencyPipe } from '@angular/common';
 
 import { Ingresoservice } from './services/ingresoservice';
 import { IIngresoResponse } from './nuevoingreso/DTO/ingresoResponse.model';
+import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { MatSort, MatSortModule } from '@angular/material/sort';
 
 
 @Component({
@@ -32,20 +34,25 @@ import { IIngresoResponse } from './nuevoingreso/DTO/ingresoResponse.model';
     MatPaginatorModule,
     MatTooltipModule,
     DatePipe,
-    CurrencyPipe],
+    CurrencyPipe,
+    MatProgressSpinner,
+    MatSortModule],
   templateUrl: './ingresos.html',
   styleUrl: './ingresos.css',
 })
-export class Ingresos implements OnInit  {
+export class Ingresos implements OnInit {
+
+  totalRegistros: number = 15;
+  isLoading = true;
+
+  filtros: { [key: string]: string } = {};
 
   constructor(private dialog: MatDialog, private ingresosService: Ingresoservice) { }
-  
-  ngOnInit(): void {
-    this.cargarIngresos();
-  }
+
+
 
   displayedColumns: string[] = [
-    'casa',
+    'numeroCasa',
     'nombreTitular',
     'fechaRecepcion',
     'numeroRecibo',
@@ -57,12 +64,46 @@ export class Ingresos implements OnInit  {
   ];
 
   dataSource = new MatTableDataSource<IIngresoResponse>();
-
+  @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+
+  ngOnInit(): void {
+    this.dataSource.filterPredicate = (
+      data: IIngresoResponse,
+      filter: string
+    ): boolean => {
+      const texto = filter.trim().toLowerCase();
+
+      return [
+        data.numeroCasa,
+        data.nombreTitular,
+        data.numeroRecibo,
+        data.concepto,
+        data.observaciones
+      ]
+        .filter(valor => valor !== null && valor !== undefined)
+        .some(valor => String(valor).toLowerCase().includes(texto));
+    };
+
+    this.cargarIngresos();
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
 
   editar(registro: IIngreso): void {
     console.log(registro);
   }
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
+  }
+
 
   abrirPopup() {
     const dialogRef = this.dialog.open(Nuevoingreso, {
@@ -86,15 +127,33 @@ export class Ingresos implements OnInit  {
     this.ingresosService.getIngresos().subscribe({
       next: (response: IIngresoResponse[]) => {
         this.dataSource.data = response;
-        this.dataSource.paginator = this.paginator;
+        this.totalRegistros = response.length;
+        this.isLoading = false;
         console.log('Ingresos cargados:', response);
       },
       error: (error) => {
         console.error('Error al obtener los ingresos', error);
       }
     });
+
+    this.isLoading = false;
   }
 
+  filtrar(columna: string, event: Event): void {
+    const valor = (event.target as HTMLInputElement).value
+      .trim()
+      .toLowerCase();
 
+    this.filtros[columna] = valor;
+    this.dataSource.filter = JSON.stringify(this.filtros);
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  editarIngreso(id: number): void {
+
+  }
 
 }

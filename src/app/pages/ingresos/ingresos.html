@@ -4,11 +4,11 @@
             <h1>Control y Registro de Ingresos</h1>
         </div>
         <div class="header-actions">
-            <select class="filter-select">
+            <!-- <select class="filter-select">
                 <option value="this-month">Mes Actual (Mayo)</option>
                 <option value="last-month">Mes Anterior</option>
                 <option value="full-year">Año Fiscal 2026</option>
-            </select>
+            </select> -->
             <button mat-raised-button color="primary" (click)="abrirPopup()">
                 Registrar Ingreso
             </button>
@@ -31,191 +31,107 @@
         </div>
     </section>
 
-
-    <div class="mat-elevation-z8">
-
-    <table mat-table [dataSource]="dataSource">
-
-        <!-- Casa -->
-        <ng-container matColumnDef="casa">
-            <th mat-header-cell *matHeaderCellDef> Casa </th>
-            <td mat-cell *matCellDef="let element">
-                {{ element.numeroCasa }}
-                <br>
-            </td>
-        </ng-container>
-
-        <!-- nombre titular -->
-        <ng-container matColumnDef="nombreTitular">
-            <th mat-header-cell *matHeaderCellDef> Titular </th>
-            <td mat-cell *matCellDef="let element">
-                {{ element.nombreTitular }}
-            </td>
-        </ng-container>
-
-        <!-- Fecha Recepción -->
-        <ng-container matColumnDef="fechaRecepcion">
-            <th mat-header-cell *matHeaderCellDef> Fecha Recepción </th>
-            <td mat-cell *matCellDef="let element">
-                {{ element.fechaRecepcion | date:'dd-MMM-yyyy' }}
-            </td>
-        </ng-container>
-
-        <!-- Número Recibo -->
-        <ng-container matColumnDef="numeroRecibo">
-            <th mat-header-cell *matHeaderCellDef> No. Recibo </th>
-            <td mat-cell *matCellDef="let element">
-                {{ element.numeroRecibo }}
-            </td>
-        </ng-container>
-
-        <!-- Concepto -->
-        <ng-container matColumnDef="concepto">
-            <th mat-header-cell *matHeaderCellDef> Concepto </th>
-            <td mat-cell *matCellDef="let element">
-                {{ element.concepto }}
-            </td>
-        </ng-container>
-
-        <!-- Fecha Concepto -->
-        <ng-container matColumnDef="fechaConcepto">
-            <th mat-header-cell *matHeaderCellDef> Fecha Concepto </th>
-            <td mat-cell *matCellDef="let element">
-                {{ element.fechaConcepto | date:'dd-MMM-yyyy' }}
-            </td>
-        </ng-container>
-
-        <!-- Monto -->
-        <ng-container matColumnDef="monto">
-            <th mat-header-cell *matHeaderCellDef> Monto </th>
-            <td mat-cell *matCellDef="let element">
-                {{ element.monto | currency:'MXN':'symbol':'1.2-2' }}
-            </td>
-        </ng-container>
-
-        <!-- Observaciones -->
-        <ng-container matColumnDef="observaciones">
-            <th mat-header-cell *matHeaderCellDef> Observaciones </th>
-            <td mat-cell *matCellDef="let element">
-                {{ element.observaciones || '-' }}
-            </td>
-        </ng-container>
-
-        <!-- Acciones -->
-        <ng-container matColumnDef="acciones">
-            <th mat-header-cell *matHeaderCellDef> Acciones </th>
-            <td mat-cell *matCellDef="let element">
-
-                <button
-                    mat-icon-button
-                    color="primary"
-                    (click)="editar(element)"
-                    matTooltip="Editar">
-
-                    <mat-icon>edit</mat-icon>
-
-                </button>
-
-            </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-    </table>
-
-    <mat-paginator
-        [pageSize]="10"
-        [pageSizeOptions]="[5,10,20,50]"
-        showFirstLastButtons>
-    </mat-paginator>
-
-</div>
-
-
-    <!-- <section class="table-container">
+    <section class="table-container">
         <div class="table-header-area">
-            <div class="table-title">Historial de Entradas de Caja</div>
-            <select class="filter-select" style="padding: 6px 12px; font-size: 0.8rem;">
-                <option value="all">Todos los conceptos</option>
-                <option value="mantenimiento">Cuotas de Mantenimiento</option>
-                <option value="extraordinaria">Cuotas Extraordinarias</option>
-                <option value="amenidades">Reserva de Amenidades</option>
-            </select>
-
-      
-
-            <button mat-raised-button color="primary">
-                <mat-icon>table_chart</mat-icon>
-                Exportrar a Excel
-            </button>
-
-
+            <div class="table-title">Lista de Ingresos</div>
+            <!-- Campo de búsqueda -->
+            <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
+                <input matInput (keyup)="applyFilter($event)" placeholder="Filtra por Casa, Titular, Núm Recibo">
+            </mat-form-field>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID Recibo</th>
-                    <th>Fecha</th>
-                    <th>Casa</th>
-                    <th>Concepto</th>
-                    <th>Categoria</th>
-                    <th>Estado</th>
-                    <th>Monto Neto</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="font-family: monospace; color: var(--text-muted);">#ING-2415</td>
-                    <td>28 May, 2026</td>
-                    <td>
-                        <strong>Carlos Mendoza</strong>
-                        <span class="sub-text">Casa 42 - Paseo de los Lirios</span>
-                    </td>
-                    <td>Cuota Mantenimiento Mayo</td>
-                    <td>Cuota de Mantenimiento</td>
-                    <td><span class="badge ingreso">Pagado</span></td>
-                    <td style="font-weight: 600; color: var(--text-ingreso);">+$2,500.00</td>
-                </tr>
-                <tr>
-                    <td style="font-family: monospace; color: var(--text-muted);">#ING-2414</td>
-                    <td>25 May, 2026</td>
-                    <td>
-                        <strong>Diana Peralta</strong>
-                        <span class="sub-text">Depto B-104 - Torre Olivos</span>
-                    </td>
-                    <td>Reserva Salón de Eventos</td>
-                    <td>Cuota de Mantenimiento</td>
-                    <td><span class="badge ingreso">Pagado</span></td>
-                    <td style="font-weight: 600; color: var(--text-ingreso);">+$1,200.00</td>
-                </tr>
-                <tr>
-                    <td style="font-family: monospace; color: var(--text-muted);">#ING-2413</td>
-                    <td>20 May, 2026</td>
-                    <td>
-                        <strong>Familia Gómez Ruiz</strong>
-                        <span class="sub-text">Casa 11 - Paseo de los Lirios</span>
-                    </td>
-                    <td>Tag de Acceso Vehicular (x2)</td>
-                    <td>Cuota de Mantenimiento</td>
-                    <td><span class="badge ingreso">Pagado</span></td>
-                    <td style="font-weight: 600; color: var(--text-ingreso);">+$600.00</td>
-                </tr>
-                <tr>
-                    <td style="font-family: monospace; color: var(--text-muted);">#ING-2412</td>
-                    <td>10 May, 2026</td>
-                    <td>
-                        <strong>Ricardo Treviño</strong>
-                        <span class="sub-text">Casa 88 - Paseo de los Lirios</span>
-                    </td>
-                    <td>Cuota Extraordinaria (Pavimentación)</td>
-                    <td>Cuota de Mantenimiento</td>
-                    <td><span class="badge overdue">Vencido / Atrasado</span></td>
-                    <td style="font-weight: 600; color: #94A3B8;">$5,000.00</td>
-                </tr>
-            </tbody>
+        <!-- Loader con Angular Material -->
+        @if(isLoading){
+        <div class="loader-container">
+            <mat-progress-spinner mode="indeterminate" diameter="60" color="primary">
+            </mat-progress-spinner>
+            <p>Cargando datos...</p>
+        </div>
+        }
+
+
+        <!-- TABLA DE DATOS DE INGRESOS -->
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+
+            <!-- Número de Casa -->
+            <ng-container matColumnDef="numeroCasa">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Casa</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.numeroCasa }} </td>
+            </ng-container>
+
+            <!-- Nombre Titular -->
+            <ng-container matColumnDef="nombreTitular">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Titular</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.nombreTitular }} </td>
+            </ng-container>
+
+            <!-- Nombre Fecha recepcion -->
+            <ng-container matColumnDef="fechaRecepcion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha Recepción</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.fechaRecepcion | date:'dd-MMM-yyyy' }} </td>
+            </ng-container>
+
+            <!-- Numero Recibo -->
+            <ng-container matColumnDef="numeroRecibo">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Núm. Recibo</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.numeroRecibo }} </td>
+            </ng-container>            
+
+            <!-- Concepto -->
+            <ng-container matColumnDef="concepto">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Concepto</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.concepto }} </td>
+            </ng-container>            
+
+            <!-- Fecha Concepto -->
+            <ng-container matColumnDef="fechaConcepto">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha Concepto</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.fechaConcepto  | date:'dd-MMM-yyyy' }} </td>
+            </ng-container>      
+
+            <!-- Monto -->
+            <ng-container matColumnDef="monto">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Monto</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.monto | currency:'MXN':'symbol':'1.2-2' }} </td>
+            </ng-container> 
+
+            <!-- Monto -->
+            <ng-container matColumnDef="observaciones">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Observaciones</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.observaciones }} </td>
+            </ng-container>             
+
+
+
+
+            <!-- Acciones -->
+            <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>
+                    Acciones
+                </th>
+
+                <td mat-cell *matCellDef="let casa" style="text-align: center;">
+                    <button
+                        mat-icon-button
+                        color="primary"
+                        matTooltip="Editar"
+                        (click)="editarIngreso(casa.id)">
+                        <mat-icon>edit</mat-icon>
+
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
         </table>
-    </section> -->
+
+        <!-- ✅ Paginador -->
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+        </mat-paginator>
+
+    </section>
+
+
 </main>
