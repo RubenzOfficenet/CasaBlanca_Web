@@ -4,15 +4,9 @@
             <h1>Control y Registro de Ingresos</h1>
         </div>
         <div class="header-actions">
-            <!-- <select class="filter-select">
-                <option value="this-month">Mes Actual (Mayo)</option>
-                <option value="last-month">Mes Anterior</option>
-                <option value="full-year">Año Fiscal 2026</option>
-            </select> -->
             <button mat-raised-button color="primary" (click)="abrirPopup()">
                 Registrar Ingreso
             </button>
-
         </div>
     </header>
 
@@ -34,6 +28,31 @@
     <section class="table-container">
         <div class="table-header-area">
             <div class="table-title">Lista de Ingresos</div>
+
+            <div>
+                <mat-form-field style="margin-right: 10px;">
+                    <mat-label>Año</mat-label>
+                    <mat-select [(ngModel)]="anioSeleccionado" (selectionChange)="cambiaAnio($event.value)">
+                        @for (year of yearList; track year.value) {
+                        <mat-option [value]="year.value">{{year.viewValue}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field style="margin-right: 10px;">
+                    <mat-label>Mes</mat-label>
+                    <mat-select [(ngModel)]="mesActual" (selectionChange)="cambiaMes($event.value)">
+                        @for (mes of monthList; track mes.value) {
+                        <mat-option [value]="mes.value">{{mes.viewValue}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" (click)="leeDatos()">
+                    Leer Datos
+                </button>
+            </div>
+
             <!-- Campo de búsqueda -->
             <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
                 <input matInput (keyup)="applyFilter($event)" placeholder="Filtra por Casa, Titular, Núm Recibo">
@@ -68,38 +87,41 @@
             <!-- Nombre Fecha recepcion -->
             <ng-container matColumnDef="fechaRecepcion">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha Recepción</th>
-                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.fechaRecepcion | date:'dd-MMM-yyyy' }} </td>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.fechaRecepcion | date:'dd-MMM-yyyy'
+                    }} </td>
             </ng-container>
 
             <!-- Numero Recibo -->
             <ng-container matColumnDef="numeroRecibo">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Núm. Recibo</th>
                 <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.numeroRecibo }} </td>
-            </ng-container>            
+            </ng-container>
 
             <!-- Concepto -->
             <ng-container matColumnDef="concepto">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Concepto</th>
                 <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.concepto }} </td>
-            </ng-container>            
+            </ng-container>
 
             <!-- Fecha Concepto -->
             <ng-container matColumnDef="fechaConcepto">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha Concepto</th>
-                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.fechaConcepto  | date:'dd-MMM-yyyy' }} </td>
-            </ng-container>      
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.fechaConcepto | date:'dd-MMM-yyyy' }}
+                </td>
+            </ng-container>
 
             <!-- Monto -->
             <ng-container matColumnDef="monto">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Monto</th>
-                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.monto | currency:'MXN':'symbol':'1.2-2' }} </td>
-            </ng-container> 
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.monto |
+                    currency:'MXN':'symbol':'1.2-2' }} </td>
+            </ng-container>
 
             <!-- Monto -->
             <ng-container matColumnDef="observaciones">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Observaciones</th>
                 <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.observaciones }} </td>
-            </ng-container>             
+            </ng-container>
 
 
 
@@ -111,11 +133,7 @@
                 </th>
 
                 <td mat-cell *matCellDef="let casa" style="text-align: center;">
-                    <button
-                        mat-icon-button
-                        color="primary"
-                        matTooltip="Editar"
-                        (click)="editarIngreso(casa.id)">
+                    <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarIngreso(casa.id)">
                         <mat-icon>edit</mat-icon>
 
                     </button>

@@ -20,7 +20,13 @@ import { Ingresoservice } from './services/ingresoservice';
 import { IIngresoResponse } from './nuevoingreso/DTO/ingresoResponse.model';
 import { MatProgressSpinner } from "@angular/material/progress-spinner";
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { FormsModule } from '@angular/forms';
 
+
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
+
+import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../Constants/app.constants'
 
 @Component({
   selector: 'app-ingresos',
@@ -36,7 +42,11 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
     DatePipe,
     CurrencyPipe,
     MatProgressSpinner,
-    MatSortModule],
+    MatSortModule,
+    FormsModule,
+    MatDatepickerModule,
+    MatFormFieldModule],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './ingresos.html',
   styleUrl: './ingresos.css',
 })
@@ -44,12 +54,24 @@ export class Ingresos implements OnInit {
 
   totalRegistros: number = 15;
   isLoading = true;
-
   filtros: { [key: string]: string } = {};
+  today: Date = new Date();
+  yearList = Object.entries(YEAR_CONSTATS).map(([key, value]) => ({
+    value: Number(key),
+    viewValue: value
+  }));
+
+  monthList = Object.entries(MONTH_CONSTANTS).map(([key, value]) => ({
+    value: Number(key),
+    viewValue: value
+  }));
+
+
+  anioSeleccionado: number = this.yearList[0].value; // primer elemento
+
+  mesActual: number = new Date().getMonth() + 1;
 
   constructor(private dialog: MatDialog, private ingresosService: Ingresoservice) { }
-
-
 
   displayedColumns: string[] = [
     'numeroCasa',
@@ -89,11 +111,27 @@ export class Ingresos implements OnInit {
     this.cargarIngresos();
   }
 
+
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+  leeDatos() {
+    console.log('Año seleccionado:', this.anioSeleccionado);
+    console.log('Mes seleccionado:', this.mesActual);
+   }
+
+  cambiaAnio(anioSeleccionado: number): void {
+    console.log('Año seleccionado:', anioSeleccionado);
+  }
+
+  cambiaMes(mesSeleccionado: number): void {
+    console.log('Mes seleccionado:', mesSeleccionado);
+    // aquí tu lógica, por ejemplo:
+    // this.mesActual = mesSeleccionado;
+    // this.cargarDatosPorMes(mesSeleccionado);
+  }
 
   editar(registro: IIngreso): void {
     console.log(registro);
