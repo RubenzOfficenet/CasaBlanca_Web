@@ -14,7 +14,7 @@ import { IIngreso } from './nuevoingreso/DTO/ingreso.model';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DatePipe, CurrencyPipe } from '@angular/common';
+import { DatePipe, CurrencyPipe, PercentPipe } from '@angular/common';
 
 import { Ingresoservice } from './services/ingresoservice';
 import { IIngresoResponse } from './nuevoingreso/DTO/ingresoResponse.model';
@@ -45,17 +45,21 @@ import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../Constants/app.constants'
     MatSortModule,
     FormsModule,
     MatDatepickerModule,
-    MatFormFieldModule],
+    MatFormFieldModule,
+    PercentPipe],
   providers: [provideNativeDateAdapter()],
   templateUrl: './ingresos.html',
   styleUrl: './ingresos.css',
 })
 export class Ingresos implements OnInit {
 
-  totalRegistros: number = 15;
+  totalRegistros: number = 0;
   isLoading = true;
   filtros: { [key: string]: string } = {};
   today: Date = new Date();
+  recaudacionTotal : number = 0;
+  CarteraVencida : number = 0;
+  efectividadCobro : number = .25;
   yearList = Object.entries(YEAR_CONSTATS).map(([key, value]) => ({
     value: Number(key),
     viewValue: value
@@ -68,7 +72,6 @@ export class Ingresos implements OnInit {
 
 
   anioSeleccionado: number = this.yearList[0].value; // primer elemento
-
   mesActual: number = new Date().getMonth() + 1;
 
   constructor(private dialog: MatDialog, private ingresosService: Ingresoservice) { }
@@ -120,17 +123,18 @@ export class Ingresos implements OnInit {
   leeDatos() {
     console.log('Año seleccionado:', this.anioSeleccionado);
     console.log('Mes seleccionado:', this.mesActual);
+
+    this.cargarIngresos();
    }
 
   cambiaAnio(anioSeleccionado: number): void {
     console.log('Año seleccionado:', anioSeleccionado);
+    this.leeDatos();
   }
 
   cambiaMes(mesSeleccionado: number): void {
     console.log('Mes seleccionado:', mesSeleccionado);
-    // aquí tu lógica, por ejemplo:
-    // this.mesActual = mesSeleccionado;
-    // this.cargarDatosPorMes(mesSeleccionado);
+    this.leeDatos();
   }
 
   editar(registro: IIngreso): void {
@@ -162,10 +166,16 @@ export class Ingresos implements OnInit {
   }
 
   cargarIngresos(): void {
-    this.ingresosService.getIngresos().subscribe({
+    const indiceYear : number = Number(this.anioSeleccionado);
+    const anio : number  = YEAR_CONSTATS[indiceYear];
+    
+    const indiceMonth : number = Number(this.mesActual);
+
+    this.ingresosService.getIngresos(anio, indiceMonth).subscribe({
       next: (response: IIngresoResponse[]) => {
         this.dataSource.data = response;
         this.totalRegistros = response.length;
+        this.recaudacionTotal = response.length > 0 ? Number(response[0].totalMonto) : 0;
         this.isLoading = false;
         console.log('Ingresos cargados:', response);
       },
@@ -174,7 +184,7 @@ export class Ingresos implements OnInit {
       }
     });
 
-    this.isLoading = false;
+    
   }
 
   filtrar(columna: string, event: Event): void {

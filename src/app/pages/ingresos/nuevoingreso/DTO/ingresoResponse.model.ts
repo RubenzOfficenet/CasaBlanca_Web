@@ -7,4 +7,5 @@ export interface IIngresoResponse {
   fechaConcepto: string; // Nuevo campo
   monto: number;
   observaciones?: string;
+  totalMonto : number;
 }   

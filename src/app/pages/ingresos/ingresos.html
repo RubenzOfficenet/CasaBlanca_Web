@@ -13,15 +13,15 @@
     <section class="analytics-grid ">
         <div class="metric-card">
             <div class="metric-label">Recaudación Total (Mes)</div>
-            <div class="metric-value positive">+$145,200.00</div>
+            <div class="metric-value positive">{{recaudacionTotal | currency:'MXN':'symbol':'1.2-2'}}</div>
         </div>
         <div class="metric-card card-total-ingresos">
             <div class="metric-label">Cartera Vencida (Morosidad)</div>
-            <div class="metric-value" style="color: #DC2626;">$18,500.00</div>
+            <div class="metric-value" style="color: #DC2626;">{{CarteraVencida | currency: 'MXN':'symbol':'1.2-2'}}</div>
         </div>
         <div class="metric-card card-total-ingresos">
             <div class="metric-label">Efectividad de Cobro</div>
-            <div class="metric-value" style="color: #0F172A; font-size: 1.5rem;">88.7%</div>
+            <div class="metric-value" style="color: #0F172A; font-size: 1.5rem;">{{efectividadCobro | percent:'1.0' }}</div>
         </div>
     </section>
 
@@ -48,9 +48,9 @@
                     </mat-select>
                 </mat-form-field>
 
-                <button mat-raised-button color="primary" (click)="leeDatos()">
+                <!-- <button mat-raised-button color="primary" (click)="leeDatos()">
                     Leer Datos
-                </button>
+                </button> -->
             </div>
 
             <!-- Campo de búsqueda -->
@@ -62,8 +62,10 @@
         <!-- Loader con Angular Material -->
         @if(isLoading){
         <div class="loader-container">
+
             <mat-progress-spinner mode="indeterminate" diameter="60" color="primary">
             </mat-progress-spinner>
+
             <p>Cargando datos...</p>
         </div>
         }
@@ -71,6 +73,12 @@
 
         <!-- TABLA DE DATOS DE INGRESOS -->
         <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+    
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-registros" [attr.colspan]="displayedColumns.length">
+                    No hay registros para mostrar.
+                </td>
+            </tr>
 
             <!-- Número de Casa -->
             <ng-container matColumnDef="numeroCasa">
@@ -113,8 +121,7 @@
             <!-- Monto -->
             <ng-container matColumnDef="monto">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Monto</th>
-                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.monto |
-                    currency:'MXN':'symbol':'1.2-2' }} </td>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.monto | currency:'MXN':'symbol':'1.2-2' }} </td>
             </ng-container>
 
             <!-- Monto -->

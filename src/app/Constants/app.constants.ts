@@ -6,7 +6,7 @@ export const APP_CONSTANTS = {
     URL_LOCAL: 'https://localhost:7128/api/'
 };
 
-export const YEAR_CONSTATS = {
+export const YEAR_CONSTATS : { [key: number]: number } = {
     1 : 2026,
     2 : 2027,
     3 : 2028,
@@ -14,7 +14,7 @@ export const YEAR_CONSTATS = {
     5 : 2030
 }
 
-export const MONTH_CONSTANTS = {
+export const MONTH_CONSTANTS : { [key: number]: string } = {
     1 : 'Enero',
     2 : 'Febrero',
     3 : 'Marzo',
