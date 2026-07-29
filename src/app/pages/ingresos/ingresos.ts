@@ -53,6 +53,8 @@ export class Ingresos implements OnInit {
 
   private snackBar = inject(MatSnackBar);
 
+  fechaActual = new Date();
+
   modalConfirmacion = viewChild<ConfirmDialog>('modalConfirmacion');
   totalRegistros: number = 0;
   isLoading = true;
@@ -249,6 +251,8 @@ export class Ingresos implements OnInit {
     });
 
   }
+
+
 
   onCancelar() { };
 

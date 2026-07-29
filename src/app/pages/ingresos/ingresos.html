@@ -20,10 +20,11 @@
             <div class="metric-value" style="color: #DC2626;">{{CarteraVencida | currency: 'MXN':'symbol':'1.2-2'}}
             </div> -->
         </div>
-        <div class="metric-card card-total-ingresos">
-            <!-- <div class="metric-label">Efectividad de Cobro</div>
-            <div class="metric-value" style="color: #0F172A; font-size: 1.5rem;">{{efectividadCobro | percent:'1.0' }}
-            </div> -->
+        <div class="metric-card card-total-ingresos" style="text-align: right;">
+            <!-- <div class="metric-label">Efectividad de Cobro</div> -->
+            <div class="metric-label">Fecha Actual</div>
+            <div class="metric-value" style="color: #0F172A; font-size: 1.5rem;">{{fechaActual | date:'dd-MMM-yyyy' }}
+            </div>
         </div>
     </section>
 
