@@ -41,7 +41,7 @@ export class InmueblesServices {
 
   postUpdateHouse(datos: iupdateCasa)
   {
-    debugger;
+ 
     var url = this._apiUrl + 'UpdateHouse/';
     return this._http.post<any>(url, datos);
   }

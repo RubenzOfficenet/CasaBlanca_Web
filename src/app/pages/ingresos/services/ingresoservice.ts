@@ -13,7 +13,7 @@ export class Ingresoservice {
   private readonly _apiUrl = APP_CONSTANTS.URL_LOCAL;
 
   getIngresos(year: number, month: number): Observable<any> {
-  
+
     var url = this._apiUrl + 'GetIngresos';
     var params = new HttpParams()
       .set('year', year.toString())
@@ -21,9 +21,14 @@ export class Ingresoservice {
     return this._http.get<IIngreso[]>(url, { params });
   }
 
-    addIngreso(ingreso: IIngreso): Observable<IIngreso> {
+  addIngreso(ingreso: IIngreso): Observable<IIngreso> {
     var url = this._apiUrl + 'AddIngreso'
     return this._http.post<IIngreso>(url, ingreso);
+  }
+
+  deleteIngreso(Id: number): Observable<number> {
+    var url = this._apiUrl + 'DeleteIngreso/' + Id.toString();
+    return this._http.delete<number>(url);
   }
 
 }

@@ -16,12 +16,14 @@
             <div class="metric-value positive">{{recaudacionTotal | currency:'MXN':'symbol':'1.2-2'}}</div>
         </div>
         <div class="metric-card card-total-ingresos">
-            <div class="metric-label">Cartera Vencida (Morosidad)</div>
-            <div class="metric-value" style="color: #DC2626;">{{CarteraVencida | currency: 'MXN':'symbol':'1.2-2'}}</div>
+            <!-- <div class="metric-label">Cartera Vencida (Morosidad)</div>
+            <div class="metric-value" style="color: #DC2626;">{{CarteraVencida | currency: 'MXN':'symbol':'1.2-2'}}
+            </div> -->
         </div>
         <div class="metric-card card-total-ingresos">
-            <div class="metric-label">Efectividad de Cobro</div>
-            <div class="metric-value" style="color: #0F172A; font-size: 1.5rem;">{{efectividadCobro | percent:'1.0' }}</div>
+            <!-- <div class="metric-label">Efectividad de Cobro</div>
+            <div class="metric-value" style="color: #0F172A; font-size: 1.5rem;">{{efectividadCobro | percent:'1.0' }}
+            </div> -->
         </div>
     </section>
 
@@ -73,7 +75,7 @@
 
         <!-- TABLA DE DATOS DE INGRESOS -->
         <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
-    
+
             <tr class="mat-row" *matNoDataRow>
                 <td class="mat-cell no-registros" [attr.colspan]="displayedColumns.length">
                     No hay registros para mostrar.
@@ -121,7 +123,8 @@
             <!-- Monto -->
             <ng-container matColumnDef="monto">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Monto</th>
-                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.monto | currency:'MXN':'symbol':'1.2-2' }} </td>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.monto |
+                    currency:'MXN':'symbol':'1.2-2' }} </td>
             </ng-container>
 
             <!-- Monto -->
@@ -142,9 +145,12 @@
                 <td mat-cell *matCellDef="let casa" style="text-align: center;">
                     <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarIngreso(casa.id)">
                         <mat-icon>edit</mat-icon>
-
+                    </button>
+                    <button mat-icon-button color="primary" matTooltip="Borrar" (click)="borrarIngreso(casa.id)">
+                        <mat-icon>delete</mat-icon>
                     </button>
                 </td>
+
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -160,3 +166,7 @@
 
 
 </main>
+
+<app-confirm-dialog #modalConfirmacion [titulo]="'Borrar Ingreso'" [mensaje]="'¿Estás seguro de borrrar el Ingreso?'"
+    (confirmado)="onBorrarIngreso()" (cancelado)="onCancelar()">
+</app-confirm-dialog>
