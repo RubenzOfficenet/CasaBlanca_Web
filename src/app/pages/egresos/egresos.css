@@ -1,30 +1,29 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
 :root {
     /* Paleta Corporativa Base */
     --bg-main: #F8FAFC;
     --bg-surface: #FFFFFF;
     --bg-sidebar: #0F172A;
-    
+
     --text-main: #1E293B;
     --text-muted: #64748B;
     --border-color: #E2E8F0;
-    
+
     --color-brand: #2563EB;
     --color-brand-hover: #1D4ED8;
-    
+
     /* Estados específicos de Egresos */
-    --text-egreso: #991B1B;     /* Carmesí oscuro para montos negativos */
-    --bg-badge-paid: #F0FDF4;   /* Verde suave para facturas liquidadas */
+    --text-egreso: #991B1B;
+    /* Carmesí oscuro para montos negativos */
+    --bg-badge-paid: #F0FDF4;
+    /* Verde suave para facturas liquidadas */
     --text-badge-paid: #166534;
-    --bg-badge-pending: #FFFBEB;/* Ámbar suave para cuentas pendientes */
+    --bg-badge-pending: #FFFBEB;
+    /* Ámbar suave para cuentas pendientes */
     --text-badge-pending: #92400E;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
 
 body {
     background-color: var(--bg-main);
@@ -35,69 +34,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* --- SIDEBAR CORPORATIVO --- */
-.sidebar {
-    width: 260px;
-    background-color: var(--bg-sidebar);
-    display: flex;
-    flex-direction: column;
-    padding: 32px 20px;
-    justify-content: space-between;
-}
 
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #FFFFFF;
-    letter-spacing: -0.5px;
-}
-
-.brand-icon {
-    width: 18px;
-    height: 18px;
-    background-color: var(--color-brand);
-    border-radius: 4px;
-}
-
-.menu-list {
-    list-style: none;
-    margin-top: 36px;
-    flex-grow: 1;
-}
-
-.menu-item a {
-    display: flex;
-    align-items: center;
-    padding: 10px 14px;
-    color: #94A3B8;
-    text-decoration: none;
-    border-radius: 8px;
-    margin-bottom: 4px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.menu-item a:hover {
-    background-color: rgba(255, 255, 255, 0.04);
-    color: #F1F5F9;
-}
-
-.menu-item.active a {
-    background-color: rgba(37, 99, 213, 0.15);
-    color: #38BDF8;
-    font-weight: 600;
-}
 
 /* --- MAIN CONTENT AREA --- */
 .main-content {
@@ -199,28 +136,30 @@ header h1 {
     overflow: hidden;
 }
 
-.table-header-area {
+/* .table-header-area {
     padding: 24px;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
+} */
 
-.table-title {
+/* .table-title {
     font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: -0.3px;
-}
+} */
 
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0 1px;
+    /* 0px horizontal y 5px vertical */
 }
 
 th {
     background-color: #F8FAFC;
-    padding: 12px 24px;
+    padding: 1px 1px;
     color: var(--text-muted);
     font-size: 0.75rem;
     font-weight: 600;
@@ -231,14 +170,25 @@ th {
 }
 
 td {
-    padding: 16px 24px;
-    font-size: 0.875rem;
+    padding: 1px 1px;
+    font-size: 0.85rem;
     border-bottom: 1px solid var(--border-color);
-    color: #334155;
+    color: #0f0f0f;
 }
 
-tr:last-child td {
+tr {
+    border-color: red;
+
+}
+
+/* tr:last-child td {
     border-bottom: none;
+} */
+
+.badge.ingreso {
+    background-color: var(--bg-ingreso);
+    color: var(--text-ingreso);
+    border-color: var(--border-ingreso);
 }
 
 /* Badges de Estado Operativo */
@@ -249,6 +199,10 @@ tr:last-child td {
     font-weight: 600;
     display: inline-flex;
     align-items: center;
+}
+
+.card-total-ingresos {
+    background-color: var(--bg-ingreso);
 }
 
 .badge.paid {
@@ -267,4 +221,67 @@ tr:last-child td {
     font-size: 0.75rem;
     color: var(--text-muted);
     margin-top: 2px;
+}
+
+.textCasa {
+    font-size: 12px;
+    color: rgb(62, 65, 206);
+}
+
+
+.contenedor-filtros {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1px;
+    margin-bottom: 1px;
+}
+
+.table-container {
+    background-color: var(--bg-surface);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.table-header-area {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* centra spinner y texto horizontalmente */
+    justify-content: center;
+}
+
+.loader-container p {
+    margin-top: 12px;
+}
+
+:host ::ng-deep .mi-select-personalizado .mat-mdc-text-field-wrapper {
+    background-color: #bedfff !important;
+}
+
+
+/* Selecciona la primera celda del encabezado y la primera celda de datos */
+.mat-mdc-table th:first-child,
+.mat-mdc-table td:first-child {
+  padding-left: 10px !important; /* Ajusta los px a tu gusto */
 }

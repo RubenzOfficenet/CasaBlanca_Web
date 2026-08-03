@@ -1,109 +1,140 @@
-  <!-- CONTENIDO PRINCIPAL -->
-    <main class="main-content">
-        <header>
+<main class="main-content">
+    <header>
+        <div>
+            <h1>Control y Registro de Egresos</h1>
+        </div>
+        <div class="header-actions">
+            <button mat-raised-button color="primary" (click)="abrirPopup()">
+                Registrar Egreso
+            </button>
+        </div>
+    </header>
+
+    <section class="analytics-grid ">
+        <div class="metric-card">
+            <div class="metric-label">Gasto Consolidado (Mes)</div>
+            <div class="metric-value positive">{{gastoConsolidado | currency:'MXN':'symbol':'1.2-2'}}</div>
+        </div>
+        <div class="metric-card card-total-ingresos">
+        </div>
+        <div class="metric-card card-total-ingresos" style="text-align: right;">
+            <div class="metric-label">Fecha Actual</div>
+            <div class="metric-value" style="color: #0F172A; font-size: 1.5rem;">{{fechaActual | date:'dd-MMM-yyyy' }}
+            </div>
+        </div>
+    </section>
+
+    <section class="table-container">
+        <div class="table-header-area">
+            <div class="table-title">Lista de Egresos</div>
+
             <div>
-                <h1>Control y Gestión de Egresos</h1>
-            </div>
-            <div class="header-actions">
-                <select class="filter-select">
-                    <option value="this-month">Mes Actual (Mayo)</option>
-                    <option value="last-month">Mes Anterior</option>
-                    <option value="full-year">Año Fiscal 2026</option>
-                </select>
-                
-                <button matButton="elevated" style="width: 250px;">
-                    Registrar Salida
-                </button>
+                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
+                    <mat-label>Año</mat-label>
+                    <mat-select [(ngModel)]="anioSeleccionado" (selectionChange)="cambiaAnio($event.value)">
+                        @for (year of yearList; track year.value) {
+                        <mat-option [value]="year.value">{{year.viewValue}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+
+                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
+                    <mat-label>Mes</mat-label>
+                    <mat-select [(ngModel)]="mesActual" (selectionChange)="cambiaMes($event.value)">
+                        @for (mes of monthList; track mes.value) {
+                        <mat-option [value]="mes.value">{{mes.viewValue}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
             </div>
 
-            
-        </header>
+            <!-- Campo de búsqueda -->
+            <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
+                <input matInput (keyup)="applyFilter($event)" placeholder="Filtra por Beneficiario o Concepto">
+            </mat-form-field>
+        </div>
 
-        <!-- TARJETAS DE MÉTRICAS ESPECÍFICAS -->
-        <section class="analytics-grid">
-            <div class="metric-card">
-                <div class="metric-label">Gasto Consolidado (Mes)</div>
-                <div class="metric-value negative">-$42,500.00</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Cuentas por Liquidar</div>
-                <div class="metric-value" style="color: #D97706;">$12,800.00</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Categoría Mayor Gasto</div>
-                <div class="metric-value" style="color: #0F172A; font-size: 1.25rem; padding-top: 4px;">Seguridad Privada</div>
-            </div>
-        </section>
+        <!-- Loader con Angular Material -->
+@if (isLoading) {
+  <div class="loader-container">
+    <mat-progress-spinner mode="indeterminate" diameter="60" color="primary"></mat-progress-spinner>
+    <p>Cargando datos...</p>
+  </div>
+}
 
-        <!-- CONTENEDOR DE TABLA DE AUDITORÍA -->
-        <section class="table-container">
-            <div class="table-header-area">
-                <div class="table-title">Historial de Salidas de Caja</div>
-                <select class="filter-select" style="padding: 6px 12px; font-size: 0.8rem;">
-                    <option value="all">Todas las categorías</option>
-                    <option value="servicios">Servicios Públicos</option>
-                    <option value="nomina">Nómina y Proveedores</option>
-                    <option value="mantenimiento">Mantenimiento Infraestructura</option>
-                </select>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID Pago</th>
-                        <th>Fecha</th>
-                        <th>Beneficiario / Proveedor</th>
-                        <th>Categoría</th>
-                        <th>Estado</th>
-                        <th>Monto Neto</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="font-family: monospace; color: var(--text-muted);">#EGR-0942</td>
-                        <td>26 May, 2026</td>
-                        <td>
-                            <strong>Seguritek SA</strong>
-                            <span class="sub-text">Pago Seguridad Privada Quincenal</span>
-                        </td>
-                        <td>Nómina y Proveedores</td>
-                        <td><span class="badge paid">Liquidado</span></td>
-                        <td style="font-weight: 600; color: var(--text-egreso);">-$18,000.00</td>
-                    </tr>
-                    <tr>
-                        <td style="font-family: monospace; color: var(--text-muted);">#EGR-0941</td>
-                        <td>22 May, 2026</td>
-                        <td>
-                            <strong>Eléctrica Gral.</strong>
-                            <span class="sub-text">Reparación Luminaria Entrada</span>
-                        </td>
-                        <td>Mantenimiento</td>
-                        <td><span class="badge paid">Liquidado</span></td>
-                        <td style="font-weight: 600; color: var(--text-egreso);">-$3,200.00</td>
-                    </tr>
-                    <tr>
-                        <td style="font-family: monospace; color: var(--text-muted);">#EGR-0940</td>
-                        <td>18 May, 2026</td>
-                        <td>
-                            <strong>Compañía de Agua Local</strong>
-                            <span class="sub-text">Consumo Áreas Comunes Periodo Abril</span>
-                        </td>
-                        <td>Servicios Públicos</td>
-                        <td><span class="badge pending">Pendiente de Pago</span></td>
-                        <td style="font-weight: 600; color: #475569;">-$12,800.00</td>
-                    </tr>
-                    <tr>
-                        <td style="font-family: monospace; color: var(--text-muted);">#EGR-0939</td>
-                        <td>15 May, 2026</td>
-                        <td>
-                            <strong>Limpieza & Brillo Inc</strong>
-                            <span class="sub-text">Insumos mantenimiento alberca</span>
-                        </td>
-                        <td>Mantenimiento</td>
-                        <td><span class="badge paid">Liquidado</span></td>
-                        <td style="font-weight: 600; color: var(--text-egreso);">-$8,500.00</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-    </main>
+        <!-- TABLA DE DATOS DE INGRESOS -->
+         <div [hidden]="isLoading">
+        <table mat-table [dataSource]="dataSource" matSort matSortActive="fechaEgreso" matSortDirection="asc">
+
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-registros" [attr.colspan]="displayedColumns.length">
+                    No hay registros para mostrar.
+                </td>
+            </tr>
+
+            <!-- Fecha Concepto -->
+            <ng-container matColumnDef="fechaEgreso">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha Concepto</th>
+                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.fechaEgreso | date:'dd-MMM-yyyy'
+                    }}
+                </td>
+            </ng-container>
+
+            <!-- Nombre Beneficiario -->
+            <ng-container matColumnDef="beneficiario">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Beneficiario</th>
+                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.beneficiario }} </td>
+            </ng-container>
+
+            <!-- Concepto -->
+            <ng-container matColumnDef="concepto">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Concepto</th>
+                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.concepto }} </td>
+            </ng-container>
+
+            <!-- Monto -->
+            <ng-container matColumnDef="monto">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Monto</th>
+                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.monto |
+                    currency:'MXN':'symbol':'1.2-2' }} </td>
+            </ng-container>
+
+            <!-- Observaciones -->
+            <ng-container matColumnDef="observaciones">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Observaciones</th>
+                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.observaciones }} </td>
+            </ng-container>
+
+
+            <!-- Acciones -->
+            <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>
+                    Acciones
+                </th>
+
+                <td mat-cell *matCellDef="let casa" style="text-align: center;">
+                    <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarEgreso(casa.id)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="primary" matTooltip="Borrar" (click)="borrarEgreso(casa.id)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        </table>
+        </div>
+        <!-- ✅ Paginador -->
+        <mat-paginator [pageSize]="10" [hidden]="isLoading" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+        </mat-paginator>
+
+    </section>
+
+
+</main>
+

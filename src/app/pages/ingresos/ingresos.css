@@ -274,3 +274,10 @@ table {
 .loader-container p {
     margin-top: 12px;
 }
+
+
+
+
+:host ::ng-deep .mi-select-personalizado .mat-mdc-text-field-wrapper {
+  background-color: #c3f3db !important;
+}

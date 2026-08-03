@@ -33,7 +33,7 @@
             <div class="table-title">Lista de Ingresos</div>
 
             <div>
-                <mat-form-field style="margin-right: 10px;">
+                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
                     <mat-label>Año</mat-label>
                     <mat-select [(ngModel)]="anioSeleccionado" (selectionChange)="cambiaAnio($event.value)">
                         @for (year of yearList; track year.value) {
@@ -42,7 +42,7 @@
                     </mat-select>
                 </mat-form-field>
 
-                <mat-form-field style="margin-right: 10px;">
+                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
                     <mat-label>Mes</mat-label>
                     <mat-select [(ngModel)]="mesActual" (selectionChange)="cambiaMes($event.value)">
                         @for (mes of monthList; track mes.value) {
@@ -168,6 +168,6 @@
 
 </main>
 
-<app-confirm-dialog #modalConfirmacion [titulo]="'Borrar Ingreso'" [mensaje]="'¿Estás seguro de borrrar el Ingreso?'"
+<!-- <app-confirm-dialog #modalConfirmacion [titulo]="'Borrar Ingreso'" [mensaje]="'¿Estás seguro de borrrar el Ingreso?'"
     (confirmado)="onBorrarIngreso()" (cancelado)="onCancelar()">
-</app-confirm-dialog>
+</app-confirm-dialog> -->

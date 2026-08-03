@@ -1,34 +1,10 @@
-<div class="modal fade" tabindex="-1" [class.show]="visible()" [style.display]="visible() ? 'block' : 'none'"
-    [attr.aria-hidden]="!visible()">
+<h2 mat-dialog-title>{{ data?.titulo ?? 'Confirmación' }}</h2>
 
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+<mat-dialog-content>
+  <p>{{ data?.mensaje ?? '¿Deseas continuar?' }}</p>
+</mat-dialog-content>
 
-            <div class="modal-header">
-                <h5 class="modal-title">{{ titulo() }}</h5>
-
-                <button type="button" class="btn-close" aria-label="Close" (click)="cancelar()">
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <p>{{ mensaje() }}</p>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="cancelar()">
-                    Cancelar
-                </button>
-
-                <button type="button" class="btn btn-primary" (click)="confirmar()">
-                    Confirmar
-                </button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-@if (visible()) {
-<div class="modal-backdrop fade show"></div>
-}
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancelar()">Cancelar</button>
+  <button mat-flat-button color="primary" (click)="confirmar()">Aceptar</button>
+</mat-dialog-actions>

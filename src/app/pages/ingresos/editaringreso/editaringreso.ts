@@ -1,110 +1,78 @@
-import { ChangeDetectorRef, Component, Inject, inject, OnInit, viewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
-import { MatDialogContent, MatDialogActions, MatDialogModule } from "@angular/material/dialog";
-import { ConfirmDialog } from "../../shared/confirm-dialog/confirm-dialog";
-import { CasaDTO } from '../nuevoingreso/DTO/casaDTO.model';
-import { ConceptoIngreso } from '../nuevoingreso/DTO/conceptoIngresos.model';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
-import { ICasas } from '../../../Models/inmueble.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
+
+import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
+import { CasaDTO } from '../nuevoingreso/DTO/casaDTO.model';
+import { ConceptoIngreso } from '../nuevoingreso/DTO/conceptoIngresos.model';
+import { ICasas } from '../../../Models/inmueble.model';
 import { InmueblesServices } from '../../inmuebles/services/inmuebles-services';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { catalogosservice } from '../../../services/catalogos/catalogosservice';
 import { InmuebleEditarDTO } from '../../../Models/InmuebleEditarDTO.model';
 import { IngresosService } from '../nuevoingreso/services/ingresoService';
 import { IIngresoUpdate } from '../nuevoingreso/DTO/ingresoUpdateDTO';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { IIngresoDataUpdate } from '../nuevoingreso/DTO/ingresoDataUpdate';
-
 
 @Component({
   selector: 'app-editaringreso',
-  imports: [MatDialogModule,
-    MatButtonModule,
-    ReactiveFormsModule,
+  standalone: true,
+  imports: [
     MatDialogModule,
     MatButtonModule,
     ReactiveFormsModule,
     MatAutocompleteModule,
-    MatInputModule,
-    ConfirmDialog],
+    MatInputModule
+  ],
   templateUrl: './editaringreso.html',
   styleUrl: './editaringreso.css',
 })
 export class Editaringreso implements OnInit {
-
   private fb = inject(FormBuilder);
   private inmueblesServices = inject(InmueblesServices);
   private cdr = inject(ChangeDetectorRef);
   private conceptoIngresosService = inject(catalogosservice);
   private ingresoService = inject(IngresosService);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
   private dialogRef = inject(MatDialogRef<Editaringreso>);
 
   ingresoForm!: FormGroup;
   casaDatos: CasaDTO[] = [];
   conceptoIngreso: ConceptoIngreso[] = [];
   casas: ICasas[] = [];
-  ingredoData: IIngresoUpdate;
-  modalConfirmacion = viewChild<ConfirmDialog>('modalConfirmacion');
-  IngresoDataUpdate: IIngresoDataUpdate;
+  ingredoData!: IIngresoUpdate;
+  IngresoDataUpdate!: IIngresoDataUpdate;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: { id: number }) {
-    //console.log('Dato input', this.data.id); // aquí ya tienes el id
     this.ingresoForm = this.fb.group({
       casa: [{ value: null, disabled: true }, Validators.required],
       nombre: [{ value: '', disabled: true }],
       fechaRecepcion: [this.obtenerFechaActual(), Validators.required],
       numeroRecibo: ['', Validators.required],
       concepto: [null, Validators.required],
-      fechaConcepto: ['', Validators.required], // Nuevo campo
+      fechaConcepto: ['', Validators.required],
       monto: [null, [Validators.required, Validators.min(0.01)]],
       observaciones: ['']
     });
-
-    this.ingredoData = {
-      id: 0,
-      idCasa: 0,
-      numerocasa: '',
-      nombreTitular: '',
-      nombreOcupante: '',
-      fechaRecepcion: '',
-      numeroRecibo: '',
-      idConcepto: 0,
-      concepto: '',
-      fechaConcepto: '',
-      monto: 0
-    };
-
-    this.IngresoDataUpdate = {
-      id: 0,
-      idCasa: 0,
-      fechaRecepcion: '',
-      numeroRecibo: '',
-      idConcepto: 0,
-      fechaConcepto: '',
-      monto: 0,
-      observaciones: '',
-    }
-
   }
 
   ngOnInit(): void {
     this.leerDatosCasa();
     this.leerConoceptoIngreso();
-    this.leeDatosIngresoById(this.data.id);
+    if (this.data?.id) {
+      this.leeDatosIngresoById(this.data.id);
+    }
   }
-
 
   leeDatosIngresoById(id: number): void {
     this.ingresoService.leeIngresoById(id).subscribe({
       next: (respuesta: IIngresoUpdate) => {
-        //console.log('Respuesta cruda:', JSON.stringify(respuesta, null, 2));
-
         this.ingredoData = respuesta;
-        //console.log(this.ingredoData.fechaRecepcion);
 
         this.ingresoForm.patchValue({
           casa: this.ingredoData.idCasa,
@@ -118,24 +86,28 @@ export class Editaringreso implements OnInit {
         });
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Error al obtener los datso del ingreso', error);
+        console.error('Error al obtener los datos del ingreso', error);
       }
     });
   }
 
   private formatToInputDate(fecha: string): string {
     if (!fecha) return '';
-    const [datePart] = fecha.split(' '); // "07/21/2026"
-    const [month, day, year] = datePart.split('/');
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-  }
+    
+    // Si viene en formato ISO o con hora ("YYYY-MM-DDT..."), tomamos solo la fecha
+    if (fecha.includes('T')) {
+      return fecha.split('T')[0];
+    }
 
-  private cargarDatosEnFormulario(): void {
-    this.ingresoForm.patchValue({
-      casa: this.ingredoData.idCasa,
-      numerorecibo: this.ingredoData.numeroRecibo,
-      // ...resto de campos
-    });
+    // Si viene en formato MM/DD/YYYY
+    const [datePart] = fecha.split(' ');
+    const parts = datePart.split('/');
+    if (parts.length === 3) {
+      const [month, day, year] = parts;
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    return fecha;
   }
 
   leerDatosCasa(): void {
@@ -151,34 +123,28 @@ export class Editaringreso implements OnInit {
     });
   }
 
-  leerConoceptoIngreso() {
+  leerConoceptoIngreso(): void {
     this.conceptoIngresosService.getConceptoIngresos().subscribe({
       next: (respuesta: ConceptoIngreso[]) => {
         this.conceptoIngreso = respuesta;
-        //console.log(this.conceptoIngreso);
-        this.cdr.markForCheck()
+        this.cdr.markForCheck();
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Error al obtener las casas', error);
+        console.error('Error al obtener los conceptos', error);
       }
     });
   }
 
-  actualizarIngrso() { }
-
-
   obtenerFechaActual(): string {
     return new Date().toISOString().split('T')[0];
   }
-
 
   campoInvalido(campo: string): boolean {
     const control = this.ingresoForm.get(campo);
     return !!(control?.invalid && (control.dirty || control.touched));
   }
 
-
-  guardar() {
+  guardar(): void {
     if (this.ingresoForm.invalid) {
       this.ingresoForm.markAllAsTouched();
       return;
@@ -198,103 +164,69 @@ export class Editaringreso implements OnInit {
     };
 
     this.ingresoService.updateIngreso(this.IngresoDataUpdate).subscribe({
-      next: (respuesta) => {
-        //console.log('Actualización realzada correctamente:', respuesta);
+      next: () => {
         const snackBarRef = this.snackBar.open('Ingreso actualizado correctamente', 'Cerrar', {
           duration: 3000,
         });
 
         snackBarRef.afterDismissed().subscribe(() => {
-          this.onCancelar(); // se ejecuta cuando el snackbar se cierra
+          this.dialogRef.close(true);
         });
-
       },
       error: (error) => {
         this.snackBar.open('Error al actualizar el ingreso', 'Cerrar', {
           duration: 4000,
         });
-        console.error('Error al crear el ingreso:', error);
+        console.error('Error al actualizar el ingreso:', error);
       }
     });
-
-
-
   }
 
-  onCancelar() {
+  onCancelar(): void {
     this.dialogRef.close(false);
   }
 
   mostrarConfirmacion(): void {
+    const datos = this.ingresoForm.getRawValue();
 
-    if (this.ingresoForm.get('casa')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar el Número de Casa.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
+    // Validar casa manualmente dado que el control está disabled y .invalid devuelve false
+    if (!datos.casa) {
+      this.snackBar.open('Debe capturar el Número de Casa.', 'Cerrar', { duration: 3000 });
       return;
     }
 
     if (this.ingresoForm.get('numeroRecibo')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar el Número de Recibo.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
+      this.snackBar.open('Debe capturar el Número de Recibo.', 'Cerrar', { duration: 3000 });
       return;
     }
 
     if (this.ingresoForm.get('concepto')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar el Concepto.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
+      this.snackBar.open('Debe capturar el Concepto.', 'Cerrar', { duration: 3000 });
       return;
     }
 
-
     if (this.ingresoForm.get('fechaConcepto')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar la fecha del Concepto.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
+      this.snackBar.open('Debe capturar la fecha del Concepto.', 'Cerrar', { duration: 3000 });
       return;
     }
 
     if (this.ingresoForm.get('monto')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar el monto del ingreso.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
+      this.snackBar.open('Debe capturar el monto del ingreso.', 'Cerrar', { duration: 3000 });
       return;
     }
 
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        titulo: 'Confirmar Actualización',
+        mensaje: '¿Deseas guardar los cambios realizados?'
+      }
+    });
 
-    this.modalConfirmacion()?.abrir();
+    dialogRef.afterClosed().subscribe((confirmado: boolean) => {
+      if (confirmado) {
+        this.guardar();
+      }
+    });
   }
 
   private mapToCasaDTO(casa: ICasas): CasaDTO {
@@ -304,12 +236,9 @@ export class Editaringreso implements OnInit {
     };
   }
 
-
   alSeleccionarCasa(): void {
     const casaId = this.ingresoForm.get('casa')?.value as number | null;
-    if (casaId === null) {
-      return;
-    }
+    if (casaId === null) return;
     this.leeNombreDeHbitante(casaId);
   }
 
@@ -317,7 +246,7 @@ export class Editaringreso implements OnInit {
     this.inmueblesServices.getInuebleById(Id).subscribe({
       next: (inmueble: InmuebleEditarDTO) => {
         this.ingresoForm.patchValue({
-          nombre: inmueble.nombreTitular + ' ' + inmueble.apellidosTitular
+          nombre: `${inmueble.nombreTitular} ${inmueble.apellidosTitular}`
         });
       },
       error: (error) => {
@@ -327,5 +256,7 @@ export class Editaringreso implements OnInit {
   }
 
 
+actualizarIngrso(){}
 
-} // fin control
+
+}

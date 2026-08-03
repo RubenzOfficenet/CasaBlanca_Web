@@ -1,34 +1,35 @@
-import { Component, ChangeDetectionStrategy, ViewChild, OnInit, viewChild, inject } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, inject } from '@angular/core';
+import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatDialog } from '@angular/material/dialog';
-import { Nuevoingreso } from './nuevoingreso/nuevoingreso';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { IIngreso } from './nuevoingreso/DTO/ingreso.model';
-import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DatePipe, CurrencyPipe } from '@angular/common';
-import { Ingresoservice } from './services/ingresoservice';
-import { IIngresoResponse } from './nuevoingreso/DTO/ingresoResponse.model';
-import { MatProgressSpinner } from "@angular/material/progress-spinner";
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../Constants/app.constants'
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+import { IIngresoResponse } from './nuevoingreso/DTO/ingresoResponse.model';
+import { Ingresoservice } from './services/ingresoservice';
+import { Nuevoingreso } from './nuevoingreso/nuevoingreso';
 import { Editaringreso } from './editaringreso/editaringreso';
 import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../Constants/app.constants';
 
 @Component({
   selector: 'app-ingresos',
-  imports: [MatButtonModule,
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
     MatInputModule,
     MatSelectModule,
     MatFormFieldModule,
@@ -39,31 +40,31 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatTooltipModule,
     DatePipe,
     CurrencyPipe,
-    MatProgressSpinner,
+    MatProgressSpinnerModule,
     MatSortModule,
-    FormsModule,
-    MatDatepickerModule,
-    MatFormFieldModule,
-    ConfirmDialog],
+    MatDatepickerModule
+  ],
   providers: [provideNativeDateAdapter()],
   templateUrl: './ingresos.html',
   styleUrl: './ingresos.css',
 })
-export class Ingresos implements OnInit {
-
-  private snackBar = inject(MatSnackBar);
+export class Ingresos implements OnInit, AfterViewInit {
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
+  private readonly ingresosService = inject(Ingresoservice);
 
   fechaActual = new Date();
-
-  modalConfirmacion = viewChild<ConfirmDialog>('modalConfirmacion');
-  totalRegistros: number = 0;
-  isLoading = true;
-  filtros: { [key: string]: string } = {};
   today: Date = new Date();
+  
+  totalRegistros: number = 0;
+  isLoading: boolean = true;
+  filtros: Record<string, string> = {};
+  
   recaudacionTotal: number = 0;
   CarteraVencida: number = 0;
   efectividadCobro: number = 0;
   ingresoId: number = 0;
+
   yearList = Object.entries(YEAR_CONSTATS).map(([key, value]) => ({
     value: Number(key),
     viewValue: value
@@ -74,8 +75,7 @@ export class Ingresos implements OnInit {
     viewValue: value
   }));
 
-
-  anioSeleccionado: number = this.yearList[0].value; // primer elemento
+  anioSeleccionado: number = this.yearList[0].value;
   mesActual: number = new Date().getMonth() + 1;
 
   displayedColumns: string[] = [
@@ -91,18 +91,29 @@ export class Ingresos implements OnInit {
   ];
 
   dataSource = new MatTableDataSource<IIngresoResponse>();
+
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private dialog: MatDialog, private ingresosService: Ingresoservice) { }
-
   ngOnInit(): void {
+    // Sincronizar búsqueda global y por columna
     this.dataSource.filterPredicate = (
       data: IIngresoResponse,
       filter: string
     ): boolean => {
-      const texto = filter.trim().toLowerCase();
+      // 1. Si el filtro es un JSON (búsqueda por columna específica)
+      if (filter.startsWith('{')) {
+        const searchTerms = JSON.parse(filter) as Record<string, string>;
+        return Object.keys(searchTerms).every((column) => {
+          const term = searchTerms[column];
+          if (!term) return true;
+          const val = (data as Record<string, any>)[column];
+          return val !== null && val !== undefined && String(val).toLowerCase().includes(term);
+        });
+      }
 
+      // 2. Si el filtro es texto plano (búsqueda general)
+      const texto = filter.trim().toLowerCase();
       return [
         data.numeroCasa,
         data.nombreTitular,
@@ -110,64 +121,107 @@ export class Ingresos implements OnInit {
         data.concepto,
         data.observaciones
       ]
-        .filter(valor => valor !== null && valor !== undefined)
-        .some(valor => String(valor).toLowerCase().includes(texto));
+        .filter((valor) => valor !== null && valor !== undefined)
+        .some((valor) => String(valor).toLowerCase().includes(texto));
+    };
+
+    // Manejo personalizado del ordenamiento en la tabla
+    this.dataSource.sortingDataAccessor = (item: IIngresoResponse, property: string) => {
+      switch (property) {
+        case 'fechaRecepcion':
+        case 'fechaConcepto':
+          return item[property] ? new Date(item[property]).getTime() : 0;
+        case 'monto':
+          return Number(item.monto) || 0;
+        default:
+          return (item as Record<string, any>)[property];
+      }
     };
 
     this.cargarIngresos();
   }
 
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
-
-  leeDatos() {
-    //console.log('Año seleccionado:', this.anioSeleccionado);
-    //console.log('Mes seleccionado:', this.mesActual);
-    this.cargarIngresos();
-  }
-
-  cambiaAnio(anioSeleccionado: number): void {
-    //console.log('Año seleccionado:', anioSeleccionado);
-    this.leeDatos();
-  }
-
-  cambiaMes(mesSeleccionado: number): void {
-    //console.log('Mes seleccionado:', mesSeleccionado);
-    this.leeDatos();
-  }
-
-  editar(registro: IIngreso): void {
-    //console.log(registro);
-  }
-
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }
 
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
 
-  abrirPopup() {
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  filtrar(columna: string, event: Event): void {
+    const valor = (event.target as HTMLInputElement).value
+      .trim()
+      .toLowerCase();
+
+    if (valor) {
+      this.filtros[columna] = valor;
+    } else {
+      delete this.filtros[columna];
+    }
+
+    this.dataSource.filter = Object.keys(this.filtros).length > 0 
+      ? JSON.stringify(this.filtros) 
+      : '';
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  leeDatos(): void {
+    this.cargarIngresos();
+  }
+
+  cambiaAnio(anioSeleccionado: number): void {
+    this.leeDatos();
+  }
+
+  cambiaMes(mesSeleccionado: number): void {
+    this.leeDatos();
+  }
+
+  abrirPopup(): void {
     const dialogRef = this.dialog.open(Nuevoingreso, {
-      width: '40vw',       // 80% del ancho de la pantalla (Viewport Width)
-      maxWidth: '2000px',   // No crecerá más de 800px
-      minWidth: '320px',   // No se encogerá a menos de 320px
-      disableClose: false, // Evita que se cierre al hacer clic fuera o presionar Escape
+      width: '40vw',
+      maxWidth: '2000px',
+      minWidth: '320px',
+      disableClose: false,
       hasBackdrop: true
     });
 
-    // Capturar el resultado cuando se cierre
-    dialogRef.afterClosed().subscribe(result => {
-      //console.log('El pop-up se cerró. Resultado:', result);
-      if (result === true) {
-        // El usuario hizo clic en "Aceptar"
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.cargarIngresos();
+      }
+    });
+  }
+
+  editarIngreso(id: number): void {
+    const dialogRef = this.dialog.open(Editaringreso, {
+      width: '40vw',
+      maxWidth: '2000px',
+      minWidth: '320px',
+      disableClose: false,
+      hasBackdrop: true,
+      data: { id }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.cargarIngresos();
       }
     });
   }
 
   cargarIngresos(): void {
+    this.isLoading = true;
     const indiceYear: number = Number(this.anioSeleccionado);
     const anio: number = YEAR_CONSTATS[indiceYear];
     const indiceMonth: number = Number(this.mesActual);
@@ -176,87 +230,49 @@ export class Ingresos implements OnInit {
       next: (response: IIngresoResponse[]) => {
         this.dataSource.data = response;
         this.totalRegistros = response.length;
-        this.recaudacionTotal = response.length > 0 ? Number(response[0].totalMonto) : 0;
+        this.recaudacionTotal = response.length > 0 ? Number(response[0].totalMonto ?? 0) : 0;
         this.isLoading = false;
-        //console.log('Ingresos cargados:', response);
       },
       error: (error) => {
         console.error('Error al obtener los ingresos', error);
-      }
-    });
-
-
-  }
-
-  filtrar(columna: string, event: Event): void {
-    const valor = (event.target as HTMLInputElement).value
-      .trim()
-      .toLowerCase();
-
-    this.filtros[columna] = valor;
-    this.dataSource.filter = JSON.stringify(this.filtros);
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-  }
-
-  editarIngreso(id: number): void {
-    //console.log('Id : ', id);
-    const dialogRef = this.dialog.open(Editaringreso, {
-      width: '40vw',       // 80% del ancho de la pantalla (Viewport Width)
-      maxWidth: '2000px',   // No crecerá más de 800px
-      minWidth: '320px',   // No se encogerá a menos de 320px
-      disableClose: false, // Evita que se cierre al hacer clic fuera o presionar Escape
-      hasBackdrop: true,
-      data: { id } // o: data: { idIngreso: id }
-    });
-
-    // Capturar el resultado cuando se cierre
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('El pop-up se cerró. Resultado:', result);
-      if (result === false) {
-        this.leeDatos();
+        this.isLoading = false;
       }
     });
   }
 
-
-  borrarIngreso(id: number) {
-    console.log('Valor ID: ', id);
+  borrarIngreso(id: number): void {
     this.ingresoId = id;
-    this.modalConfirmacion()?.abrir();
+
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        titulo: 'Eliminar Ingreso',
+        mensaje: '¿Estás seguro de borrar este registro?'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado: boolean) => {
+      if (confirmado) {
+        this.onBorrarIngreso();
+      }
+    });
   }
 
-
-  onBorrarIngreso() {
-    console.log('Id por borrar : ', this.ingresoId);
+  onBorrarIngreso(): void {
     this.ingresosService.deleteIngreso(this.ingresoId).subscribe({
-      next: (respuesta) => {
-        //console.log('Actualización realzada correctamente:', respuesta);
-        const snackBarRef = this.snackBar.open('Se borró el ingreso correctamente', 'Cerrar', {
+      next: () => {
+        this.snackBar.open('Se borró el ingreso correctamente', 'Cerrar', {
           duration: 3000,
         });
-
-        snackBarRef.afterDismissed().subscribe(() => {
-          this.leeDatos(); // se ejecuta cuando el snackbar se cierra
-        });
+        this.leeDatos();
       },
       error: (error) => {
-        this.snackBar.open('Error al actualizar el ingreso', 'Cerrar', {
+        this.snackBar.open('Error al borrar el ingreso', 'Cerrar', {
           duration: 4000,
         });
-        console.error('Error al crear el ingreso:', error);
+        console.error('Error al borrar el ingreso:', error);
       }
     });
-
   }
 
-
-
-  onCancelar() { };
-
-} // fin control
-
-
-
+  onCancelar(): void {}
+}

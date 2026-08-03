@@ -1,94 +1,92 @@
-import { ChangeDetectorRef, Component, inject, OnInit, viewChild } from '@angular/core';
-import { MatDialogModule } from '@angular/material/dialog';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
 import { ICasas } from '../../../Models/inmueble.model';
 import { InmueblesServices } from '../../inmuebles/services/inmuebles-services';
 import { CasaDTO } from './DTO/casaDTO.model';
-
-import { FormControl } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatInputModule } from '@angular/material/input';
 import { InmuebleEditarDTO } from '../../../Models/InmuebleEditarDTO.model';
 import { ConceptoIngreso } from './DTO/conceptoIngresos.model';
 import { catalogosservice } from '../../../services/catalogos/catalogosservice';
 import { ConfirmDialog } from "../../shared/confirm-dialog/confirm-dialog";
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { IIngresoDTO } from './DTO/ingresoDTO.model';
 import { IngresosService } from './services/ingresoService';
 
 @Component({
   selector: 'app-nuevoingreso',
-  imports: [MatDialogModule,
-    MatButtonModule,
+  standalone: true,
+  imports: [
+    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
-    ReactiveFormsModule,
     MatAutocompleteModule,
-    MatInputModule, ConfirmDialog],
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatSnackBarModule
+  ],
   templateUrl: './nuevoingreso.html',
   styleUrl: './nuevoingreso.css',
 })
 export class Nuevoingreso implements OnInit {
+  private readonly fb = inject(FormBuilder);
+  private readonly inmueblesServices = inject(InmueblesServices);
+  private readonly conceptoIngresosService = inject(catalogosservice);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly ingresoService = inject(IngresosService);
+  private readonly dialogRef = inject(MatDialogRef<Nuevoingreso>);
+  private readonly dialog = inject(MatDialog);
 
-  private fb = inject(FormBuilder);
-  private inmueblesServices = inject(InmueblesServices);
-  private conceptoIngresosService = inject(catalogosservice)
-  private cdr = inject(ChangeDetectorRef);
-  private snackBar = inject(MatSnackBar);
-  private ingresoService = inject(IngresosService)
-
-  modalConfirmacion = viewChild<ConfirmDialog>('modalConfirmacion');
   casas: ICasas[] = [];
   casaDatos: CasaDTO[] = [];
-  ingresoForm!: FormGroup;
   casasFiltradas: CasaDTO[] = [];
   conceptoIngreso: ConceptoIngreso[] = [];
-  ingresoDto: IIngresoDTO = {
-    idCasa: '',
-    fechaRecepcion: '',
-    numeroRecibo: '',
-    idConcepto: 0,
-    fechaConcepto: '',
-    monto: 0,
-    observaciones: ''
-  };
+
   casaControl = new FormControl<string>('');
 
-  ngOnInit(): void {
-    this.leerConoceptoIngreso();
-    this.leerDatosCasa();
-
-    this.casaDatos = this.casas.map(casa => this.mapToCasaDTO(casa));
-    this.casasFiltradas = [...this.casaDatos];
-    this.cdr.detectChanges();
-  }
+  ingresoForm: FormGroup = this.fb.group({
+    casa: [null, Validators.required],
+    nombre: [{ value: '', disabled: true }],
+    fechaRecepcion: [this.obtenerFechaActual(), Validators.required],
+    numeroRecibo: ['', Validators.required],
+    concepto: [null, Validators.required],
+    fechaConcepto: ['', Validators.required],
+    monto: [null, [Validators.required, Validators.min(0.01)]],
+    observaciones: ['']
+  });
 
   constructor() {
-    this.ingresoForm = this.fb.group({
-      casa: [null, Validators.required],
-      nombre: [{ value: '', disabled: true }],
-      fechaRecepcion: [this.obtenerFechaActual(), Validators.required],
-      numeroRecibo: ['', Validators.required],
-      concepto: [null, Validators.required],
-      fechaConcepto: ['', Validators.required], // Nuevo campo
-      monto: [null, [Validators.required, Validators.min(0.01)]],
-      observaciones: ['']
-    });
+    // Escuchamos los cambios del autocompletar limpiando automáticamente al destruir el componente
+    this.casaControl.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((texto) => {
+        const valor = texto ?? '';
+        this.filtrarCasas(valor);
 
+        // Si el usuario borra manualmente el texto, limpiamos la selección en el formulario principal
+        if (!valor.trim()) {
+          this.ingresoForm.patchValue({ casa: null, nombre: '' });
+        }
+      });
+  }
 
-
-
-    this.casaControl.valueChanges.subscribe(texto => {
-      this.filtrarCasas(texto ?? '');
-    });
+  ngOnInit(): void {
+    this.leerConceptoIngreso();
+    this.leerDatosCasa();
   }
 
   filtrarCasas(texto: string): void {
     const busqueda = texto.toLowerCase().trim();
-
-    this.casasFiltradas = this.casaDatos.filter(casa =>
+    this.casasFiltradas = this.casaDatos.filter((casa) =>
       casa.casa.toLowerCase().includes(busqueda)
     );
   }
@@ -96,58 +94,101 @@ export class Nuevoingreso implements OnInit {
   seleccionarCasa(casa: CasaDTO): void {
     this.ingresoForm.get('casa')?.setValue(casa.id);
     this.casaControl.setValue(casa.casa, { emitEvent: false });
+    this.leeNombreDeHabitante(casa.id ?? 0);
   }
 
-  leerConoceptoIngreso() {
+  leerConceptoIngreso(): void {
     this.conceptoIngresosService.getConceptoIngresos().subscribe({
       next: (respuesta: ConceptoIngreso[]) => {
         this.conceptoIngreso = respuesta;
-        console.log(this.conceptoIngreso);
-        this.cdr.markForCheck()
       },
       error: (error) => {
-        console.error('Error al obtener las casas', error);
+        console.error('Error al obtener los conceptos de ingreso:', error);
+      }
+    });
+  }
+
+  leerDatosCasa(): void {
+    this.inmueblesServices.getInmuebles().subscribe({
+      next: (respuesta: ICasas[]) => {
+        this.casas = respuesta;
+        this.casaDatos = this.casas.map((casa) => this.mapToCasaDTO(casa));
+        this.casasFiltradas = [...this.casaDatos];
+      },
+      error: (error) => {
+        console.error('Error al obtener las casas:', error);
+      }
+    });
+  }
+
+  leeNombreDeHabitante(id: number): void {
+    this.inmueblesServices.getInuebleById(id).subscribe({
+      next: (inmueble: InmuebleEditarDTO) => {
+        const nombreCompleto = `${inmueble.nombreTitular ?? ''} ${inmueble.apellidosTitular ?? ''}`.trim();
+        this.ingresoForm.patchValue({ nombre: nombreCompleto });
+      },
+      error: (error) => {
+        console.error('No se pudo obtener el inmueble:', error);
+      }
+    });
+  }
+
+  mostrarConfirmacion(): void {
+    if (this.ingresoForm.invalid) {
+      this.ingresoForm.markAllAsTouched();
+      this.snackBar.open(
+        'Por favor, completa todos los campos requeridos.',
+        'Cerrar',
+        { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
+      );
+      return;
+    }
+
+    const ref = this.dialog.open(ConfirmDialog, {
+      data: {
+        titulo: 'Registrar Ingreso',
+        mensaje: '¿Estás seguro de guardar este nuevo ingreso?'
+      }
+    });
+
+    ref.afterClosed().subscribe((confirmado) => {
+      if (confirmado) {
+        this.guardar();
       }
     });
   }
 
   guardar(): void {
-    if (this.ingresoForm.invalid) {
-      this.ingresoForm.markAllAsTouched();
-      return;
-    }
-
     const datos = this.ingresoForm.getRawValue();
 
-    this.ingresoDto = {
+    const ingresoDto: IIngresoDTO = {
       idCasa: datos.casa,
       fechaRecepcion: datos.fechaRecepcion,
       numeroRecibo: datos.numeroRecibo,
       idConcepto: datos.concepto,
       fechaConcepto: datos.fechaConcepto,
-      monto: datos.monto,
+      monto: Number(datos.monto),
       observaciones: datos.observaciones
     };
-    
-    this.ingresoService.agregaIngreso(this.ingresoDto).subscribe({
-      next: (respuesta) => {
-        console.log('Ingreso creado correctamente:', respuesta);
 
-        // Opcional: limpiar formulario
-        this.ingresoForm.reset({
-          casa: null,
-          concepto: null,
-          fechaRecepcion: this.obtenerFechaActual()
-        });
+    this.ingresoService.agregaIngreso(ingresoDto).subscribe({
+      next: (respuesta) => {
+        this.snackBar.open('Ingreso registrado con éxito', 'OK', { duration: 3000 });
+        this.dialogRef.close(respuesta);
       },
       error: (error) => {
         console.error('Error al crear el ingreso:', error);
+        this.snackBar.open(
+          'Error al registrar el ingreso. Inténtalo de nuevo.',
+          'Cerrar',
+          { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
+        );
       }
     });
   }
 
-  obtenerFechaActual(): string {
-    return new Date().toISOString().split('T')[0];
+  onCancelar(): void {
+    this.dialogRef.close(null);
   }
 
   campoInvalido(campo: string): boolean {
@@ -155,17 +196,8 @@ export class Nuevoingreso implements OnInit {
     return !!(control?.invalid && (control.dirty || control.touched));
   }
 
-  leerDatosCasa(): void {
-    this.inmueblesServices.getInmuebles().subscribe({
-      next: (respuesta: ICasas[]) => {
-        this.casas = respuesta;
-        this.casaDatos = this.casas.map(casa => this.mapToCasaDTO(casa));
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error('Error al obtener las casas', error);
-      }
-    });
+  private obtenerFechaActual(): string {
+    return new Date().toISOString().split('T')[0];
   }
 
   private mapToCasaDTO(casa: ICasas): CasaDTO {
@@ -175,104 +207,12 @@ export class Nuevoingreso implements OnInit {
     };
   }
 
-  alSeleccionarCasa(): void {
-    const casaId = this.ingresoForm.get('casa')?.value as number | null;
-    if (casaId === null) {
-      return;
+  alSeleccionarCasa(event: Event): void {
+    const idCasa = this.ingresoForm.get('casa')?.value;
+    if (idCasa) {
+      this.leeNombreDeHabitante(idCasa);
+    } else {
+      this.ingresoForm.patchValue({ nombre: '' });
     }
-    this.leeNombreDeHbitante(casaId);
   }
-
-  leeNombreDeHbitante(Id: number): void {
-    this.inmueblesServices.getInuebleById(Id).subscribe({
-      next: (inmueble: InmuebleEditarDTO) => {
-        this.ingresoForm.patchValue({
-          nombre: inmueble.nombreTitular + ' ' + inmueble.apellidosTitular
-        });
-      },
-      error: (error) => {
-        console.error('No se pudo obtener el inmueble:', error);
-      }
-    });
-  }
-
-  onCancelar(): void {
-    console.log('Operación cancelada');
-  }
-
-  mostrarConfirmacion(): void {
-
-    if (this.ingresoForm.get('casa')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar el Número de Casa.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
-      return;
-    }
-
-    if (this.ingresoForm.get('numeroRecibo')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar el Número de Recibo.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
-      return;
-    }
-
-    if (this.ingresoForm.get('concepto')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar el Concepto.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
-      return;
-    }
-
-
-    if (this.ingresoForm.get('fechaConcepto')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar la fecha del Concepto.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
-      return;
-    }
-
-    if (this.ingresoForm.get('monto')?.invalid) {
-      this.snackBar.open(
-        'Debe capturar el monto del ingreso.',
-        'Cerrar',
-        {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
-      return;
-    }
-
-
-    this.modalConfirmacion()?.abrir();
-  }
-
-
-
-
 }

@@ -1,43 +1,30 @@
+import { Component, inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 
-import {
-  Component,
-  input,
-  output,
-  signal
-} from '@angular/core';
+export interface ConfirmDialogData {
+  titulo: string;
+  mensaje: string;
+}
 
 @Component({
   selector: 'app-confirm-dialog',
-  imports: [],
+  imports: [MatDialogModule, MatButtonModule],
   templateUrl: './confirm-dialog.html',
   styleUrl: './confirm-dialog.css',
 })
 export class ConfirmDialog {
-
-  titulo = input('Confirmación');
-  mensaje = input('¿Deseas continuar?');
-
-  confirmado = output<void>();
-  cancelado = output<void>();
-
-  visible = signal(false);
-
-  abrir(): void {
-    this.visible.set(true);
-  }
-
-  cerrar(): void {
-    this.visible.set(false);
-  }
+  // Inyección moderna con inject()
+  public readonly data = inject<ConfirmDialogData>(MAT_DIALOG_DATA, { optional: true });
+  private readonly dialogRef = inject(MatDialogRef<ConfirmDialog>);
 
   confirmar(): void {
-    this.confirmado.emit();
-    this.cerrar();
+    // Retorna true al cerrar
+    this.dialogRef.close(true);
   }
 
   cancelar(): void {
-    this.cancelado.emit();
-    this.cerrar();
+    // Retorna false al cerrar
+    this.dialogRef.close(false);
   }
-
 }

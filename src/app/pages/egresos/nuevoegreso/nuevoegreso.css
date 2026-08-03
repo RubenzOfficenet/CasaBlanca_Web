@@ -1,0 +1,19 @@
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+.egreso-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.half-width {
+  flex: 1;
+}
+
+.full-width {
+  width: 100%;
+}

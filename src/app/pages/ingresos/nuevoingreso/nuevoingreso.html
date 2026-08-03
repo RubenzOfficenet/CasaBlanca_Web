@@ -13,7 +13,7 @@
                         <!-- Fila 1 -->
                         <div class="form-group">
                             <label for="casa">Casa</label>
-                            <select id="casa" formControlName="casa" (change)="alSeleccionarCasa()">
+                            <select id="casa" formControlName="casa" (change)="alSeleccionarCasa($event)">
                                 <option [ngValue]="null" disabled>
                                     Seleccione una casa
                                 </option>
@@ -121,6 +121,6 @@
 
 </mat-dialog-actions>
 
-<app-confirm-dialog #modalConfirmacion [titulo]="'Guardar Datos'" [mensaje]="'¿Estás seguro de guardar los datos?'"
+<!-- <app-confirm-dialog #modalConfirmacion [titulo]="'Guardar Datos'" [mensaje]="'¿Estás seguro de guardar los datos?'"
     (confirmado)="guardar()" (cancelado)="onCancelar()">
-</app-confirm-dialog>
+</app-confirm-dialog> -->
