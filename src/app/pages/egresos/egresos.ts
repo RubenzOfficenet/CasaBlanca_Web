@@ -139,6 +139,7 @@ ngAfterViewInit(): void {
   }
 
   editarEgreso(id: number): void {
+    console.log('Editar egreso con ID:', id);
     const dialogRef = this.dialog.open(Editaregreso, {
       width: '40vw',
       maxWidth: '2000px',

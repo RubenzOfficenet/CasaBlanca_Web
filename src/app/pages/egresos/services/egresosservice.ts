@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { APP_CONSTANTS } from '../../../Constants/app.constants';
 import { Observable } from 'rxjs';
 import { IEgresoDTO } from '../DTO/IEgresoDTO';
+import { IEgresoAddDTO } from '../DTO/IEgresoAddDTO';
 
 @Injectable({
   providedIn: 'root',
@@ -33,5 +34,14 @@ agregarEgreso(egreso: IEgresoDTO): Observable<number> {
   return this._http.post<number>(url, iegresoAddDTO);  
 }
 
+getEgresosById(id : number): Observable<IEgresoDTO> {
+  const url = `${this._apiUrl}GetEgresoById/${id}`;
+  return this._http.get<IEgresoDTO>(url);
+}
+
+actualizarEgreso(id: number, egreso: IEgresoAddDTO): Observable<void> {
+  const url = `${this._apiUrl}UpdateEgreso?id=${id}`;
+  return this._http.put<void>(url, egreso); 
+}
 
 }
