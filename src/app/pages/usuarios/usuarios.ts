@@ -86,10 +86,10 @@ export class Usuarios {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         debugger;
-        console.log('Datos recibidos del popup:', result);
+        //console.log('Datos recibidos del popup:', result);
         this.cargaUsuarios();
       } else {
-        console.log('El usuario canceló');
+        //console.log('El usuario canceló');
       }
     });
   }
@@ -121,11 +121,11 @@ export class Usuarios {
   cargaUsuarios() {
     this.usuarioService.getUsuarios().subscribe({
       next: (data : any) => {
-        console.log('Datos de usuarios recibidos:', data);
+        //console.log('Datos de usuarios recibidos:', data);
         this.dataSource.data = data;   // ✅ Actualizas los datos sin recrear el dataSource
         this.totalRegistros = data.length;
         this.isLoading = false;
-        console.log("Se cargaron los datos de los usuarios");
+        //console.log("Se cargaron los datos de los usuarios");
 
       },
       error: (err: any) => {

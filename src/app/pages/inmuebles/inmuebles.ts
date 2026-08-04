@@ -98,11 +98,11 @@ export class Inmuebles implements AfterViewInit {
   cargaDatosInmuebles() {
     this._inmueblesServices.getInmuebles().subscribe({
       next: (data) => {
-        console.log('Datos de inmuebles recibidos:', data);
+        //console.log('Datos de inmuebles recibidos:', data);
         this.dataSource.data = data;   // ✅ Actualizas los datos sin recrear el dataSource
         this.totalRegistros = data.length;
         this.isLoading = false;
-        console.log("Se cargaron los datos de los inmuebles");
+        //console.log("Se cargaron los datos de los inmuebles");
         
       },
       error: (err) => {
@@ -123,10 +123,10 @@ export class Inmuebles implements AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Datos recibidos del popup:', result);
+        //console.log('Datos recibidos del popup:', result);
         this.cargaDatosInmuebles();
       } else {
-        console.log('El usuario canceló');
+        //console.log('El usuario canceló');
       }
     });
   }
@@ -134,7 +134,8 @@ export class Inmuebles implements AfterViewInit {
 
   editarCasa(casa: number){
 
-    console.log(casa);
+    //console.log(casa);
+
 
     const dialogRef = this.dialog.open(Editarinmueble, {
       width: '40vw',
@@ -150,10 +151,10 @@ export class Inmuebles implements AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Datos recibidos del popup:', result);
+        //console.log('Datos recibidos del popup:', result);
         this.cargaDatosInmuebles();
       } else {
-        console.log('El usuario canceló');
+        //console.log('El usuario canceló');
       }
     });   
     

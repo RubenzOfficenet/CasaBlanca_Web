@@ -44,4 +44,11 @@ actualizarEgreso(id: number, egreso: IEgresoAddDTO): Observable<void> {
   return this._http.put<void>(url, egreso); 
 }
 
+borrarEgreso(id: number): Observable<void> {
+  const url = `${this._apiUrl}DeleteEgreso/${id}`;
+  return this._http.delete<void>(url); 
+}
+
+
+
 }

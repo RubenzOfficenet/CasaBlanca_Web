@@ -54,12 +54,13 @@ export class Egresos implements OnInit {
   gastoConsolidado: number = 0;
   isLoading: boolean = true;
   totalRegistros: number = 0;
+  eliminandoIds = new Set<number>();
 
   yearList = Object.entries(YEAR_CONSTATS).map(([key, value]) => ({
     value: Number(key),
     viewValue: value
   }));
-  
+
   monthList = Object.entries(MONTH_CONSTANTS).map(([key, value]) => ({
     value: Number(key),
     viewValue: value
@@ -117,10 +118,10 @@ export class Egresos implements OnInit {
     this.cargarEgresos();
   }
 
-ngAfterViewInit(): void {
-  // Aquí el paginator y sort YA están seteados por los @ViewChild setters
-  Promise.resolve().then(() => this.cargarEgresos());
-}
+  ngAfterViewInit(): void {
+    // Aquí el paginator y sort YA están seteados por los @ViewChild setters
+    Promise.resolve().then(() => this.cargarEgresos());
+  }
 
   abrirPopup(): void {
     const dialogRef = this.dialog.open(Nuevoegreso, {
@@ -133,7 +134,7 @@ ngAfterViewInit(): void {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        setTimeout(() => this.leeDatos()); 
+        setTimeout(() => this.leeDatos());
       }
     });
   }
@@ -157,55 +158,82 @@ ngAfterViewInit(): void {
   }
 
   borrarEgreso(id: number): void {
-    this.egresoIdSeleccionado = id;
 
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      data: {
-        titulo: 'Eliminar Egreso',
-        mensaje: '¿Estás seguro de que deseas eliminar este egreso?'
-      }
-    });
+    // Protección contra doble clic 👈
+    if (this.eliminandoIds.has(id)) {
+      return;
+    }
 
-    dialogRef.afterClosed().subscribe((confirmado: boolean) => {
-      if (confirmado) {
-        this.onBorrarEgreso();
+    this.eliminandoIds.add(id);
+
+    console.log('Borrar egreso con ID:', id);
+
+    this.egresosService.borrarEgreso(id).subscribe({
+      next: () => {
+        this.snackBar.open('Egreso eliminado correctamente', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom'
+        });
+        this.leeDatos();
+      },
+      error: (err) => {
+        console.error('Error al eliminar egreso:', err);
+        this.snackBar.open('Error al eliminar el egreso', 'Cerrar', { duration: 3000 });
+      },
+      complete: () => {
+        this.eliminandoIds.delete(id); // 👈 libera el id sin importar éxito o error
       }
     });
   }
 
-  onBorrarEgreso(): void {
+  onBorrarEgreso(id: number): void {
     // Servicio de borrado futuro
+    console.log('Intentando borrar egreso con ID:', id);
+    const ref = this.dialog.open(ConfirmDialog, {
+      data: {
+        titulo: 'Borrar Egreso',
+        mensaje: '¿Estás seguro de borrar el egreso?'
+      }
+    });
+
+    ref.afterClosed().subscribe(confirmado => {
+      if (confirmado) {
+        this.borrarEgreso(id);
+      }
+      // Si presiona "No" en la confirmación, simplemente regresamos al formulario para corregir algo si lo desea.
+    });
   }
 
   leeDatos(): void {
     this.cargarEgresos();
   }
 
-cargarEgresos(): void {
-  this.isLoading = true;
-  const indiceYear: number = Number(this.anioSeleccionado);
-  const anio: number = YEAR_CONSTATS[indiceYear];
-  const indiceMonth: number = Number(this.mesActual);
+  cargarEgresos(): void {
+    this.isLoading = true;
+    const indiceYear: number = Number(this.anioSeleccionado);
+    const anio: number = YEAR_CONSTATS[indiceYear];
+    const indiceMonth: number = Number(this.mesActual);
 
-  this.egresosService.getEgresos(anio, indiceMonth).subscribe({
-    next: (response: IEgresoDTO[]) => {
-      // Difiere al siguiente ciclo para evitar chocar con la
-      // inicialización del paginador/sort en la misma pasada de CD
-      setTimeout(() => {
-        this.dataSource.data = response;
-        this.totalRegistros = response.length;
-        this.gastoConsolidado = response.length > 0 ? response[0].totalMonto ?? 0 : 0;
+    this.egresosService.getEgresos(anio, indiceMonth).subscribe({
+      next: (response: IEgresoDTO[]) => {
+        // Difiere al siguiente ciclo para evitar chocar con la
+        // inicialización del paginador/sort en la misma pasada de CD
+        setTimeout(() => {
+          this.dataSource.data = response;
+          this.totalRegistros = response.length;
+          this.gastoConsolidado = response.length > 0 ? response[0].totalMonto ?? 0 : 0;
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        });
+      },
+      error: (error) => {
+        console.error('Error al obtener los egresos', error);
         this.isLoading = false;
         this.cdr.markForCheck();
-      });
-    },
-    error: (error) => {
-      console.error('Error al obtener los egresos', error);
-      this.isLoading = false;
-      this.cdr.markForCheck();
-    }
-  });
-}
+      }
+    });
+  }
 
   cambiaAnio(anioSeleccionado: number): void {
     this.leeDatos();

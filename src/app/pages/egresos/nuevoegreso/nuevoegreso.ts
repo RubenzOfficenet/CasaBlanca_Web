@@ -125,7 +125,7 @@ mostrarConfirmacion(): void {
         : ''
     };
 
-    console.log('DTO a enviar:', egresoDto);
+    //console.log('DTO a enviar:', egresoDto);
 
 // --- Consumo del servicio ---
     this.egresoService.agregarEgreso(egresoDto).subscribe({
@@ -133,7 +133,7 @@ mostrarConfirmacion(): void {
         
 
         //this.guardando.set(false);
-        console.log('Respuesta del servicio:', respuesta);
+        //console.log('Respuesta del servicio:', respuesta);
 
         this.snackBar.open('Egreso registrado correctamente', 'Cerrar', {
           duration: 3000,
@@ -159,7 +159,7 @@ mostrarConfirmacion(): void {
   }
 
   onCancelar(): void {
-    console.log('Operación cancelada');
+    //console.log('Operación cancelada');
     this.dialogRef.close(false);
   }
 }

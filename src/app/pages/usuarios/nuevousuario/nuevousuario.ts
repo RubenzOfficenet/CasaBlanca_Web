@@ -139,7 +139,7 @@ export class Nuevousuario implements OnInit {
 
     this.usuarioService.addUsuario(this.nuevoUsuario).subscribe({
       next: (data) => {
-        console.log('Usuario agregado:', data);
+        //console.log('Usuario agregado:', data);
         this.snackBar.open('Usuario registrado con éxito', 'OK', { duration: 3000 });
         this.dialogRef.close(data); // Cierra solo cuando el backend responde éxito
       },

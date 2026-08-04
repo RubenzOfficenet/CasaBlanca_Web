@@ -17,7 +17,7 @@ export class Login {
   
 
   validarDatos(datosUsuario: NgForm) {
-    console.log('Datos del formulario:', datosUsuario.value);
+    // console.log('Datos del formulario:', datosUsuario.value);
     this.router.navigate(['/dashboard']);
   }
 
