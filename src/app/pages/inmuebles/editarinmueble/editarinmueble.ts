@@ -7,11 +7,13 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { forkJoin } from 'rxjs';
 
 import { IEstadosOcupacion } from '../../../interfaces/iestadosocupacion.interfase';
 import { InmueblesServices } from '../services/inmuebles-services';
 import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
 import { iupdateCasa } from '../interface/iupdateCasa';
+import { IUbicacion } from '../nuevoinmueble/DOT/IUbicacion.model';
 
 @Component({
   selector: 'app-editarinmueble',
@@ -32,7 +34,6 @@ import { iupdateCasa } from '../interface/iupdateCasa';
   styleUrl: './editarinmueble.css',
 })
 export class Editarinmueble implements OnInit {
-  // Inyección de dependencias con inject()
   private readonly fb = inject(FormBuilder);
   private readonly _inmueblesServices = inject(InmueblesServices);
   private readonly dialogRef = inject(MatDialogRef<Editarinmueble>);
@@ -41,10 +42,11 @@ export class Editarinmueble implements OnInit {
   public readonly data = inject<{ id: number }>(MAT_DIALOG_DATA);
 
   estadosOcupacion: IEstadosOcupacion[] = [];
+  ubicaciones: IUbicacion[] = [];
 
   inmuebleForm: FormGroup = this.fb.group({
     numeroCasa: ['', [Validators.required]],
-    ubicacion: [''],
+    idubicacion: [null],
     cuotaDeMantenimientoBase: [0],
     estadoOcupacion: [-1],
     numeroHabitantes: [0],
@@ -60,56 +62,51 @@ export class Editarinmueble implements OnInit {
   });
 
   ngOnInit(): void {
-    this.getEstadosOcupacion();
-    this.cargarInmueble();
+    this.cargarDatosIniciales();
   }
 
-  cargarInmueble(): void {
-    this._inmueblesServices.getInuebleById(this.data.id).subscribe({
-      next: (inmueble) => {
-        this.inmuebleForm.patchValue({
-          numeroCasa: inmueble.numeroCasa,
-          ubicacion: inmueble.ubicacion,
-          cuotaDeMantenimientoBase: inmueble.cuotaDeMantenimientoBase,
-          estadoOcupacion: inmueble.estadoOcupacion,
-          numeroHabitantes: inmueble.numeroHabitantes,
-          nombreTitular: inmueble.nombreTitular,
-          apellidosTitular: inmueble.apellidosTitular,
-          celularTitular: inmueble.celularTitular,
-          emailTitular: inmueble.emailTitular,
-          nombreOcupante: inmueble.nombreOcupante,
-          apellidosOcupante: inmueble.apellidosOcupante,
-          celularOcupante: inmueble.celularOcupante,
-          emailOcupante: inmueble.emailOcupante,
-          observaciones: inmueble.observaciones
-        });
-      },
-      error: (err) => {
-        console.error('Error al obtener inmueble', err);
-        this.snackBar.open('Error al cargar datos del inmueble', 'Cerrar', { duration: 3000 });
-      }
-    });
-  }
+  // Carga catalogos e inmueble secuencialmente usando forkJoin para evitar race conditions
+cargarDatosIniciales(): void {
+  forkJoin({
+    estados: this._inmueblesServices.getEstadosOcupacion(),
+    ubicaciones: this._inmueblesServices.getUbicaciones(),
+    inmueble: this._inmueblesServices.getInuebleById(this.data.id)
+  }).subscribe({
+    next: ({ estados, ubicaciones, inmueble }) => {
+      this.estadosOcupacion = estados;
+      this.ubicaciones = ubicaciones;
 
-  getEstadosOcupacion(): void {
-    this._inmueblesServices.getEstadosOcupacion().subscribe({
-      next: (data) => {
-        this.estadosOcupacion = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar los Estados de Ocupación:', err);
-      }
-    });
-  }
+      // Corregido: idUbicacion con U mayúscula, tal como viene del JSON
+      const idUbicacionString = inmueble.idUbicacion ? String(inmueble.idUbicacion) : null;
+
+      this.inmuebleForm.patchValue({
+        numeroCasa: inmueble.numeroCasa,
+        idubicacion: idUbicacionString, // el control del form se llama 'idubicacion' (minúsculas), eso está bien
+        cuotaDeMantenimientoBase: inmueble.cuotaDeMantenimientoBase,
+        estadoOcupacion: inmueble.estadoOcupacion,
+        numeroHabitantes: inmueble.numeroHabitantes,
+        nombreTitular: inmueble.nombreTitular,
+        apellidosTitular: inmueble.apellidosTitular,
+        celularTitular: inmueble.celularTitular,
+        emailTitular: inmueble.emailTitular,
+        nombreOcupante: inmueble.nombreOcupante,
+        apellidosOcupante: inmueble.apellidosOcupante,
+        celularOcupante: inmueble.celularOcupante,
+        emailOcupante: inmueble.emailOcupante,
+        observaciones: inmueble.observaciones
+      });
+    },
+    error: (err) => {
+      console.error('Error al cargar datos:', err);
+      this.snackBar.open('Error al cargar la información del inmueble.', 'Cerrar', { duration: 3000 });
+    }
+  });
+}
 
   mostrarConfirmacion(): void {
     if (this.inmuebleForm.invalid) {
       this.inmuebleForm.markAllAsTouched();
-      this.snackBar.open(
-        'Por favor, valida los campos requeridos.',
-        'Cerrar',
-        { duration: 3000 }
-      );
+      this.snackBar.open('Por favor, valida los campos requeridos.', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -128,26 +125,26 @@ export class Editarinmueble implements OnInit {
   }
 
   guardar(): void {
+    const rawValues = this.inmuebleForm.getRawValue();
+
+    debugger;
     const datosHouse: iupdateCasa = {
       id: this.data.id,
-      ...this.inmuebleForm.getRawValue(),
-      cuotaDeMantenimientoBase: Number(this.inmuebleForm.value.cuotaDeMantenimientoBase) || 0,
-      numeroHabitantes: Number(this.inmuebleForm.value.numeroHabitantes) || 0,
-      estadoOcupacion: Number(this.inmuebleForm.value.estadoOcupacion) || 0
+      ...rawValues,
+      idubicacion: Number(rawValues.idubicacion) || 0,
+      cuotaDeMantenimientoBase: Number(rawValues.cuotaDeMantenimientoBase) || 0,
+      numeroHabitantes: Number(rawValues.numeroHabitantes) || 0,
+      estadoOcupacion: Number(rawValues.estadoOcupacion) || 0
     };
 
     this._inmueblesServices.postUpdateHouse(datosHouse).subscribe({
       next: (res) => {
         this.snackBar.open('Inmueble actualizado correctamente', 'OK', { duration: 3000 });
-        this.dialogRef.close(res); // Se cierra solo tras la respuesta exitosa
+        this.dialogRef.close(res);
       },
       error: (err) => {
         console.error('Error al actualizar el inmueble:', err);
-        this.snackBar.open(
-          'Error al actualizar el inmueble. Inténtalo de nuevo.',
-          'Cerrar',
-          { duration: 3000 }
-        );
+        this.snackBar.open('Error al actualizar el inmueble. Inténtalo de nuevo.', 'Cerrar', { duration: 3000 });
       }
     });
   }
@@ -155,4 +152,7 @@ export class Editarinmueble implements OnInit {
   cancelar(): void {
     this.dialogRef.close(null);
   }
+
+
+
 }

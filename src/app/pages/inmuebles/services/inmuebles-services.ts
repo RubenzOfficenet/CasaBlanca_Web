@@ -40,9 +40,7 @@ export class InmueblesServices {
     return this._http.get<any>(url);
   }
 
-  postUpdateHouse(datos: iupdateCasa)
-  {
- 
+  postUpdateHouse(datos: iupdateCasa) {
     var url = this._apiUrl + 'UpdateHouse/';
     return this._http.post<any>(url, datos);
   }

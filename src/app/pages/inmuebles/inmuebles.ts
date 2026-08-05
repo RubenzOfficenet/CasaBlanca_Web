@@ -136,7 +136,7 @@ export class Inmuebles implements AfterViewInit {
 
   editarCasa(casa: number){
 
-    //console.log(casa);
+    console.log(casa);
 
 
     const dialogRef = this.dialog.open(Editarinmueble, {
