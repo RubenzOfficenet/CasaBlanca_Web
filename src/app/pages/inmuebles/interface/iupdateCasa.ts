@@ -1,7 +1,7 @@
 export interface iupdateCasa {
     id: number;
     numeroCasa?: string;
-    ubicacion?: string;
+    ubicacion?: string; 
     cuotaDeMantenimientoBase: number;
     estadoOcupacion?: number;
     nombreTitular?: string;
