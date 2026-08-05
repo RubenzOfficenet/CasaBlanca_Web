@@ -45,6 +45,7 @@ export class Inmuebles implements AfterViewInit {
 
   displayedColumns: string[] = [
     'numeroCasa',
+    'nombreubicacion',
     'cuotaDeMantenimientoBase',
     'estadoInicialOcupacion',
     'nombreTitular',
@@ -83,7 +84,8 @@ export class Inmuebles implements AfterViewInit {
 
       return (data.nombreTitular?.toLowerCase().includes(normalizedFilter) ?? false)
         || (data.numeroCasa !== undefined && data.numeroCasa.toString().toLowerCase().includes(normalizedFilter))
-        || (data.nombreOcupante?.toLowerCase().includes(normalizedFilter) ?? false);
+        || (data.nombreOcupante?.toLowerCase().includes(normalizedFilter) ?? false)
+        || (data.nombreubicacion?.toLowerCase().includes(normalizedFilter) ?? false);
     };
 
     this.cargaDatosInmuebles();
@@ -98,7 +100,7 @@ export class Inmuebles implements AfterViewInit {
   cargaDatosInmuebles() {
     this._inmueblesServices.getInmuebles().subscribe({
       next: (data) => {
-        //console.log('Datos de inmuebles recibidos:', data);
+        console.log('Datos de inmuebles recibidos:', data);
         this.dataSource.data = data;   // ✅ Actualizas los datos sin recrear el dataSource
         this.totalRegistros = data.length;
         this.isLoading = false;

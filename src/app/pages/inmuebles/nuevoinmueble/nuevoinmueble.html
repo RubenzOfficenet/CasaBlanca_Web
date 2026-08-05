@@ -39,9 +39,14 @@
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="Ubicación">Ubicación / Dirección</label>
-                                    <input type="text" id="Ubicación" formControlName="Ubicacion"
-                                        placeholder="Ej. Sección I" />
+                                    <label for="Ubicación">Sección</label>
+                                    <select id="Ubicacion" formControlName="Ubicacion">
+                                        @for (ubicacion of ubicaciones; track ubicacion.id) {
+                                        <option [value]="ubicacion.id">
+                                            {{ ubicacion.nombreUbicacion }}
+                                        </option>
+                                        }
+                                    </select>
                                 </div>
                             </div>
 
@@ -62,7 +67,7 @@
                                         Seleccione un estado
                                     </option>
                                     <select id="EstadoOcupacion" formControlName="EstadoOcupacion">
-                                        <option value="-1" disabled selected>Seleccione un estado</option>
+                                        <!-- <option value="-1" disabled selected>Seleccione un estado</option> -->
                                         @for (estado of estadosOcupacion; track estado.id) {
                                         <option [value]="estado.id">
                                             {{ estado.estadoInicialOcupacion }}
@@ -139,7 +144,7 @@
                                     <small class="text-danger">
                                         El usuario es obligatorio.
                                     </small>
-                                    }                                    
+                                    }
                                 </div>
                             </div>
 
@@ -153,12 +158,12 @@
                                     <input type="password" id="Password" formControlName="Password"
                                         placeholder="******" />
                                     @if (
-                                        inmuebleForm.get('Password')?.hasError('minlength') &&
-                                        inmuebleForm.get('Password')?.touched
+                                    inmuebleForm.get('Password')?.hasError('minlength') &&
+                                    inmuebleForm.get('Password')?.touched
                                     ) {
-                                        <small class="text-danger">
-                                            La contraseña debe tener al menos 8 caracteres.
-                                        </small>
+                                    <small class="text-danger">
+                                        La contraseña debe tener al menos 8 caracteres.
+                                    </small>
                                     }
                                     @if (
                                     inmuebleForm.get('Password')?.hasError('required') &&
@@ -264,8 +269,3 @@
     <button mat-raised-button (click)="cancelar()">Cancelar</button>
     <button mat-raised-button (click)="mostrarConfirmacion()" color="primary">Guardar Registro</button>
 </mat-dialog-actions>
-
-<!-- 
-<app-confirm-dialog #modalConfirmacion [titulo]="'Guardar Datos'" [mensaje]="'¿Estás seguro de guardar los datos?'"
-    (confirmado)="guardar()" (cancelado)="onCancelar()">
-</app-confirm-dialog> -->

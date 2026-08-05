@@ -7,6 +7,7 @@ import { IEstadosOcupacion } from '../../../interfaces/iestadosocupacion.interfa
 import { ICasaCreate } from '../interface/icasa.interfase';
 import { InmuebleEditarDTO } from '../../../Models/InmuebleEditarDTO.model';
 import { type iupdateCasa } from '../interface/iupdateCasa';
+import { IUbicacion } from '../nuevoinmueble/DOT/IUbicacion.model';
 
 @Injectable({
   providedIn: 'root',
@@ -46,5 +47,10 @@ export class InmueblesServices {
     return this._http.post<any>(url, datos);
   }
 
+
+  getUbicaciones(): Observable<IUbicacion[]> {
+    var url = this._apiUrl + 'GetAllUbicaciones';
+    return this._http.get<IUbicacion[]>(url);
+  }
 
 }

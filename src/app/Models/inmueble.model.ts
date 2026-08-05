@@ -1,8 +1,9 @@
 export interface ICasas {
     id: number;
     numeroCasa?: string;
-    CuotaDeMantenimientoBase: number;
-    EstadoInicialOcupacion: string;
+    nombreubicacion: string;
+    cuotaDeMantenimientoBase: number;
+    estadoInicialOcupacion: string;
     nombreTitular?: string;
     emailTitular?: string;
     celularTitular?: string;

@@ -4,11 +4,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractContro
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MatDialogRef, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
 import { ICasaCreate } from '../interface/icasa.interfase';
 import { IEstadosOcupacion } from '../../../interfaces/iestadosocupacion.interfase';
 import { InmueblesServices } from '../services/inmuebles-services';
 import { ConfirmDialog } from "../../shared/confirm-dialog/confirm-dialog";
+import { IUbicacion } from './DOT/IUbicacion.model';
 
 export const passwordsIgualesValidator: ValidatorFn = (form: AbstractControl): ValidationErrors | null => {
   const password = form.get('Password')?.value;
@@ -46,6 +46,8 @@ export class Nuevoinmueble implements OnInit {
 
   estadosOcupacion: IEstadosOcupacion[] = [];
   numeroCasaVacio: boolean = true;
+  ubicaciones : IUbicacion[] = []; // Variable para almacenar las ubicaciones  
+
 
   inmuebleForm: FormGroup = this.fb.group(
     {
@@ -72,8 +74,9 @@ export class Nuevoinmueble implements OnInit {
     }
   );
 
-  nuevaCasa: ICasaCreate = {
+    nuevaCasa: ICasaCreate = {
     numeroCasa: '',
+    idubicacion: 0,
     ubicacion: '',
     cuotaDeMantenimientoBase: 0,
     estadoOcupacion: 0,
@@ -94,6 +97,22 @@ export class Nuevoinmueble implements OnInit {
 
   ngOnInit(): void {
     this.getEstadosOcupacion();
+    this.getUbicaciones();
+  }
+
+getUbicaciones(): void {
+    this._inmueblesServices.getUbicaciones().subscribe({
+      next: (data) => {
+        this.ubicaciones = data;
+        console.log('Ubicaciones cargadas:', this.ubicaciones);
+        if (data.length > 0) {
+          this.inmuebleForm.patchValue({
+            Ubicacion: data[0].id
+          });
+        }
+      },
+      error: (err) => console.error('Error al cargar las Ubicaciones:', err)
+    });
   }
 
   getEstadosOcupacion(): void {
@@ -137,6 +156,8 @@ export class Nuevoinmueble implements OnInit {
 
   guardar(): void {
     this.nuevaCasa = this.construirNuevaCasa();
+    debugger;
+    console.log('Datos a enviar al API:', this.nuevaCasa);
 
     this._inmueblesServices.postCreateHouse(this.nuevaCasa).subscribe({
       next: (respuesta) => {
@@ -163,6 +184,7 @@ export class Nuevoinmueble implements OnInit {
 
     return {
       numeroCasa: f.NumeroCasa,
+      idubicacion: f.Ubicacion,
       ubicacion: f.Ubicacion,
       cuotaDeMantenimientoBase: Number(f.CuotaDeMantenimientoBase) || 0,
       estadoOcupacion: f.EstadoOcupacion ? Number(f.EstadoOcupacion) : undefined,

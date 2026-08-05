@@ -1,5 +1,6 @@
 export interface ICasaCreate {
     numeroCasa?: string;
+    idubicacion:number;
     ubicacion?: string;
     cuotaDeMantenimientoBase: number;
     estadoOcupacion?: number;

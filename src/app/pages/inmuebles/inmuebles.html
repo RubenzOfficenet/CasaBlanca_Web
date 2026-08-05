@@ -58,11 +58,17 @@
                 <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.numeroCasa }} </td>
             </ng-container>
 
+            <!-- Nombre de Ubicación -->
+            <ng-container matColumnDef="nombreubicacion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Ubicación</th>
+                <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.nombreubicacion }} </td>
+            </ng-container>
+
             <!-- Cuota de Mantenimiento -->
             <ng-container matColumnDef="cuotaDeMantenimientoBase">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Cuota de Mantenimiento </th>
                 <td mat-cell *matCellDef="let casa" class="table-td-text">
-                    {{ casa.cuotaDeMantenimientoBase | currency:'':'symbol':'1.2-2' }}
+                    {{ casa.cuotaDeMantenimientoBase | currency:'MXN':'symbol':'1.2-2' }}
                 </td>
             </ng-container>
 
