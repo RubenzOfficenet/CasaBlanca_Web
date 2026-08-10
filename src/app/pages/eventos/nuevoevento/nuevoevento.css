@@ -1,0 +1,52 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+.form-container {
+    padding: 8px 0;
+}
+
+.evento-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 4px;
+}
+
+/* 3 campos por renglón */
+.third-width {
+    flex: 1 1 0;
+    min-width: 220px;
+}
+
+/* Por si necesitas mezclar renglones de 2 columnas */
+.half-width {
+    flex: 1 1 0;
+    min-width: 260px;
+}
+
+/* Campo que ocupa todo el ancho del renglón */
+.full-width {
+    flex: 1 1 100%;
+    width: 100%;
+}
+
+/* Ajuste responsivo: en pantallas chicas cada campo pasa a ocupar todo el ancho */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .third-width,
+    .half-width {
+        min-width: 100%;
+    }
+}
+
+
+

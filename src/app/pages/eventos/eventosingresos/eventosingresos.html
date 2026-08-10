@@ -1,0 +1,241 @@
+<main class="main-content">
+    <header>
+        <div>
+            <h1>Lista de Eventos</h1>
+        </div>
+        <div class="header-actions">
+            <button mat-raised-button color="primary" (click)="abrirPopup()">
+                Registrar Evento
+            </button>
+        </div>
+    </header>
+
+    <!-- <section class="analytics-grid ">
+        <div class="metric-card">
+            <div class="metric-label">ingreso Consolidado (Mes)</div>
+            <div class="metric-value positive">{{gastoConsolidado | currency:'MXN':'symbol':'1.2-2'}}</div>
+        </div>
+        <div class="metric-card card-total-ingresos">
+        </div>
+        <div class="metric-card card-total-ingresos" style="text-align: right;">
+            <div class="metric-label">Fecha Actual</div>
+            <div class="metric-value" style="color: #0F172A; font-size: 1.5rem;">{{fechaActual | date:'dd-MMM-yyyy' }}
+            </div>
+        </div>
+    </section> -->
+
+
+    <section class="table-container">
+        <div class="table-header-area">
+            <div class="table-title">Lista de Egresos</div>
+
+            <div>
+                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
+                    <mat-label>Año</mat-label>
+                    <mat-select [(ngModel)]="anioSeleccionado" (selectionChange)="cambiaAnio($event.value)">
+                        @for (year of yearList; track year.value) {
+                        <mat-option [value]="year.value">{{year.viewValue}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+
+                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
+                    <mat-label>Mes</mat-label>
+                    <mat-select [(ngModel)]="mesActual" (selectionChange)="cambiaMes($event.value)">
+                        @for (mes of monthList; track mes.value) {
+                        <mat-option [value]="mes.value">{{mes.viewValue}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <!-- Campo de búsqueda -->
+            <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
+                <input matInput (keyup)="applyFilter($event)" placeholder="Filtra por Beneficiario o Concepto">
+            </mat-form-field>
+        </div>
+
+        <!-- Loader con Angular Material -->
+        @if (isLoading) {
+        <div class="loader-container">
+            <mat-progress-spinner mode="indeterminate" diameter="60" color="primary"></mat-progress-spinner>
+            <p>Cargando datos...</p>
+        </div>
+        }
+
+        <!-- TABLA DE DATOS DE INGRESOS -->
+        <div [hidden]="isLoading">
+
+            <table mat-table [dataSource]="dataSource" matSort matSortActive="fechaEgreso" matSortDirection="asc">
+
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell no-registros" [attr.colspan]="displayedColumns.length">
+                        No hay registros para mostrar.
+                    </td>
+                </tr>
+
+                <!-- ubicacion -->
+                <ng-container matColumnDef="nombreUbicacion">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Ubicación</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.nombreUbicacion }} </td>
+                </ng-container>
+
+                <!-- Casa -->
+                <ng-container matColumnDef="numeroCasa">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Casa</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.numeroCasa }} </td>
+                </ng-container>
+
+                <!-- Fecha evento -->
+                <ng-container matColumnDef="fechaEvento">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha Evento</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.fechaEvento |
+                        date:'dd-MMM-yyyy'
+                        }}
+                    </td>
+                </ng-container>
+
+                <!-- Nombre titular -->
+                <ng-container matColumnDef="nombreTitular">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Nombre Titular</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.nombreTitular }} </td>
+                </ng-container>
+
+                <!-- Apellido titular -->
+                <ng-container matColumnDef="apellidosTitular">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Apellido Titular</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.apellidosTitular }} </td>
+                </ng-container>
+
+
+                <!-- Numero Recibo -->
+                <ng-container matColumnDef="reciboNumero">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Recibo número</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text-center"> {{ evento.reciboNumero }} </td>
+                </ng-container>
+
+                <!-- Fecha Pago -->
+                <ng-container matColumnDef="fechaPago">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha Pago</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.fechaPago |
+                        date:'dd-MMM-yyyy' }} </td>
+                </ng-container>
+
+
+                <!-- Monto apartado -->
+                <ng-container matColumnDef="apartado">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Apartado</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text-right">
+                        @if (evento.apartado > 0) {
+                        {{ evento.apartado | currency:'MXN':'symbol':'1.2-2' }}
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- Monto liquida -->
+                <ng-container matColumnDef="liquida">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Liquida</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text-right">
+                        @if (evento.liquida > 0) {
+                        {{ evento.liquida | currency:'MXN':'symbol':'1.2-2' }}
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- Luz -->
+                <ng-container matColumnDef="luz">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Luz</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text-right">
+                        @if (evento.luz > 0) {
+                        {{ evento.luz | currency:'MXN':'symbol':'1.2-2' }}
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- Depósito garantía -->
+                <ng-container matColumnDef="depositoGarantia">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Depósito Garantía</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text-right">
+                        @if (evento.depositoGarantia > 0) {
+                        {{ evento.depositoGarantia | currency:'MXN':'symbol':'1.2-2' }}
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- Limpieza domingo -->
+                <ng-container matColumnDef="limpiezaDomingo">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Limpieza Domingo</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text-right">
+                        @if (evento.limpiezaDomingo > 0) {
+                        {{ evento.limpiezaDomingo | currency:'MXN':'symbol':'1.2-2' }}
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- Renta inmobiliario -->
+                <ng-container matColumnDef="rentaInmobiliario">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Renta Inmobiliario</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text-right">
+                        @if (evento.rentaInmobiliario > 0) {
+                        {{ evento.rentaInmobiliario | currency:'MXN':'symbol':'1.2-2' }}
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- Total -->
+                <ng-container matColumnDef="total">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Total</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text-right">
+                        @if (evento.total > 0) {
+                        {{ evento.total | currency:'MXN':'symbol':'1.2-2' }}
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- Estatus -->
+                <ng-container matColumnDef="estatusEvento">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Estatus</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text">
+                        <span class="estatus-badge" [ngClass]="'estatus-' + evento.estatusEvento.toLowerCase()">
+                            {{ evento.estatusEvento }}
+                        </span>
+                    </td>
+                </ng-container>
+
+
+                <!-- Acciones -->
+                <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Acciones
+                    </th>
+
+                    <td mat-cell *matCellDef="let casa" style="text-align: center;">
+                        <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarEgreso(casa.id)"
+                            aria-label="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="primary" matTooltip="Borrar" (click)="onBorrarEgreso(casa.id)"
+                            aria-label="Borrar">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            </table>
+        </div>
+        <!-- ✅ Paginador -->
+        <mat-paginator [pageSize]="10" [hidden]="isLoading" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+        </mat-paginator>
+
+    </section>
+
+
+
+
+
+</main>

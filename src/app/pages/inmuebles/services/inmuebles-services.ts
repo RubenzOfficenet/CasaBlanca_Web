@@ -8,6 +8,7 @@ import { ICasaCreate } from '../interface/icasa.interfase';
 import { InmuebleEditarDTO } from '../../../Models/InmuebleEditarDTO.model';
 import { type iupdateCasa } from '../interface/iupdateCasa';
 import { IUbicacion } from '../nuevoinmueble/DOT/IUbicacion.model';
+import { ICasaRsponse } from '../interface/casarequest.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -50,5 +51,11 @@ export class InmueblesServices {
     var url = this._apiUrl + 'GetAllUbicaciones';
     return this._http.get<IUbicacion[]>(url);
   }
+
+  leeCasasporSeccion(idSeccion: number): Observable<ICasaRsponse[]> {
+    const url = this._apiUrl + 'GetHouseIdUbicacion/?idUbicacion=' + idSeccion;
+    return this._http.get<ICasaRsponse[]>(url);
+  }
+
 
 }

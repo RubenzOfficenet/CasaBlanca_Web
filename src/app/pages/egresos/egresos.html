@@ -56,78 +56,79 @@
         </div>
 
         <!-- Loader con Angular Material -->
-@if (isLoading) {
-  <div class="loader-container">
-    <mat-progress-spinner mode="indeterminate" diameter="60" color="primary"></mat-progress-spinner>
-    <p>Cargando datos...</p>
-  </div>
-}
+        @if (isLoading) {
+        <div class="loader-container">
+            <mat-progress-spinner mode="indeterminate" diameter="60" color="primary"></mat-progress-spinner>
+            <p>Cargando datos...</p>
+        </div>
+        }
 
         <!-- TABLA DE DATOS DE INGRESOS -->
-         <div [hidden]="isLoading">
-        <table mat-table [dataSource]="dataSource" matSort matSortActive="fechaEgreso" matSortDirection="asc">
+        <div [hidden]="isLoading">
+            <table mat-table [dataSource]="dataSource" matSort matSortActive="fechaEgreso" matSortDirection="asc">
 
-            <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell no-registros" [attr.colspan]="displayedColumns.length">
-                    No hay registros para mostrar.
-                </td>
-            </tr>
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell no-registros" [attr.colspan]="displayedColumns.length">
+                        No hay registros para mostrar.
+                    </td>
+                </tr>
 
-            <!-- Fecha Concepto -->
-            <ng-container matColumnDef="fechaEgreso">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha Concepto</th>
-                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.fechaEgreso | date:'dd-MMM-yyyy'
-                    }}
-                </td>
-            </ng-container>
+                <!-- Fecha Concepto -->
+                <ng-container matColumnDef="fechaEgreso">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha Concepto</th>
+                    <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.fechaEgreso |
+                        date:'dd-MMM-yyyy'
+                        }}
+                    </td>
+                </ng-container>
 
-            <!-- Nombre Beneficiario -->
-            <ng-container matColumnDef="beneficiario">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Beneficiario</th>
-                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.beneficiario }} </td>
-            </ng-container>
+                <!-- Nombre Beneficiario -->
+                <ng-container matColumnDef="beneficiario">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Beneficiario</th>
+                    <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.beneficiario }} </td>
+                </ng-container>
 
-            <!-- Concepto -->
-            <ng-container matColumnDef="concepto">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Concepto</th>
-                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.concepto }} </td>
-            </ng-container>
+                <!-- Concepto -->
+                <ng-container matColumnDef="concepto">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Concepto</th>
+                    <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.concepto }} </td>
+                </ng-container>
 
-            <!-- Monto -->
-            <ng-container matColumnDef="monto">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Monto</th>
-                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.monto |
-                    currency:'MXN':'symbol':'1.2-2' }} </td>
-            </ng-container>
+                <!-- Monto -->
+                <ng-container matColumnDef="monto">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Monto</th>
+                    <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.monto |
+                        currency:'MXN':'symbol':'1.2-2' }} </td>
+                </ng-container>
 
-            <!-- Observaciones -->
-            <ng-container matColumnDef="observaciones">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Observaciones</th>
-                <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.observaciones }} </td>
-            </ng-container>
+                <!-- Observaciones -->
+                <ng-container matColumnDef="observaciones">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Observaciones</th>
+                    <td mat-cell *matCellDef="let egreso" class="table-td-text"> {{ egreso.observaciones }} </td>
+                </ng-container>
 
 
-            <!-- Acciones -->
-            <ng-container matColumnDef="acciones">
-                <th mat-header-cell *matHeaderCellDef>
-                    Acciones
-                </th>
+                <!-- Acciones -->
+                <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Acciones
+                    </th>
 
-                <td mat-cell *matCellDef="let casa" style="text-align: center;">
-                    <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarEgreso(casa.id)">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button color="primary" matTooltip="Borrar" (click)="onBorrarEgreso(casa.id)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </td>
+                    <td mat-cell *matCellDef="let casa" style="text-align: center;">
+                        <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarEgreso(casa.id)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="primary" matTooltip="Borrar" (click)="onBorrarEgreso(casa.id)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
 
-            </ng-container>
+                </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-        </table>
+            </table>
         </div>
         <!-- ✅ Paginador -->
         <mat-paginator [pageSize]="10" [hidden]="isLoading" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
@@ -137,4 +138,3 @@
 
 
 </main>
-

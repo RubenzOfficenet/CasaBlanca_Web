@@ -1,0 +1,156 @@
+
+
+<mat-dialog-content>
+    <div class="form-container">
+        <h3>Nuevo Evento</h3>
+        <hr>
+        <form [formGroup]="eventoForm" class="evento-form">
+
+            <!-- Renglón 1: Ubicación + Nombre Ubicación + Número Casa -->
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Ubicación</mat-label>
+                    <mat-select formControlName="idubicacion" (selectionChange)="onUbicacionChange($event.value)">
+                        @for (ubicacion of ubicacionList; track ubicacion.id) {
+                            <mat-option [value]="ubicacion.id">{{ ubicacion.nombreUbicacion }}</mat-option>
+                        }
+                    </mat-select>
+                    @if (eventoForm.get('idubicacion')?.hasError('required')) {
+                    <mat-error>La ubicación es obligatoria</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Casa</mat-label>
+                    <mat-select formControlName="idinmueble" (selectionChange)="onCasaChange($event.value)">
+                        @for (casa of casalist; track casa.id) {
+                            <mat-option [value]="casa.id">{{ casa.numeroCasa }}</mat-option>
+                        }
+                    </mat-select>
+                    @if (eventoForm.get('idinmueble')?.hasError('required')) {
+                        <mat-error>La casa es obligatoria</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Fecha Evento</mat-label>
+                    <input matInput [matDatepicker]="pickerEvento" formControlName="fechaevento">
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerEvento"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerEvento></mat-datepicker>
+                    <!-- @if (eventoForm.get('fechaevento')?.hasError('required')) {
+                    <mat-error>La fecha del evento es obligatoria</mat-error>
+                    } -->
+                </mat-form-field>
+            </div>
+            
+            <!-- Renglón 2: Fecha Evento + Nombre Titular + Apellidos Titular -->
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Nombre Titular</mat-label>
+                    <input matInput formControlName="nombretitular" readonly>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Nombre Ocupante</mat-label>
+                    <input matInput formControlName="nombreOcupante" readonly>
+                </mat-form-field>
+            </div>
+            <!-- Renglón 3: Recibo Número + Fecha Pago + Estatus Evento -->
+            <div class="form-row">
+                
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Recibo Número</mat-label>
+                    <input matInput formControlName="recibonumero">
+                    <!-- @if (eventoForm.get('recibonumero')?.hasError('required')) {
+                    <mat-error>El número de recibo es obligatorio</mat-error>
+                    } -->
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Fecha Pago</mat-label>
+                    <input matInput [matDatepicker]="pickerPago" formControlName="fechapago">
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerPago"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerPago></mat-datepicker>
+                    <!-- @if (eventoForm.get('fechapago')?.hasError('required')) {
+                    <mat-error>La fecha de pago es obligatoria</mat-error>
+                    } -->
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Estatus</mat-label>
+                    <mat-select formControlName="idestatusevento">
+                        @for (estatus of estatusList; track estatus.id) {
+                        <mat-option [value]="estatus.id">{{ estatus.estatusEvento }}</mat-option>
+                        }
+
+                    </mat-select>
+                    <!-- @if (eventoForm.get('estatusevento')?.hasError('required')) {
+                    <mat-error>El estatus es obligatorio</mat-error>
+                    } -->
+                </mat-form-field>
+            </div>
+
+            <!-- Renglón 4: Apartado + Liquida + Luz -->
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Apartado</mat-label>
+                    <input matInput type="number" formControlName="apartado">
+                    @if (eventoForm.get('apartado')?.hasError('min')) {
+                    <mat-error>El monto debe ser mayor o igual a 0</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Liquida</mat-label>
+                    <input matInput type="number" formControlName="liquida">
+                    @if (eventoForm.get('liquida')?.hasError('min')) {
+                    <mat-error>El monto debe ser mayor o igual a 0</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Luz</mat-label>
+                    <input matInput type="number" formControlName="luz">
+                    @if (eventoForm.get('luz')?.hasError('min')) {
+                    <mat-error>El monto debe ser mayor o igual a 0</mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+            <!-- Renglón 5: Depósito Garantía + Limpieza Domingo + Renta Inmobiliario -->
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Depósito Garantía</mat-label>
+                    <input matInput type="number" formControlName="depositogarantia">
+                    @if (eventoForm.get('depositogarantia')?.hasError('min')) {
+                    <mat-error>El monto debe ser mayor o igual a 0</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Limpieza Domingo</mat-label>
+                    <input matInput type="number" formControlName="limpiezadomingo">
+                    @if (eventoForm.get('limpiezadomingo')?.hasError('min')) {
+                    <mat-error>El monto debe ser mayor o igual a 0</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="third-width">
+                    <mat-label>Renta Inmobiliario</mat-label>
+                    <input matInput type="number" formControlName="rentainmobiliario">
+                    @if (eventoForm.get('rentainmobiliario')?.hasError('min')) {
+                    <mat-error>El monto debe ser mayor o igual a 0</mat-error>
+                    }
+                </mat-form-field>
+            </div>
+
+        </form>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button [mat-dialog-close]="false">Cancelar</button>
+    <button mat-flat-button color="primary" class="btn-confirm" cdkFocusInitial (click)="mostrarConfirmacion()">
+        Guardar Registro
+    </button>
+</mat-dialog-actions>

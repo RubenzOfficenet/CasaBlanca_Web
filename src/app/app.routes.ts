@@ -7,6 +7,7 @@ import { Ingresos } from './pages/ingresos/ingresos';
 import { Inmuebles } from './pages/inmuebles/inmuebles';    
 import { Usuarios } from './pages/usuarios/usuarios';
 import { Eventos } from './pages/eventos/eventos';
+import { Eventosingresos } from './pages/eventos/eventosingresos/eventosingresos';
 
 
 export const routes: Routes = [
@@ -22,7 +23,8 @@ export const routes: Routes = [
             { path: 'ingresos', component: Ingresos },
             { path: 'inmuebles', component: Inmuebles },
             { path: 'usuarios', component: Usuarios },
-            { path: 'eventos', component: Eventos }
+            { path: 'eventos', component: Eventos },
+            { path: 'eventos/eventosingresos', component: Eventosingresos }
         ]
     },
 

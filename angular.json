@@ -69,7 +69,10 @@
               "buildTarget": "CasaBlanca:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+              "port": 61160
+            }          
         },
         "test": {
           "builder": "@angular/build:unit-test"
