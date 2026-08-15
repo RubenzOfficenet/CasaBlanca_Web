@@ -12,16 +12,18 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../../Constants/app.constants';
 import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
 import { IEventoIngreso } from '../Model/Evento.model';
-import { EdigarEventoIngreso } from '../edigar-evento-ingreso/edigar-evento-ingreso';
 import { EventosingresoService } from '../services/eventosingresoService';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Nuevoevento } from '../nuevoevento/nuevoevento';
 import { forkJoin } from 'rxjs';
+import { Editaringresoevento } from '../editaringresoevento/editaringresoevento';
+import { Ubicacion } from '../Model/ubicacion.interface';
+import { EstatusEvento } from '../Model/estatusEvento.interface';
 
 
 @Component({
@@ -78,7 +80,6 @@ export class Eventosingresos implements OnInit {
     'numeroCasa',
     'fechaEvento',
     'nombreTitular',
-    
     'reciboNumero',
     'fechaPago',
     'apartado',
@@ -101,53 +102,53 @@ export class Eventosingresos implements OnInit {
     this.leeDatos();
   }
 
-ngAfterViewInit() {
-  this.dataSource.paginator = this.paginator;
-  this.dataSource.sort = this.sort;
-}
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
 
 
-abrirPopup(): void {
-  forkJoin({
-    ubicaciones: this.catalogosService.leeSecciones(),
-    estatus: this.catalogosService.leeEstatusEvento()
-  }).subscribe({
-    next: ({ ubicaciones, estatus }) => {
+  abrirPopup(): void {
+    forkJoin({
+      ubicaciones: this.catalogosService.leeSecciones(),
+      estatus: this.catalogosService.leeEstatusEvento()
+    }).subscribe({
+      next: ({ ubicaciones, estatus }) => {
 
-      if (!ubicaciones?.length || !estatus?.length) {
-        this.snackBar.open(
-          'No se encontraron catálogos disponibles. Verifica la configuración.',
-          'Cerrar',
-          { duration: 4000, horizontalPosition: 'center', verticalPosition: 'bottom' }
-        );
-        return; // no abre el diálogo si falta algún catálogo
-      }
-
-      const dialogRef = this.dialog.open(Nuevoevento, {
-        width: '40vw',
-        maxWidth: '2000px',
-        minWidth: '320px',
-        disableClose: false,
-        hasBackdrop: true,
-        data: { ubicaciones, estatus }
-      });
-
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result) {
-          this.cargarEgresos();
+        if (!ubicaciones?.length || !estatus?.length) {
+          this.snackBar.open(
+            'No se encontraron catálogos disponibles. Verifica la configuración.',
+            'Cerrar',
+            { duration: 4000, horizontalPosition: 'center', verticalPosition: 'bottom' }
+          );
+          return; // no abre el diálogo si falta algún catálogo
         }
-      });
-    },
-    error: () => {
-      this.snackBar.open(
-        'Error al cargar los catálogos. Inténtalo de nuevo.',
-        'Cerrar',
-        { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
-      );
-    }
-  });
-}
-  
+
+        const dialogRef = this.dialog.open(Nuevoevento, {
+          width: '40vw',
+          maxWidth: '2000px',
+          minWidth: '320px',
+          disableClose: false,
+          hasBackdrop: true,
+          data: { ubicaciones, estatus }
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result) {
+            this.cargarEgresos();
+          }
+        });
+      },
+      error: () => {
+        this.snackBar.open(
+          'Error al cargar los catálogos. Inténtalo de nuevo.',
+          'Cerrar',
+          { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
+        );
+      }
+    });
+  }
+
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
@@ -177,7 +178,7 @@ abrirPopup(): void {
 
     this.eventosingresoService.leeEventoIngresos(year, mont).subscribe({
       next: (response: IEventoIngreso[]) => {
-        
+
         console.log('Datos de egresos obtenidos:', response);
 
         this.dataSource.data = response;
@@ -202,21 +203,45 @@ abrirPopup(): void {
   }
 
   editarEgreso(id: number): void {
-    console.log('Editar egreso con ID:', id);
-    const dialogRef = this.dialog.open(EdigarEventoIngreso, {
-      width: '40vw',
-      maxWidth: '2000px',
-      minWidth: '320px',
-      disableClose: false,
-      hasBackdrop: true,
-      data: { id }
-    });
+    forkJoin({
+      ubicaciones: this.catalogosService.leeSecciones(),
+      estatus: this.catalogosService.leeEstatusEvento()
+    }).subscribe({
+      next: ({ ubicaciones, estatus }) => {
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        setTimeout(() => this.leeDatos());
+        if (!ubicaciones?.length || !estatus?.length) {
+          this.snackBar.open(
+            'No se encontraron catálogos disponibles. Verifica la configuración.',
+            'Cerrar',
+            { duration: 4000, horizontalPosition: 'center', verticalPosition: 'bottom' }
+          );
+          return; // no abre el diálogo si falta algún catálogo
+        }
+
+        const dialogRef = this.dialog.open(Editaringresoevento, {
+          width: '40vw',
+          maxWidth: '2000px',
+          minWidth: '320px',
+          disableClose: false,
+          hasBackdrop: true,
+          data: { id, ubicaciones, estatus }
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result) {
+            this.cargarEgresos();
+          }
+        });
+      },
+      error: () => {
+        this.snackBar.open(
+          'Error al cargar los catálogos. Inténtalo de nuevo.',
+          'Cerrar',
+          { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
+        );
       }
     });
+
   }
 
 

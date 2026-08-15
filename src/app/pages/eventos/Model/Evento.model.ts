@@ -7,7 +7,7 @@ export interface IEventoIngreso {
   idubicacion: number;
   nombreubicacion: string;
   numerocasa: string;
-  fechaevento: string;      
+  fechavento: string;      
   nombretitular: string;
   apellidostitular: string;
   recibonumero: string;

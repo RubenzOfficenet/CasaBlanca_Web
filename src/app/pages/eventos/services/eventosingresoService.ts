@@ -6,6 +6,8 @@ import { Observable } from 'rxjs';
 import { EventoAddRequest } from '../Model/eventoAdd.interface';
 import { Ubicacion } from '../Model/ubicacion.interface';
 import { EstatusEvento } from '../Model/estatusEvento.interface';
+import { IEventoIngresoEdit } from '../interface/EventoIngreso.interface';
+import { IEventoIngresoUpdate } from '../interface/eventooingresoUpdate.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -33,14 +35,22 @@ export class EventosingresoService {
   }
 
 
-leeEstatusEvento(): Observable<EstatusEvento[]> {
+  leeEstatusEvento(): Observable<EstatusEvento[]> {
     const url = this._apiUrl + 'GetEstatusEvento';
     return this._http.get<EstatusEvento[]>(url);
   }
 
 
+  leeEventosIngresoById(idEvento : number) {
+    const url = this._apiUrl + 'GetEventoingresosById?IdEvento=' + idEvento;
+    console.log('url: ', url );
+    return this._http.get<IEventoIngresoEdit>(url);
+  }
 
-
-
+  updateEventosIngresoById(eventoIngresoUpdate : IEventoIngresoUpdate) {
+    const url = this._apiUrl + 'UpdateEventoingreso';
+    console.log('url: ', url );
+    return this._http.put<IEventoIngresoUpdate>(url, eventoIngresoUpdate);
+  }
 
 }

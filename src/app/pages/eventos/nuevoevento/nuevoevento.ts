@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatDialog, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatFormField, MatLabel, MatError } from "@angular/material/form-field";
 import { MatDatepickerToggle, MatDatepicker, MatDatepickerModule } from "@angular/material/datepicker";
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Ubicacion } from '../Model/ubicacion.interface';
 import { MatSelectModule } from '@angular/material/select';
 import { EstatusEvento } from '../Model/estatusEvento.interface';
@@ -38,7 +38,7 @@ import { MAT_DIALOG_DATA } from "@angular/material/dialog";
     provideNativeDateAdapter()
   ],
   templateUrl: './nuevoevento.html',
-  styleUrl: './nuevoevento.css',
+  styleUrl: './nuevoevento.css'
 })
 export class Nuevoevento implements OnInit {
 
