@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink, RouterModule } from "@angular/router";
 
 @Component({
@@ -9,5 +9,11 @@ import { RouterLink, RouterModule } from "@angular/router";
 })
 export class Navbar {
 
+isSubmenuOpen = signal(false);
+
+  toggleSubmenu(event: Event): void {
+    event.preventDefault();
+    this.isSubmenuOpen.update((open) => !open);
+  }
 
 }

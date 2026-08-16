@@ -199,7 +199,7 @@ export class Eventosingresos implements OnInit {
   }
 
   borrarIngreso(id: number): void {
-    this.borrarEgreso(id);
+    this.borrarIngresoEvento(id);
   }
 
   editarEgreso(id: number): void {
@@ -245,37 +245,49 @@ export class Eventosingresos implements OnInit {
   }
 
 
-  onBorrarEgreso(id: number) { }
+  onBorrarEgreso(id: number) {
 
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        titulo: 'Eliminar el Evento',
+        mensaje: '¿Estás seguro de borrar este Evento?'
+      }
+    });
 
-  borrarEgreso(id: number): void {
+    dialogRef.afterClosed().subscribe((confirmado: boolean) => {
+      if (confirmado) {
+        this.borrarIngresoEvento(id);
+      }
+    });
+  }
 
-    // Protección contra doble clic 👈
+  borrarIngresoEvento(id: number): void {
     if (this.eliminandoIds.has(id)) {
       return;
     }
+    this.eliminandoIds.add(id); // 👈 Asegúrate de agregarlo al Set aquí antes de suscribir
 
-    this.eliminandoIds.add(id);
+    this.eventosingresoService.deleteEventosIngresoById(id).subscribe({
+      next: () => {
+        this.snackBar.open('Egreso eliminado correctamente', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom'
+        });
 
-    console.log('Borrar egreso con ID:', id);
-
-    // this.egresosService.borrarEgreso(id).subscribe({
-    //   next: () => {
-    //     this.snackBar.open('Egreso eliminado correctamente', 'Cerrar', {
-    //       duration: 3000,
-    //       horizontalPosition: 'center',
-    //       verticalPosition: 'bottom'
-    //     });
-    //     this.leeDatos();
-    //   },
-    //   error: (err) => {
-    //     console.error('Error al eliminar egreso:', err);
-    //     this.snackBar.open('Error al eliminar el egreso', 'Cerrar', { duration: 3000 });
-    //   },
-    //   complete: () => {
-    //     this.eliminandoIds.delete(id); // 👈 libera el id sin importar éxito o error
-    //   }
-    // });
+        // 👈 Posponemos la recarga al siguiente ciclo para evitar el error NG0100
+        setTimeout(() => {
+          this.leeDatos();
+        });
+      },
+      error: (err) => {
+        console.error('Error al eliminar egreso:', err);
+        this.snackBar.open('Error al eliminar el egreso', 'Cerrar', { duration: 3000 });
+      },
+      complete: () => {
+        this.eliminandoIds.delete(id);
+      }
+    });
   }
 
 }

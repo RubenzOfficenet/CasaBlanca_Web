@@ -210,12 +210,12 @@
                         Acciones
                     </th>
 
-                    <td mat-cell *matCellDef="let casa" style="text-align: center;">
-                        <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarEgreso(casa.id)"
+                    <td mat-cell *matCellDef="let evento" style="text-align: center;">
+                        <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarEgreso(evento.id)"
                             aria-label="Editar">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button mat-icon-button color="primary" matTooltip="Borrar" (click)="onBorrarEgreso(casa.id)"
+                        <button mat-icon-button color="primary" matTooltip="Borrar" (click)="onBorrarEgreso(evento.id)"
                             aria-label="Borrar">
                             <mat-icon>delete</mat-icon>
                         </button>

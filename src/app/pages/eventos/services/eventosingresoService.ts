@@ -41,16 +41,23 @@ export class EventosingresoService {
   }
 
 
-  leeEventosIngresoById(idEvento : number) {
+  leeEventosIngresoById(idEvento: number) {
     const url = this._apiUrl + 'GetEventoingresosById?IdEvento=' + idEvento;
-    console.log('url: ', url );
+    console.log('url: ', url);
     return this._http.get<IEventoIngresoEdit>(url);
   }
 
-  updateEventosIngresoById(eventoIngresoUpdate : IEventoIngresoUpdate) {
+  updateEventosIngresoById(eventoIngresoUpdate: IEventoIngresoUpdate) {
     const url = this._apiUrl + 'UpdateEventoingreso';
-    console.log('url: ', url );
     return this._http.put<IEventoIngresoUpdate>(url, eventoIngresoUpdate);
   }
+
+
+  deleteEventosIngresoById(idEventoIngrso: number) {
+    const url = this._apiUrl + 'DeleteEventoIngreso?idEvento=' + idEventoIngrso;
+    console.log('url: ', url);
+    return this._http.put<IEventoIngresoUpdate>(url, idEventoIngrso);
+  }
+
 
 }
