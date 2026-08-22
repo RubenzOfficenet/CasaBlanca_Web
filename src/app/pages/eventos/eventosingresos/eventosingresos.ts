@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,8 +11,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
-
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../../Constants/app.constants';
 import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
 import { IEventoIngreso } from '../Model/Evento.model';
@@ -22,9 +20,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Nuevoevento } from '../nuevoevento/nuevoevento';
 import { forkJoin } from 'rxjs';
 import { Editaringresoevento } from '../editaringresoevento/editaringresoevento';
-import { Ubicacion } from '../Model/ubicacion.interface';
-import { EstatusEvento } from '../Model/estatusEvento.interface';
-
 
 @Component({
   selector: 'app-eventosingresos',
@@ -98,7 +93,31 @@ export class Eventosingresos implements OnInit {
   private readonly eventosingresoService = inject(EventosingresoService);
 
   constructor() { }
-  ngOnInit(): void {
+ngOnInit(): void {
+    // Configuración del predicado para filtrar por todos los campos de displayedColumns
+    this.dataSource.filterPredicate = (data: IEventoIngreso, filter: string): boolean => {
+      const searchStr = filter.trim().toLowerCase();
+
+      // Recorremos las columnas de la tabla (excluyendo 'acciones')
+      return this.displayedColumns
+        .filter(col => col !== 'acciones')
+        .some(columnKey => {
+          const val = (data as Record<string, any>)[columnKey];
+
+          if (val === null || val === undefined) {
+            return false;
+          }
+
+          // Si es una fecha, convertimos a string/ISO
+          if (val instanceof Date) {
+            return val.toISOString().toLowerCase().includes(searchStr);
+          }
+
+          // Para números, strings u otros tipos
+          return val.toString().toLowerCase().includes(searchStr);
+        });
+    };
+
     this.leeDatos();
   }
 

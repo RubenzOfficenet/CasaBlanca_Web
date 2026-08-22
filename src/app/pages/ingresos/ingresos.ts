@@ -49,18 +49,18 @@ import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../Constants/app.constants';
   styleUrl: './ingresos.css',
 })
 export class Ingresos implements OnInit, AfterViewInit {
-  
+
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly ingresosService = inject(Ingresoservice);
 
   fechaActual = new Date();
   today: Date = new Date();
-  
+
   totalRegistros: number = 0;
   isLoading: boolean = true;
   filtros: Record<string, string> = {};
-  
+
   recaudacionTotal: number = 0;
   CarteraVencida: number = 0;
   efectividadCobro: number = 0;
@@ -96,55 +96,66 @@ export class Ingresos implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  ngOnInit(): void {
-    // Sincronizar búsqueda global y por columna
-    this.dataSource.filterPredicate = (
-      data: IIngresoResponse,
-      filter: string
-    ): boolean => {
-      // 1. Si el filtro es un JSON (búsqueda por columna específica)
-      if (filter.startsWith('{')) {
-        const searchTerms = JSON.parse(filter) as Record<string, string>;
-        return Object.keys(searchTerms).every((column) => {
-          const term = searchTerms[column];
-          if (!term) return true;
-          const val = (data as Record<string, any>)[column];
-          return val !== null && val !== undefined && String(val).toLowerCase().includes(term);
-        });
-      }
+ ngOnInit(): void {
+  // Manejo personalizado del ordenamiento en la tabla
+  this.dataSource.sortingDataAccessor = (item: IIngresoResponse, property: string) => {
+    switch (property) {
+      case 'fechaRecepcion':
+      case 'fechaConcepto':
+        return item[property] ? new Date(item[property]).getTime() : 0;
+      case 'monto':
+        return Number(item.monto) || 0;
+      default:
+        return (item as Record<string, any>)[property];
+    }
+  };
 
-      // 2. Si el filtro es texto plano (búsqueda general)
-      const texto = filter.trim().toLowerCase();
-      return [
-        data.numeroCasa,
-        data.nombreTitular,
-        data.numeroRecibo,
-        data.concepto,
-        data.observaciones
-      ]
-        .filter((valor) => valor !== null && valor !== undefined)
-        .some((valor) => String(valor).toLowerCase().includes(texto));
-    };
-
-    // Manejo personalizado del ordenamiento en la tabla
-    this.dataSource.sortingDataAccessor = (item: IIngresoResponse, property: string) => {
-      switch (property) {
-        case 'fechaRecepcion':
-        case 'fechaConcepto':
-          return item[property] ? new Date(item[property]).getTime() : 0;
-        case 'monto':
-          return Number(item.monto) || 0;
-        default:
-          return (item as Record<string, any>)[property];
-      }
-    };
-
-    this.cargarIngresos();
-  }
+  this.configurarFiltro();
+  this.cargarIngresos();
+}
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+  }
+
+  configurarFiltro(): void {
+    this.dataSource.filterPredicate = (data: IIngresoResponse, filter: string): boolean => {
+      if (!filter) return true;
+
+      // 1. Verificar si el filtro es un objeto JSON (filtro por columna específica)
+      if (filter.startsWith('{')) {
+        try {
+          const filtrosPorColumna = JSON.parse(filter) as Record<string, string>;
+          return Object.keys(filtrosPorColumna).every((columna) => {
+            const valorFiltro = filtrosPorColumna[columna];
+            if (!valorFiltro) return true;
+            const valorDato = (data as Record<string, any>)[columna];
+            return valorDato !== null && valorDato !== undefined
+              && String(valorDato).toLowerCase().includes(valorFiltro);
+          });
+        } catch (e) {
+          // En caso de error de parseo JSON, continua a la búsqueda global
+        }
+      }
+
+      // 2. Filtro global de texto
+      const texto = filter.trim().toLowerCase();
+
+      return [
+        data.numeroCasa,
+        data.nombreTitular,
+        data.fechaRecepcion ? new DatePipe('en-US').transform(data.fechaRecepcion, 'dd-MMM-yyyy') : '',
+        data.numeroRecibo,
+        data.concepto,
+        data.fechaConcepto ? new DatePipe('en-US').transform(data.fechaConcepto, 'dd-MMM-yyyy') : '',
+        data.monto,
+        data.observaciones,
+        data.totalMonto
+      ]
+        .filter((valor) => valor !== null && valor !== undefined)
+        .some((valor) => String(valor).toLowerCase().includes(texto));
+    };
   }
 
   applyFilter(event: Event): void {
@@ -167,8 +178,8 @@ export class Ingresos implements OnInit, AfterViewInit {
       delete this.filtros[columna];
     }
 
-    this.dataSource.filter = Object.keys(this.filtros).length > 0 
-      ? JSON.stringify(this.filtros) 
+    this.dataSource.filter = Object.keys(this.filtros).length > 0
+      ? JSON.stringify(this.filtros)
       : '';
 
     if (this.dataSource.paginator) {
@@ -275,5 +286,5 @@ export class Ingresos implements OnInit, AfterViewInit {
     });
   }
 
-  onCancelar(): void {}
+  onCancelar(): void { }
 }

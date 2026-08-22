@@ -7,15 +7,12 @@ import { InmueblesServices } from './services/inmuebles-services';
 import { ICasas } from '../../Models/inmueble.model';
 import { MatSortModule } from '@angular/material/sort';
 import { CurrencyPipe } from '@angular/common';
-
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
-
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Editarinmueble } from './editarinmueble/editarinmueble';
@@ -78,19 +75,27 @@ export class Inmuebles implements AfterViewInit {
     this.dataSource.paginator = this.paginator;
   }
 
-  ngOnInit() {
-    this.dataSource.filterPredicate = (data: ICasas, filter: string): boolean => {
-      const normalizedFilter = filter.trim().toLowerCase();
+ngOnInit() {
+  this.dataSource.filterPredicate = (data: ICasas, filter: string): boolean => {
+    const term = filter.trim().toLowerCase();
 
-      return (data.nombreTitular?.toLowerCase().includes(normalizedFilter) ?? false)
-        || (data.numeroCasa !== undefined && data.numeroCasa.toString().toLowerCase().includes(normalizedFilter))
-        || (data.nombreOcupante?.toLowerCase().includes(normalizedFilter) ?? false)
-        || (data.nombreubicacion?.toLowerCase().includes(normalizedFilter) ?? false);
-    };
+    return (
+      (data.numeroCasa?.toString().toLowerCase().includes(term) ?? false) ||
+      (data.nombreubicacion?.toLowerCase().includes(term) ?? false) ||
+      (data.cuotaDeMantenimientoBase?.toString().toLowerCase().includes(term) ?? false) ||
+      (data.estadoInicialOcupacion?.toLowerCase().includes(term) ?? false) ||
+      (data.nombreTitular?.toLowerCase().includes(term) ?? false) ||
+      (data.emailTitular?.toLowerCase().includes(term) ?? false) ||
+      (data.celularTitular?.toLowerCase().includes(term) ?? false) ||
+      (data.nombreOcupante?.toLowerCase().includes(term) ?? false) ||
+      (data.emailOcupante?.toLowerCase().includes(term) ?? false) ||
+      (data.celularOcupante?.toLowerCase().includes(term) ?? false) ||
+      (data.numeroHabitantes?.toString().toLowerCase().includes(term) ?? false)
+    );
+  };
 
-    this.cargaDatosInmuebles();
-    
-  }
+  this.cargaDatosInmuebles();
+}
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -134,34 +139,25 @@ export class Inmuebles implements AfterViewInit {
   }
 
 
-  editarCasa(casa: number){
+editarCasa(casa: number) {
+  const dialogRef = this.dialog.open(Editarinmueble, {
+    width: '40vw',
+    maxWidth: '2000px',
+    minWidth: '320px',
+    disableClose: false,
+    hasBackdrop: true,
+    height: '700px',
+    data: { id: casa }
+  });
 
-    console.log(casa);
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.cargaDatosInmuebles();
+    }
+  });
 
-
-    const dialogRef = this.dialog.open(Editarinmueble, {
-      width: '40vw',
-      maxWidth: '2000px',
-      minWidth: '320px',
-      disableClose: false,
-      hasBackdrop: true,
-      height: '700px',
-      data : {
-        id : casa
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        //console.log('Datos recibidos del popup:', result);
-        this.cargaDatosInmuebles();
-      } else {
-        //console.log('El usuario canceló');
-      }
-    });   
-    
-    this.cargaDatosInmuebles();
-    
-  }
+  // ❌ Elimina esta llamada fuera del subscribe:
+  // this.cargaDatosInmuebles();
+}
 
 }

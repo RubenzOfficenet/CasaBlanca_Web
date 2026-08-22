@@ -285,3 +285,34 @@ table {
 .mat-mdc-table td:first-child {
   padding-left: 10px !important; /* Ajusta los px a tu gusto */
 }
+
+
+
+.estatus-badge {
+    display: inline-block;
+    padding: 2px 5px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.estatus-cancelado {
+    background-color: #F8D7DA;
+    color: #721C24;
+}
+
+.estatus-apartado {
+    background-color: #FFF3CD;
+    color: #856404;
+}
+
+.estatus-liquidado {
+    background-color: #D1ECF1;
+    color: #0C5460;
+}
+
+.estatus-concluido {
+    background-color: #D4EDDA;
+    color: #155724;
+}

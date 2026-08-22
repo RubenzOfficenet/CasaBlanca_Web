@@ -17,14 +17,14 @@
             <div class="metric-label">Total de Casas</div>
             <div class="metric-value">{{ totalRegistros }}</div>
         </div>
-        <div class="metric-card card-total-ingresos">
+        <!-- <div class="metric-card card-total-ingresos">
             <div class="metric-label ">Tasa de Ocupación</div>
             <div class="metric-value" style="color: var(--text-badge-success);">94.1%</div>
         </div>
         <div class="metric-card card-total-ingresos">
             <div class="metric-label">Unidades con Adeudos</div>
             <div class="metric-value" style="color: var(--text-badge-danger);">7</div>
-        </div>
+        </div> -->
     </section>
 
     <!-- TABLA DE CONTROL OPERATIVO -->
@@ -34,8 +34,7 @@
             <div class="table-title">Directorio de Casas</div>
             <!-- Campo de búsqueda -->
             <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
-                <mat-label>Buscar</mat-label>
-                <input matInput (keyup)="applyFilter($event)" placeholder="Escribe para filtrar">
+                <input matInput (keyup)="applyFilter($event)" placeholder="Filtrar">
             </mat-form-field>
         </div>
 
@@ -54,7 +53,7 @@
 
             <!-- Número de Casa -->
             <ng-container matColumnDef="numeroCasa">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Número de Casa</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Número de Casa</th>
                 <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.numeroCasa }} </td>
             </ng-container>
 
@@ -80,7 +79,7 @@
 
             <!-- Titular -->
             <ng-container matColumnDef="nombreTitular">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita"> Titular </th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header > Titular </th>
                 <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.nombreTitular || 'Sin titular' }}
                 </td>
             </ng-container>
@@ -101,7 +100,7 @@
 
             <!-- Ocupante -->
             <ng-container matColumnDef="nombreOcupante">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita"> Ocupante </th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header > Ocupante </th>
                 <td mat-cell *matCellDef="let casa" class="table-td-text"> {{ casa.nombreOcupante || 'N/A' }} </td>
             </ng-container>
 

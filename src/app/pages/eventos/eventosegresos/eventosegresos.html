@@ -180,6 +180,14 @@
                 </ng-container>
 
                 <!-- Estatus -->
+                <!-- <ng-container matColumnDef="estatusEvento">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Estatus</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text">
+                        <span class="estatus-badge" [ngClass]="'estatus-' + evento.estatusEvento.toLowerCase()">
+                            {{ evento.estatusEvento }}
+                        </span>
+                    </td>
+                </ng-container> -->
                 <ng-container matColumnDef="estatusEvento">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Estatus</th>
                     <td mat-cell *matCellDef="let evento" class="table-td-text">
@@ -187,7 +195,7 @@
                             {{ evento.estatusEvento }}
                         </span>
                     </td>
-                </ng-container>
+                </ng-container>                
 
 
                 <!-- Acciones -->

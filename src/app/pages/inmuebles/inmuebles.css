@@ -259,3 +259,12 @@ tr:last-child td {
     justify-content: center;
     padding: 30px;
 }
+
+
+.metric-card {
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); /* Degradado celeste pastel */
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #bae6fd;
+}

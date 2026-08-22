@@ -51,7 +51,7 @@
 
             <!-- Campo de búsqueda -->
             <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
-                <input matInput (keyup)="applyFilter($event)" placeholder="Filtra por Beneficiario o Concepto">
+                <input matInput (keyup)="applyFilter($event)" placeholder="Filtrar">
             </mat-form-field>
         </div>
 
@@ -110,7 +110,7 @@
 
                 <!-- Acciones -->
                 <ng-container matColumnDef="acciones">
-                    <th mat-header-cell *matHeaderCellDef>
+                    <th mat-header-cell *matHeaderCellDef style="text-align: center;">
                         Acciones
                     </th>
 

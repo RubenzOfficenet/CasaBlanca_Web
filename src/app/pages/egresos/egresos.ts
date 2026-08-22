@@ -94,29 +94,41 @@ export class Egresos implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    this.dataSource.filterPredicate = (
-      data: IEgresoDTO,
-      filter: string
-    ): boolean => {
-      const texto = filter.trim().toLowerCase();
-      const beneficiario = (data.beneficiario ?? '').toString().toLowerCase();
-      const concepto = (data.concepto ?? '').toString().toLowerCase();
+ngOnInit(): void {
+  this.dataSource.filterPredicate = (
+    data: IEgresoDTO,
+    filter: string
+  ): boolean => {
+    const texto = filter.trim().toLowerCase();
 
-      return beneficiario.includes(texto) || concepto.includes(texto);
-    };
+    // Formatear la fecha para que coincida con el DatePipe del HTML ('dd-MMM-yyyy')
+    const fechaFormateada = data.fechaEgreso 
+      ? new DatePipe('en-US').transform(data.fechaEgreso, 'dd-MMM-yyyy') ?? ''
+      : '';
 
-    this.dataSource.sortingDataAccessor = (item: IEgresoDTO, property: string) => {
-      switch (property) {
-        case 'fechaEgreso':
-          return new Date(item.fechaEgreso).getTime();
-        default:
-          return (item as Record<string, any>)[property];
-      }
-    };
+    return [
+      fechaFormateada,
+      data.beneficiario,
+      data.concepto,
+      data.monto,
+      data.observaciones,
+      data.totalMonto
+    ]
+      .filter((valor) => valor !== null && valor !== undefined)
+      .some((valor) => String(valor).toLowerCase().includes(texto));
+  };
 
-    this.cargarEgresos();
-  }
+  this.dataSource.sortingDataAccessor = (item: IEgresoDTO, property: string) => {
+    switch (property) {
+      case 'fechaEgreso':
+        return new Date(item.fechaEgreso).getTime();
+      default:
+        return (item as Record<string, any>)[property];
+    }
+  };
+
+  this.cargarEgresos();
+}
 
   ngAfterViewInit(): void {
     // Aquí el paginator y sort YA están seteados por los @ViewChild setters

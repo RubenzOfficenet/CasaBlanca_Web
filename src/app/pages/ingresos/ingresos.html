@@ -51,14 +51,11 @@
                     </mat-select>
                 </mat-form-field>
 
-                <!-- <button mat-raised-button color="primary" (click)="leeDatos()">
-                    Leer Datos
-                </button> -->
             </div>
 
             <!-- Campo de búsqueda -->
             <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
-                <input matInput (keyup)="applyFilter($event)" placeholder="Filtra por Casa, Titular, Núm Recibo">
+                <input matInput (keyup)="applyFilter($event)" placeholder="Filtrar">
             </mat-form-field>
         </div>
 
@@ -139,7 +136,7 @@
 
             <!-- Acciones -->
             <ng-container matColumnDef="acciones">
-                <th mat-header-cell *matHeaderCellDef>
+                <th mat-header-cell *matHeaderCellDef style="text-align: center;">
                     Acciones
                 </th>
 
