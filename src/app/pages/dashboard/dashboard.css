@@ -1,17 +1,53 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+:root {
+    /* Paleta Corporativa Base */
+    --bg-main: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-sidebar: #0F172A;
+
+    --text-main: #1E293B;
+    --text-muted: #64748B;
+    --border-color: #E2E8F0;
+
+    --color-brand: #2563EB;
+    --color-brand-hover: #1D4ED8;
+
+    /* Estados específicos de Egresos */
+    --text-egreso: #991B1B;
+    /* Carmesí oscuro para montos negativos */
+    --bg-badge-paid: #F0FDF4;
+    /* Verde suave para facturas liquidadas */
+    --text-badge-paid: #166534;
+    --bg-badge-pending: #FFFBEB;
+    /* Ámbar suave para cuentas pendientes */
+    --text-badge-pending: #92400E;
+}
+
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+
+
+/* --- MAIN CONTENT AREA --- */
 .main-content {
     flex-grow: 1;
     padding: 40px 48px;
     overflow-y: auto;
-    height: 100vh;
 }
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    width: 100%;
-    box-sizing: border-box;    
+    margin-bottom: 32px;
 }
 
 header h1 {
@@ -21,25 +57,20 @@ header h1 {
 }
 
 .header-actions {
-    display: flex; 
+    display: flex;
     gap: 12px;
 }
 
-.search-bar {
+/* --- CONTROLES DE FILTRADO --- */
+.filter-select {
     background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
-    padding: 9px 14px;
+    padding: 10px 14px;
     border-radius: 8px;
-    width: 280px;
     font-size: 0.875rem;
-    outline: none;
     color: var(--text-main);
-    transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.search-bar:focus {
-    border-color: var(--color-brand);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+    cursor: pointer;
 }
 
 .btn {
@@ -52,24 +83,24 @@ header h1 {
     transition: all 0.15s ease;
 }
 
-.btn-brand {
-    background-color: var(--color-brand);
+.btn-danger {
+    background-color: #DC2626;
     color: #FFFFFF;
 }
 
-.btn-brand:hover {
-    background-color: var(--color-brand-hover);
+.btn-danger:hover {
+    background-color: #B91C1C;
 }
 
-/* CARDS */
-.cards-grid {
+/* --- METRICAS DE GASTO --- */
+.analytics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 24px;
     margin-bottom: 32px;
 }
 
-.card {
+.metric-card {
     background-color: var(--bg-surface);
     padding: 24px;
     border-radius: 12px;
@@ -77,15 +108,7 @@ header h1 {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.card-total-ingresos {
-    background-color: var(--bg-ingreso);
-}
-
-.card-total-egresos {
-    background-color: var(--bg-egreso);
-}
-
-.card-label {
+.metric-label {
     font-size: 0.75rem;
     color: var(--text-muted);
     font-weight: 600;
@@ -94,13 +117,125 @@ header h1 {
     letter-spacing: 0.5px;
 }
 
-.card-value {
-    font-size: 1.75rem;
+.metric-value {
+    font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.5px;
 }
 
-/* TABLA */
+.metric-value.negative {
+    color: var(--text-egreso);
+}
+
+/* --- TABLA DE EGRESOS --- */
+.table-container {
+    background-color: var(--bg-surface);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+/* .table-header-area {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+} */
+
+/* .table-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+} */
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 1px;
+    /* 0px horizontal y 5px vertical */
+}
+
+th {
+    background-color: #F8FAFC;
+    padding: 1px 1px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 1px 1px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border-color);
+    color: #0f0f0f;
+}
+
+tr {
+    border-color: red;
+
+}
+
+/* tr:last-child td {
+    border-bottom: none;
+} */
+
+.badge.ingreso {
+    background-color: var(--bg-ingreso);
+    color: var(--text-ingreso);
+    border-color: var(--border-ingreso);
+}
+
+/* Badges de Estado Operativo */
+.badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
+.card-total-ingresos {
+    background-color: var(--bg-ingreso);
+}
+
+.badge.paid {
+    background-color: var(--bg-badge-paid);
+    color: var(--text-badge-paid);
+}
+
+.badge.pending {
+    background-color: var(--bg-badge-pending);
+    color: var(--text-badge-pending);
+}
+
+/* Texto secundario de sub-concepto */
+.sub-text {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.textCasa {
+    font-size: 12px;
+    color: rgb(62, 65, 206);
+}
+
+
+.contenedor-filtros {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1px;
+    margin-bottom: 1px;
+}
+
 .table-container {
     background-color: var(--bg-surface);
     border-radius: 12px;
@@ -110,7 +245,11 @@ header h1 {
 }
 
 .table-header-area {
-    padding: 24px 24px 16px 24px;
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .table-title {
@@ -124,53 +263,58 @@ table {
     border-collapse: collapse;
 }
 
-th {
-    background-color: #F8FAFC;
-    padding: 12px 24px;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-bottom: 1px solid var(--border-color);
-    text-align: left;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-td {
-    padding: 16px 24px;
-    font-size: 0.875rem;
-    border-bottom: 1px solid var(--border-color);
-    color: #334155;
-}
-
-tr:last-child td {
-    border-bottom: none;
-}
-
-.monto-table {
-    font-weight: 600; 
-    color: #0F172A;
-}
-
-/* Badges */
-.badge {
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: inline-flex;
+.loader-container {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    border: 1px solid transparent;
+    /* centra spinner y texto horizontalmente */
+    justify-content: center;
 }
 
-.badge.ingreso {
-    background-color: var(--bg-ingreso);
-    color: var(--text-ingreso);
-    border-color: var(--border-ingreso);
+.loader-container p {
+    margin-top: 12px;
 }
 
-.badge.egreso {
-    background-color: var(--bg-egreso);
+
+
+
+:host ::ng-deep .mi-select-personalizado .mat-mdc-text-field-wrapper {
+  background-color: #c3f3db !important;
+}
+
+.metric-card-ingresos {
+    background-color: #DCFCE7;
+}
+
+.metric-card-egresos {
+    background-color: #FEE2E2;
+}
+
+.metric-card-balance {
+    background-color: #DBEAFE;
+}
+
+.badge-ingreso {
+    background-color: #DCFCE7;
+    color: var(--text-badge-paid);
+    padding: 5px;
+}
+
+.badge-egreso {
+    background-color: #FEE2E2;
     color: var(--text-egreso);
-    border-color: var(--border-egreso);
+    padding: 5px;
 }
+
+.mat-column-fechaDeOperacion {
+    padding: 10px !important;
+}
+
+.metric-value {
+    color: #0F172A;
+    font-size: 1.5rem;
+}
+
+.balance-negativo {
+    color: #DC2626 !important;
+}   

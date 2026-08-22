@@ -49,6 +49,7 @@ import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../Constants/app.constants';
   styleUrl: './ingresos.css',
 })
 export class Ingresos implements OnInit, AfterViewInit {
+  
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly ingresosService = inject(Ingresoservice);

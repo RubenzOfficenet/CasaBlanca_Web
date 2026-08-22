@@ -1,77 +1,155 @@
 <main class="main-content">
     <header>
         <div>
-            <h1>Control de Flujo Financiero</h1>
-        </div>
-        <div class="header-actions">
-            <!-- <input type="text" class="form-control" placeholder="Filtrar por unidad o concepto...">
-            <button matButton="elevated" style="width: 250px;">
-                Nuevo Registro
-            </button> -->
+            <h1>Resumen Analítico de Operaciones</h1>
         </div>
     </header>
 
-    <section class="cards-grid">
-        <div class="card">
-            <div class="card-label">Balance Neto en Caja</div>
-            <div class="card-value" style="color: #0F172A;">$142,500.00</div>
+    <section class="analytics-grid">
+        <div class="metric-card metric-card-ingresos">
+            <div class="metric-label">Total Ingresos</div>
+            <div class="metric-value positive">{{ totalIngresos | currency:'MXN':'symbol':'1.2-2' }}</div>
         </div>
-        <div class="card card-total-ingresos">
-            <div class="card-label">Total Ingresos</div>
-            <div class="card-value" style="color: #166534;">+$185,000.00</div>
+        <div class="metric-card metric-card-egresos">
+            <div class="metric-label">Total Egresos</div>
+            <div class="metric-value negative">{{ totalEgresos | currency:'MXN':'symbol':'1.2-2' }}</div>
         </div>
-        <div class="card card-total-egresos">
-            <div class="card-label">Total Egresos</div>
-            <div class="card-value" style="color: #991B1B;">-$42,500.00</div>
-        </div>
+<div class="metric-card metric-card-balance" style="text-align: right;">
+    <div class="metric-label">Balance</div>
+    <div class="metric-value" [ngClass]="{'balance-negativo': (totalIngresos - totalEgresos) < 0}">
+        {{ (totalIngresos - totalEgresos) | currency:'MXN':'symbol':'1.2-2' }}
+    </div>
+</div>
     </section>
 
     <section class="table-container">
         <div class="table-header-area">
-            <div class="table-title">Auditoría de Transacciones Recientes</div>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Fecha de Operación</th>
-                    <th>Concepto / Descripción</th>
-                    <th>Referencia</th>
-                    <th>Tipo</th>
-                    <th>Monto Neto</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>28 May, 2026</td>
-                    <td>Mantenimiento Mensual Mayo</td>
-                    <td>Unidad 14-B</td>
-                    <td><span class="badge ingreso">Ingreso</span></td>
-                    <td class="monto-table">$2,500.00</td>
-                </tr>
-                <tr>
-                    <td>26 May, 2026</td>
-                    <td>Pago Seguridad Privada Quincenal</td>
-                    <td>Seguritek SA</td>
-                    <td><span class="badge egreso">Egreso</span></td>
-                    <td class="monto-table">$18,000.00</td>
-                </tr>
-                <tr>
-                    <td>25 May, 2026</td>
-                    <td>Renta de Casa Club (Evento)</td>
-                    <td>Unidad 42</td>
-                    <td><span class="badge ingreso">Ingreso</span></td>
-                    <td class="monto-table">$1,500.00</td>
-                </tr>
-                <tr>
-                    <td>22 May, 2026</td>
-                    <td>Reparación Luminaria Entrada</td>
-                    <td>Eléctrica Gral.</td>
-                    <td><span class="badge egreso">Egreso</span></td>
-                    <td class="monto-table">$3,200.00</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
+            <div class="table-title">Detalle de Operaciones</div>
 
+            <!-- <div>
+                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
+                    <mat-label>Año</mat-label>
+                    <mat-select [(ngModel)]="anioSeleccionado" (selectionChange)="cambiaAnio($event.value)">
+                        @for (year of yearList; track year.value) {
+                        <mat-option [value]="year.value">{{year.viewValue}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
+                    <mat-label>Mes</mat-label>
+                    <mat-select [(ngModel)]="mesActual" (selectionChange)="cambiaMes($event.value)">
+                        @for (mes of monthList; track mes.value) {
+                        <mat-option [value]="mes.value">{{mes.viewValue}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div> -->
+
+            <!-- Campo de búsqueda -->
+            <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
+                <input matInput (keyup)="applyFilter($event)" placeholder="Filtra ">
+            </mat-form-field>
+        </div>
+
+        <!-- Loader con Angular Material -->
+        @if(isLoading){
+        <div class="loader-container">
+
+            <mat-progress-spinner mode="indeterminate" diameter="60" color="primary">
+            </mat-progress-spinner>
+
+            <p>Cargando datos...</p>
+        </div>
+        }
+
+
+        <!-- TABLA DE OPERACIONES -->
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-registros" [attr.colspan]="displayedColumns.length">
+                    No hay registros para mostrar.
+                </td>
+            </tr>
+
+            <!-- Fecha de Operación -->
+            <ng-container matColumnDef="fechaDeOperacion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Fecha</th>
+                <td mat-cell *matCellDef="let operacion" class="table-td-text"> {{ operacion.fechaDeOperacion |
+                    date:'dd-MMM-yyyy' }} </td>
+            </ng-container>
+
+            <!-- Concepto -->
+            <ng-container matColumnDef="concepto">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Concepto</th>
+                <td mat-cell *matCellDef="let operacion" class="table-td-text"> {{ operacion.concepto }} </td>
+            </ng-container>
+
+            <!-- Ubicación -->
+            <ng-container matColumnDef="ubicacion">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Ubicación</th>
+                <td mat-cell *matCellDef="let operacion" class="table-td-text"> {{ operacion.ubicacion }} </td>
+            </ng-container>
+
+            <!-- Casa -->
+            <ng-container matColumnDef="casa">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Casa</th>
+                <td mat-cell *matCellDef="let operacion" class="table-td-text"> {{ operacion.casa }} </td>
+            </ng-container>
+
+            <!-- Tipo -->
+            <ng-container matColumnDef="tipo">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Tipo</th>
+                <td mat-cell *matCellDef="let operacion" class="table-td-text">
+                    @if (operacion.tipo) {
+                    <span class="estatus-badge"
+                        [ngClass]="operacion.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'">
+                        {{ operacion.tipo }}
+                    </span>
+                    }
+                </td>
+            </ng-container>
+
+            <!-- Monto -->
+            <ng-container matColumnDef="monto">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita">Monto</th>
+                <td mat-cell *matCellDef="let operacion" class="table-td-text-right"
+                    [style.color]="operacion.tipo === 'Egreso' ? '#991B1B' : 'inherit'">
+                    {{ operacion.monto | currency:'MXN':'symbol':'1.2-2' }}
+                </td>
+            </ng-container>
+
+            <!-- Observaciones -->
+            <ng-container matColumnDef="observaciones">
+                <th mat-header-cell *matHeaderCellDef class="texto-negrita">Observaciones</th>
+                <td mat-cell *matCellDef="let operacion" class="table-td-text"> {{ operacion.observaciones }} </td>
+            </ng-container>
+
+            <!-- Acciones -->
+            <!-- <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef>
+                    Acciones
+                </th>
+
+                <td mat-cell *matCellDef="let operacion" style="text-align: center;">
+                    <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarOperacion(operacion)"
+                        aria-label="Editar">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                </td>
+
+            </ng-container> -->
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        </table>
+
+        <!-- ✅ Paginador -->
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+        </mat-paginator>
+
+    </section>
 
 </main>
