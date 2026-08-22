@@ -20,5 +20,6 @@ export interface IEventoIngreso {
   rentainmobiliario: number;
   estatusevento: string;
   total: number;
+  TotalEgresos : number;
 }
 

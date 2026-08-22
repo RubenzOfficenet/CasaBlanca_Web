@@ -1,0 +1,30 @@
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
+.form-container {
+  width: 100%;
+  max-width: 680px;
+}
+
+.form-row {
+  margin-bottom: 16px;
+}
+
+.form-row-triple {
+  display: flex;
+  gap: 12px;
+}
+
+.third-width {
+  flex: 1;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}

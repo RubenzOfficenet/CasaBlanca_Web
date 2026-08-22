@@ -1,0 +1,99 @@
+<main class="main-content">
+    <button mat-icon-button mat-dialog-close aria-label="Cerrar" matTooltip="Cerrar" class="btn-cerrar-dialog">
+        <mat-icon>close</mat-icon>
+    </button>
+
+    <header>
+        <div>
+            <h1>Lista de Egresos de Evento</h1>
+        </div>
+    </header>
+
+
+    <section class="table-container">
+        <div class="table-header-area">
+            <div class="table-title">Egresos</div>
+        </div>
+
+        <!-- Loader con Angular Material -->
+        @if (isLoading) {
+        <div class="loader-container">
+            <mat-progress-spinner mode="indeterminate" diameter="60" color="primary"></mat-progress-spinner>
+            <p>Cargando datos...</p>
+        </div>
+        }
+
+        <!-- TABLA DE DATOS DE EGRESOS -->
+        <div [hidden]="isLoading">
+
+            <table mat-table [dataSource]="dataSource">
+
+                <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell no-registros" [attr.colspan]="displayedColumns.length">
+                        No hay registros para mostrar.
+                    </td>
+                </tr>
+
+                <!-- Fecha evento -->
+                <ng-container matColumnDef="fechaEvento">
+                    <th mat-header-cell *matHeaderCellDef class="texto-negrita">Fecha Evento</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.fechaEvento |
+                        date:'dd-MMM-yyyy'
+                        }}
+                    </td>
+                </ng-container>
+
+                <!-- ubicacion -->
+                <ng-container matColumnDef="nombreUbicacion">
+                    <th mat-header-cell *matHeaderCellDef class="texto-negrita">Ubicación</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.nombreUbicacion }} </td>
+                </ng-container>
+
+                <!-- Casa -->
+                <ng-container matColumnDef="numeroCasa">
+                    <th mat-header-cell *matHeaderCellDef class="texto-negrita">Casa</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.numeroCasa }} </td>
+                </ng-container>
+
+                <!-- Concepto egreso -->
+                <ng-container matColumnDef="conceptoEgreso">
+                    <th mat-header-cell *matHeaderCellDef class="texto-negrita">Concepto</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.conceptoEgreso }} </td>
+                </ng-container>
+
+                <!-- Monto egreso -->
+                <ng-container matColumnDef="montoEgreso">
+                    <th mat-header-cell *matHeaderCellDef class="texto-negrita">Monto</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text-right">
+                        @if (evento.montoEgreso > 0) {
+                        {{ evento.montoEgreso | currency:'MXN':'symbol':'1.2-2' }}
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- Fecha egreso -->
+                <ng-container matColumnDef="fechaEgreso">
+                    <th mat-header-cell *matHeaderCellDef class="texto-negrita">Fecha Egreso</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.fechaEgreso |
+                        date:'dd-MMM-yyyy' }} </td>
+                </ng-container>
+
+                <!-- Observaciones -->
+                <ng-container matColumnDef="observaciones">
+                    <th mat-header-cell *matHeaderCellDef class="texto-negrita">Observaciones</th>
+                    <td mat-cell *matCellDef="let evento" class="table-td-text"> {{ evento.observaciones }} </td>
+                </ng-container>
+
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+            </table>
+        </div>
+        <!-- ✅ Paginador -->
+        <mat-paginator [pageSize]="10" [hidden]="isLoading" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+        </mat-paginator>
+
+    </section>
+
+</main>

@@ -1,0 +1,147 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+:root {
+    /* Paleta Corporativa Base */
+    --bg-main: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-sidebar: #0F172A;
+
+    --text-main: #1E293B;
+    --text-muted: #64748B;
+    --border-color: #E2E8F0;
+
+    --color-brand: #2563EB;
+    --color-brand-hover: #1D4ED8;
+
+    /* Estados específicos de Egresos */
+    --text-egreso: #991B1B;
+    /* Carmesí oscuro para montos negativos */
+    --bg-badge-paid: #F0FDF4;
+    /* Verde suave para facturas liquidadas */
+    --text-badge-paid: #166534;
+    --bg-badge-pending: #FFFBEB;
+    /* Ámbar suave para cuentas pendientes */
+    --text-badge-pending: #92400E;
+}
+
+
+/* --- MAIN CONTENT AREA --- */
+.main-content {
+    flex-grow: 1;
+    padding: 20px 20px;
+    overflow-y: auto;
+}
+
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 1px;
+    /* 0px horizontal y 5px vertical */
+}
+
+th {
+    background-color: #F8FAFC;
+    padding: 1px 1px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 1px 1px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border-color);
+    color: #0f0f0f;
+}
+
+tr {
+    border-color: red;
+
+}
+
+
+/* Texto secundario de sub-concepto */
+.sub-text {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.textCasa {
+    font-size: 12px;
+    color: rgb(62, 65, 206);
+} */
+
+
+.contenedor-filtros {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1px;
+    margin-bottom: 1px;
+}
+
+.table-container {
+    background-color: var(--bg-surface);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.table-header-area {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader-container p {
+    margin-top: 12px;
+}
+
+
+
+.main-content {
+    position: relative;
+}
+
+.btn-cerrar-dialog {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    background-color: #FEE2E2;
+    color: #000000;
+}
+
+.btn-cerrar-dialog:hover {
+    background-color: #f54545;
+}
