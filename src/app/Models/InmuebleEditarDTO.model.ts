@@ -1,25 +1,9 @@
 export interface InmuebleEditarDTO {
     id: number;
     numeroCasa?: string;
-    idUbicacion?: string;
+    idUbicacion: number;
     cuotaDeMantenimientoBase: number;
-    estadoOcupacion?: number;
-    nombreTitular?: string;
-    apellidosTitular?: string;
-    emailTitular?: string;
-    celularTitular?: string;
-    nombreOcupante?: string;
-    apellidosOcupante?: string;
-    emailOcupante?: string;
-    celularOcupante?: string;
-    
-    Usuario: string;
-    Password? : string;
-    ConfirmPassword? : string;
-    Observaciones? : string;
-
-    numeroHabitantes?: number;
+    idEstadoOcupacion?: number;
+    numeroHabitantes: number;
     observaciones?: string;
-
-
 }

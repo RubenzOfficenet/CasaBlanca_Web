@@ -1,13 +1,18 @@
 
 export interface IInmueble {
-    Id : number,
-    NumeroCasa : string,
-    Ubicación : string,
-    CuotaDeMantenimientoBase : number,
-    EstadoOcupacion : string,
-    NombreTitular : string,
-    ApellidosTitular : string,
-    EmailTitular : string,
-    CelularTitular : string,
-    Observaciones   : string
+    id: number;
+    numeroCasa: string;
+    idubicacion: number;
+    nombreubicacion: string;
+    cuotaDeMantenimientoBase: number;
+    idestadoocupacion: number;
+    estadoInicialOcupacion: string;
+    numeroHabitantes: number;
+    observaciones: string;
+    idusuario: number;
+    nombre: string;
+    apellidos: string;
+    idcasa: number;
+    rol: string;
+    idRol: number;
 }

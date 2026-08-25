@@ -41,19 +41,16 @@ export class Inmuebles implements AfterViewInit {
   isLoading = true; // al inicio está cargando
 
   displayedColumns: string[] = [
-    'numeroCasa',
     'nombreubicacion',
+    'numeroCasa',
     'cuotaDeMantenimientoBase',
     'estadoInicialOcupacion',
-    'nombreTitular',
-    'emailTitular',
-    'celularTitular',
-    'nombreOcupante',
-    'emailOcupante',
-    'celularOcupante',
     'numeroHabitantes',
+    'nombre',
+    'apellidos',
+    'rol',
+    'observaciones',
     'acciones'
-
   ];
 
   
@@ -84,13 +81,11 @@ ngOnInit() {
       (data.nombreubicacion?.toLowerCase().includes(term) ?? false) ||
       (data.cuotaDeMantenimientoBase?.toString().toLowerCase().includes(term) ?? false) ||
       (data.estadoInicialOcupacion?.toLowerCase().includes(term) ?? false) ||
-      (data.nombreTitular?.toLowerCase().includes(term) ?? false) ||
-      (data.emailTitular?.toLowerCase().includes(term) ?? false) ||
-      (data.celularTitular?.toLowerCase().includes(term) ?? false) ||
-      (data.nombreOcupante?.toLowerCase().includes(term) ?? false) ||
-      (data.emailOcupante?.toLowerCase().includes(term) ?? false) ||
-      (data.celularOcupante?.toLowerCase().includes(term) ?? false) ||
-      (data.numeroHabitantes?.toString().toLowerCase().includes(term) ?? false)
+      (data.numeroHabitantes?.toString().toLowerCase().includes(term) ?? false) ||
+      (data.observaciones?.toLowerCase().includes(term) ?? false) ||
+      (data.nombre?.toLowerCase().includes(term) ?? false) ||
+      (data.apellidos?.toLowerCase().includes(term) ?? false) ||
+      (data.rol?.toLowerCase().includes(term) ?? false)
     );
   };
 
@@ -105,7 +100,6 @@ ngOnInit() {
   cargaDatosInmuebles() {
     this._inmueblesServices.getInmuebles().subscribe({
       next: (data) => {
-        console.log('Datos de inmuebles recibidos:', data);
         this.dataSource.data = data;   // ✅ Actualizas los datos sin recrear el dataSource
         this.totalRegistros = data.length;
         this.isLoading = false;
@@ -125,7 +119,7 @@ ngOnInit() {
       minWidth: '320px',
       disableClose: false,
       hasBackdrop: true,
-      height: '700px'
+      height: '600px'
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -146,7 +140,7 @@ editarCasa(casa: number) {
     minWidth: '320px',
     disableClose: false,
     hasBackdrop: true,
-    height: '700px',
+    height: '600px',
     data: { id: casa }
   });
 

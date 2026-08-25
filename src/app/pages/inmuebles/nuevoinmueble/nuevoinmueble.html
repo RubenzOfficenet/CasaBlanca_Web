@@ -8,10 +8,24 @@
 
             <div class="form-cardx">
                 <form [formGroup]="inmuebleForm">
-                    <div class="form-sectio">
+                    <div class="form-section">
                         <div class="form-section-title">Información del Inmueble</div>
 
                         <div class="row row-cols-1 row-cols-md-3 g-3">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="Ubicacion">Sección</label>
+                                    <select id="Ubicacion" formControlName="Ubicacion">
+                                        <option value="" disabled selected>Seleccione una Sección</option>
+                                        @for (ubicacion of ubicaciones; track ubicacion.id) {
+                                        <option [value]="ubicacion.id">
+                                            {{ ubicacion.nombreUbicacion }}
+                                        </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="col">
                                 <div class="form-group">
                                     <label for="NumeroCasa">Número de Casa <span class="mensaje-error">*</span> </label>
@@ -21,9 +35,7 @@
                                     inmuebleForm.get('NumeroCasa')?.invalid &&
                                     inmuebleForm.get('NumeroCasa')?.touched
                                     ) {
-
                                     <small class="text-danger">
-
                                         @if (inmuebleForm.get('NumeroCasa')?.hasError('required')) {
                                         El número de casa es obligatorio.
                                         }
@@ -31,22 +43,8 @@
                                         @if (inmuebleForm.get('NumeroCasa')?.hasError('pattern')) {
                                         El número de casa no puede contener solo espacios.
                                         }
-
                                     </small>
                                     }
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="Ubicación">Sección</label>
-                                    <select id="Ubicacion" formControlName="Ubicacion">
-                                        @for (ubicacion of ubicaciones; track ubicacion.id) {
-                                        <option [value]="ubicacion.id">
-                                            {{ ubicacion.nombreUbicacion }}
-                                        </option>
-                                        }
-                                    </select>
                                 </div>
                             </div>
 
@@ -63,11 +61,9 @@
 
                             <div class="col">
                                 <div class="form-group">
-                                    <option [value]="-1" disabled>
-                                        Seleccione un estado
-                                    </option>
+                                    <label for="EstadoOcupacion">Estado</label>
                                     <select id="EstadoOcupacion" formControlName="EstadoOcupacion">
-                                        <!-- <option value="-1" disabled selected>Seleccione un estado</option> -->
+                                        <option value="-1" disabled selected>Seleccione un estado</option>
                                         @for (estado of estadosOcupacion; track estado.id) {
                                         <option [value]="estado.id">
                                             {{ estado.estadoInicialOcupacion }}
@@ -82,165 +78,6 @@
                                     <label for="NuneroHabitantes">Número de Habitantes</label>
                                     <input type="number" id="NuneroHabitantes" formControlName="NumeroHabitantes"
                                         placeholder="0" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <div class="form-section-title">Datos del Titular / Propietario</div>
-                        <div class="row row-cols-1 row-cols-md-3 g-3">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="NombreTitular">Nombre(s)</label>
-                                    <input type="text" id="NombreTitular" formControlName="NombreTitular" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="ApellidosTitular">Apellidos</label>
-                                    <input type="text" id="ApellidosTitular" formControlName="ApellidosTitular" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="CelularTitular">Celular</label>
-                                    <input type="tel" id="CelularTitular" formControlName="CelularTitular"
-                                        placeholder="Ej. 5534567890" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="EmailTitular">Correo Electrónico</label>
-                                    <input type="email" id="EmailTitular" formControlName="EmailTitular"
-                                        placeholder="titular@correo.com" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DATOS USUARIO -->
-                    <div class="form-section">
-                        <div class="form-section-title">Datos usuario</div>
-
-                        <div class="row row-cols-1 row-cols-md-3 g-3">
-
-                            <!-- Usuario -->
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="Usuario">
-                                        Usuario <span class="mensaje-error">*</span>
-                                    </label>
-
-                                    <input type="text" id="Usuario" formControlName="Usuario" />
-
-                                    @if (
-                                    inmuebleForm.get('Usuario')?.hasError('required') &&
-                                    inmuebleForm.get('Usuario')?.touched
-                                    ) {
-                                    <small class="text-danger">
-                                        El usuario es obligatorio.
-                                    </small>
-                                    }
-                                </div>
-                            </div>
-
-                            <!-- Contraseña -->
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="Password">
-                                        Contraseña <span class="mensaje-error">*</span>
-                                    </label>
-
-                                    <input type="password" id="Password" formControlName="Password"
-                                        placeholder="******" />
-                                    @if (
-                                    inmuebleForm.get('Password')?.hasError('minlength') &&
-                                    inmuebleForm.get('Password')?.touched
-                                    ) {
-                                    <small class="text-danger">
-                                        La contraseña debe tener al menos 8 caracteres.
-                                    </small>
-                                    }
-                                    @if (
-                                    inmuebleForm.get('Password')?.hasError('required') &&
-                                    inmuebleForm.get('Password')?.touched
-                                    ) {
-                                    <small class="text-danger">
-                                        La contraseña es obligatoria.
-                                    </small>
-                                    }
-                                </div>
-                            </div>
-
-                            <!-- Confirmar contraseña -->
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="ConfirmPassword">
-                                        Confirmar Contraseña <span class="mensaje-error">*</span>
-                                    </label>
-
-                                    <input type="password" id="ConfirmPassword" formControlName="ConfirmPassword"
-                                        placeholder="******" />
-
-                                    @if (
-                                    inmuebleForm.get('ConfirmPassword')?.hasError('required') &&
-                                    inmuebleForm.get('ConfirmPassword')?.touched
-                                    ) {
-                                    <small class="text-danger">
-                                        Debe confirmar la contraseña.
-                                    </small>
-                                    }
-
-                                    @if (
-                                    inmuebleForm.hasError('passwordsNoCoinciden') &&
-                                    inmuebleForm.get('Password')?.dirty &&
-                                    inmuebleForm.get('ConfirmPassword')?.dirty
-                                    ) {
-                                    <small class="text-danger">
-                                        Las contraseñas no coinciden.
-                                    </small>
-                                    }
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-
-                    <div class="form-section">
-                        <div class="form-section-title">Datos del Ocupante (Si aplica)</div>
-                        <div class="row row-cols-1 row-cols-md-3 g-3">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="NombreOcupante">Nombre(s)</label>
-                                    <input type="text" id="NombreOcupante" formControlName="NombreOcupante" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="ApellidosOcupante">Apellidos</label>
-                                    <input type="text" id="ApellidosOcupante" formControlName="ApellidosOcupante" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="CelularOcupante">Celular</label>
-                                    <input type="tel" id="CelularOcupante" formControlName="CelularOcupante"
-                                        placeholder="Ej. 5534567890" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="EmailOcupante">Correo Electrónico</label>
-                                    <input type="email" id="EmailOcupante" formControlName="EmailOcupante"
-                                        placeholder="titular@correo.com" />
                                 </div>
                             </div>
                         </div>
@@ -263,7 +100,6 @@
         </div>
     </main>
 </mat-dialog-content>
-
 
 <mat-dialog-actions align="end">
     <button mat-raised-button (click)="cancelar()">Cancelar</button>

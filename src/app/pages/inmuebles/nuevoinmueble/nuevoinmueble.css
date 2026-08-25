@@ -70,7 +70,7 @@
 }
 
 .form-section {
-    margin-bottom: 28px;
+    margin-bottom: 5px;
 }
 
 .form-section-title {
@@ -165,4 +165,12 @@ textarea:focus {
     color: red;
     font-size: 12px;
     margin-right: 25px;
+}
+
+
+
+.form-cardx {
+  border: 1px solid #cccccc; /* Contorno gris tenue */
+  border-radius: 8px;       /* Redondeado de esquinas */
+  padding: 20px;             /* Espaciado interno para que el contenido no pegue al borde */
 }

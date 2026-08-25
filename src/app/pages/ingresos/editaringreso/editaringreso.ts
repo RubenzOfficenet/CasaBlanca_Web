@@ -239,21 +239,21 @@ export class Editaringreso implements OnInit {
   alSeleccionarCasa(): void {
     const casaId = this.ingresoForm.get('casa')?.value as number | null;
     if (casaId === null) return;
-    this.leeNombreDeHbitante(casaId);
+    //this.leeNombreDeHbitante(casaId);
   }
 
-  leeNombreDeHbitante(Id: number): void {
-    this.inmueblesServices.getInuebleById(Id).subscribe({
-      next: (inmueble: InmuebleEditarDTO) => {
-        this.ingresoForm.patchValue({
-          nombre: `${inmueble.nombreTitular} ${inmueble.apellidosTitular}`
-        });
-      },
-      error: (error) => {
-        console.error('No se pudo obtener el inmueble:', error);
-      }
-    });
-  }
+  // leeNombreDeHbitante(Id: number): void {
+  //   this.inmueblesServices.getInuebleById(Id).subscribe({
+  //     next: (inmueble: InmuebleEditarDTO) => {
+  //       this.ingresoForm.patchValue({
+  //         nombre: `${inmueble.nombreTitular} ${inmueble.apellidosTitular}`
+  //       });
+  //     },
+  //     error: (error) => {
+  //       console.error('No se pudo obtener el inmueble:', error);
+  //     }
+  //   });
+  // }
 
 
 actualizarIngrso(){}

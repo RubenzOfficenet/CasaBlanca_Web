@@ -94,7 +94,7 @@ export class Nuevoingreso implements OnInit {
   seleccionarCasa(casa: CasaDTO): void {
     this.ingresoForm.get('casa')?.setValue(casa.id);
     this.casaControl.setValue(casa.casa, { emitEvent: false });
-    this.leeNombreDeHabitante(casa.id ?? 0);
+    //this.leeNombreDeHabitante(casa.id ?? 0);
   }
 
   leerConceptoIngreso(): void {
@@ -121,17 +121,17 @@ export class Nuevoingreso implements OnInit {
     });
   }
 
-  leeNombreDeHabitante(id: number): void {
-    this.inmueblesServices.getInuebleById(id).subscribe({
-      next: (inmueble: InmuebleEditarDTO) => {
-        const nombreCompleto = `${inmueble.nombreTitular ?? ''} ${inmueble.apellidosTitular ?? ''}`.trim();
-        this.ingresoForm.patchValue({ nombre: nombreCompleto });
-      },
-      error: (error) => {
-        console.error('No se pudo obtener el inmueble:', error);
-      }
-    });
-  }
+  // leeNombreDeHabitante(id: number): void {
+  //   this.inmueblesServices.getInuebleById(id).subscribe({
+  //     next: (inmueble: InmuebleEditarDTO) => {
+  //       const nombreCompleto = `${inmueble.nombreTitular ?? ''} ${inmueble.apellidosTitular ?? ''}`.trim();
+  //       this.ingresoForm.patchValue({ nombre: nombreCompleto });
+  //     },
+  //     error: (error) => {
+  //       console.error('No se pudo obtener el inmueble:', error);
+  //     }
+  //   });
+  // }
 
   mostrarConfirmacion(): void {
     if (this.ingresoForm.invalid) {
@@ -207,12 +207,12 @@ export class Nuevoingreso implements OnInit {
     };
   }
 
-  alSeleccionarCasa(event: Event): void {
-    const idCasa = this.ingresoForm.get('casa')?.value;
-    if (idCasa) {
-      this.leeNombreDeHabitante(idCasa);
-    } else {
-      this.ingresoForm.patchValue({ nombre: '' });
-    }
-  }
+  // alSeleccionarCasa(event: Event): void {
+  //   const idCasa = this.ingresoForm.get('casa')?.value;
+  //   if (idCasa) {
+  //     this.leeNombreDeHabitante(idCasa);
+  //   } else {
+  //     this.ingresoForm.patchValue({ nombre: '' });
+  //   }
+  // }
 }

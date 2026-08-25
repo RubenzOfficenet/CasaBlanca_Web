@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,8 +21,6 @@ import { IUbicacion } from '../nuevoinmueble/DOT/IUbicacion.model';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatDialogContent,
-    MatDialogActions,
     MatDialogModule,
     MatButtonModule,
     MatSnackBarModule,
@@ -44,29 +42,31 @@ export class Editarinmueble implements OnInit {
   estadosOcupacion: IEstadosOcupacion[] = [];
   ubicaciones: IUbicacion[] = [];
 
-  inmuebleForm: FormGroup = this.fb.group({
-    numeroCasa: ['', [Validators.required]],
-    idubicacion: [null],
-    cuotaDeMantenimientoBase: [0],
-    estadoOcupacion: [-1],
-    numeroHabitantes: [0],
-    nombreTitular: [''],
-    apellidosTitular: [''],
-    celularTitular: [''],
-    emailTitular: [''],
-    nombreOcupante: [''],
-    apellidosOcupante: [''],
-    celularOcupante: [''],
-    emailOcupante: [''],
-    observaciones: ['']
-  });
+  _idUbicacion : number = 0;
+
+
+  // Declaramos el FormGroup
+  inmuebleForm!: FormGroup;
 
   ngOnInit(): void {
+    // 1. Inicialización síncrona inmediata antes de cualquier llamada asíncrona
+    this.initForm();
+    // 2. Carga de datos de catálogo e inmueble
     this.cargarDatosIniciales();
   }
 
-  // Carga catalogos e inmueble secuencialmente usando forkJoin para evitar race conditions
-cargarDatosIniciales(): void {
+  private initForm(): void {
+    this.inmuebleForm = this.fb.group({
+      Ubicacion: ['', Validators.required],
+      NumeroCasa: ['', [Validators.required, Validators.pattern(/^[^\s]+$/)]],
+      CuotaDeMantenimientoBase: ['', Validators.required],
+      EstadoOcupacion: [-1, [Validators.required, Validators.min(0)]],
+      NumeroHabitantes: ['', Validators.required],
+      Observaciones: ['']
+    });
+  }
+
+ cargarDatosIniciales(): void {
   forkJoin({
     estados: this._inmueblesServices.getEstadosOcupacion(),
     ubicaciones: this._inmueblesServices.getUbicaciones(),
@@ -74,35 +74,25 @@ cargarDatosIniciales(): void {
   }).subscribe({
     next: ({ estados, ubicaciones, inmueble }) => {
       this.estadosOcupacion = estados;
-      this.ubicaciones = ubicaciones;
+      this.ubicaciones = ubicaciones;      
 
-      // Corregido: idUbicacion con U mayúscula, tal como viene del JSON
-      const idUbicacionString = inmueble.idUbicacion ? String(inmueble.idUbicacion) : null;
+      const idUbicacionObtenido = inmueble?.idUbicacion;      
+      this._idUbicacion = idUbicacionObtenido;
 
       this.inmuebleForm.patchValue({
-        numeroCasa: inmueble.numeroCasa,
-        idubicacion: idUbicacionString, // el control del form se llama 'idubicacion' (minúsculas), eso está bien
-        cuotaDeMantenimientoBase: inmueble.cuotaDeMantenimientoBase,
-        estadoOcupacion: inmueble.estadoOcupacion,
-        numeroHabitantes: inmueble.numeroHabitantes,
-        nombreTitular: inmueble.nombreTitular,
-        apellidosTitular: inmueble.apellidosTitular,
-        celularTitular: inmueble.celularTitular,
-        emailTitular: inmueble.emailTitular,
-        nombreOcupante: inmueble.nombreOcupante,
-        apellidosOcupante: inmueble.apellidosOcupante,
-        celularOcupante: inmueble.celularOcupante,
-        emailOcupante: inmueble.emailOcupante,
-        observaciones: inmueble.observaciones
+        Ubicacion: idUbicacionObtenido ?? '',
+        NumeroCasa: inmueble.numeroCasa ?? '',
+        CuotaDeMantenimientoBase: inmueble.cuotaDeMantenimientoBase ?? '',
+        EstadoOcupacion: inmueble.idEstadoOcupacion ?? -1,
+        NumeroHabitantes: inmueble.numeroHabitantes ?? '',
+        Observaciones: inmueble.observaciones ?? ''
       });
     },
     error: (err) => {
-      console.error('Error al cargar datos:', err);
       this.snackBar.open('Error al cargar la información del inmueble.', 'Cerrar', { duration: 3000 });
     }
   });
 }
-
   mostrarConfirmacion(): void {
     if (this.inmuebleForm.invalid) {
       this.inmuebleForm.markAllAsTouched();
@@ -125,18 +115,19 @@ cargarDatosIniciales(): void {
   }
 
   guardar(): void {
-    const rawValues = this.inmuebleForm.getRawValue();
+    const f = this.inmuebleForm.getRawValue();
 
-    debugger;
     const datosHouse: iupdateCasa = {
       id: this.data.id,
-      ...rawValues,
-      idubicacion: Number(rawValues.idubicacion) || 0,
-      cuotaDeMantenimientoBase: Number(rawValues.cuotaDeMantenimientoBase) || 0,
-      numeroHabitantes: Number(rawValues.numeroHabitantes) || 0,
-      estadoOcupacion: Number(rawValues.estadoOcupacion) || 0
+      numeroCasa: f.NumeroCasa,
+      idubicacion: Number(f.Ubicacion) || 0,
+      cuotaDeMantenimientoBase: Number(f.CuotaDeMantenimientoBase) || 0,
+      idEstadoOcupacion: Number(f.EstadoOcupacion) || 0,
+      numeroHabitantes: Number(f.NumeroHabitantes) || 0,
+      observaciones: f.Observaciones || ''
     };
 
+    console.log('datosHouse : ', datosHouse);
     this._inmueblesServices.postUpdateHouse(datosHouse).subscribe({
       next: (res) => {
         this.snackBar.open('Inmueble actualizado correctamente', 'OK', { duration: 3000 });
@@ -152,7 +143,4 @@ cargarDatosIniciales(): void {
   cancelar(): void {
     this.dialogRef.close(null);
   }
-
-
-
 }

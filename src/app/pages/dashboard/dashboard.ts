@@ -34,7 +34,7 @@ import { MatIcon } from "@angular/material/icon";
     MatProgressSpinnerModule,
     MatSelectModule,
     MatFormFieldModule,
-    MatInputModule, MatIcon],
+    MatInputModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

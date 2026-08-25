@@ -1,8 +1,9 @@
 <mat-dialog-content>
+    <!-- CONTENIDO DE CAPTURA -->
     <main class="main-content">
         <div class="form-container container-fluid">
             <div class="form-header mb-4">
-                <h1>Editar Inmueble</h1>
+                <h1>Registrar Nuevo Inmueble</h1>
             </div>
 
             <div class="form-cardx">
@@ -11,21 +12,14 @@
                         <div class="form-section-title">Información del Inmueble</div>
 
                         <div class="row row-cols-1 row-cols-md-3 g-3">
+                            <!-- Control Ubicacion -->
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="numeroCasa">Número de Casa <span class="mensaje-error">*</span></label>
-                                    <input type="text" id="numeroCasa" formControlName="numeroCasa"
-                                        placeholder="Ej. A99" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="idubicacion">Sección</label>
-                                    <select id="idubicacion" formControlName="idubicacion">
-                                        <option value="null" disabled>Seleccione una ubicación</option>
+                                    <label for="Ubicacion">Sección</label>
+                                    <select id="Ubicacion" formControlName="Ubicacion">
+                                        <option value="" disabled selected>Seleccione una Sección</option>
                                         @for (ubicacion of ubicaciones; track ubicacion.id) {
-                                        <option [value]="ubicacion.id">
+                                        <option [ngValue]="ubicacion.id">
                                             {{ ubicacion.nombreUbicacion }}
                                         </option>
                                         }
@@ -35,22 +29,45 @@
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="cuotaDeMantenimientoBase">Cuota de Mantenimiento</label>
-                                    <div class="input-wrapper has-prefix">
-                                        <span class="input-prefix">$</span>
-                                        <input type="number" id="cuotaDeMantenimientoBase"
-                                            formControlName="cuotaDeMantenimientoBase" step="0.01" placeholder="0.00" />
-                                    </div>
+                                    <label for="NumeroCasa">Número de Casa <span class="mensaje-error">*</span> </label>
+                                    <input type="text" id="NumeroCasa" formControlName="NumeroCasa"
+                                        placeholder="Ej. A99" />
+                                    @if (
+                                    inmuebleForm.get('NumeroCasa')?.invalid &&
+                                    inmuebleForm.get('NumeroCasa')?.touched
+                                    ) {
+                                    <small class="text-danger">
+                                        @if (inmuebleForm.get('NumeroCasa')?.hasError('required')) {
+                                        El número de casa es obligatorio.
+                                        }
+
+                                        @if (inmuebleForm.get('NumeroCasa')?.hasError('pattern')) {
+                                        El número de casa no puede contener solo espacios.
+                                        }
+                                    </small>
+                                    }
                                 </div>
                             </div>
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="estadoOcupacion">Estado de Ocupación</label>
-                                    <select id="estadoOcupacion" formControlName="estadoOcupacion">
-                                        <option [value]="-1" disabled selected>Seleccione un estado</option>
+                                    <label for="CuotaDeMantenimientoBase">Cuota de Mantenimiento</label>
+                                    <div class="input-wrapper has-prefix">
+                                        <span class="input-prefix">$</span>
+                                        <input type="number" id="CuotaDeMantenimientoBase"
+                                            formControlName="CuotaDeMantenimientoBase" step="0.01" placeholder="0.00" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Control EstadoOcupacion -->
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="EstadoOcupacion">Estado</label>
+                                    <select id="EstadoOcupacion" formControlName="EstadoOcupacion">
+                                        <option [ngValue]="-1" disabled selected>Seleccione un estado</option>
                                         @for (estado of estadosOcupacion; track estado.id) {
-                                        <option [value]="estado.id">
+                                        <option [ngValue]="estado.id">
                                             {{ estado.estadoInicialOcupacion }}
                                         </option>
                                         }
@@ -60,79 +77,9 @@
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="numeroHabitantes">Número de Habitantes</label>
-                                    <input type="number" id="numeroHabitantes" formControlName="numeroHabitantes"
+                                    <label for="NuneroHabitantes">Número de Habitantes</label>
+                                    <input type="number" id="NuneroHabitantes" formControlName="NumeroHabitantes"
                                         placeholder="0" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <div class="form-section-title">Datos del Titular / Propietario</div>
-                        <div class="row row-cols-1 row-cols-md-3 g-3">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="nombreTitular">Nombre(s)</label>
-                                    <input type="text" id="nombreTitular" formControlName="nombreTitular" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="apellidosTitular">Apellidos</label>
-                                    <input type="text" id="apellidosTitular" formControlName="apellidosTitular" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="celularTitular">Celular</label>
-                                    <input type="tel" id="celularTitular" formControlName="celularTitular"
-                                        placeholder="Ej. 5534567890" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="emailTitular">Correo Electrónico</label>
-                                    <input type="email" id="emailTitular" formControlName="emailTitular"
-                                        placeholder="titular@correo.com" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <div class="form-section-title">Datos del Ocupante (Si aplica)</div>
-                        <div class="row row-cols-1 row-cols-md-3 g-3">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="nombreOcupante">Nombre(s)</label>
-                                    <input type="text" id="nombreOcupante" formControlName="nombreOcupante" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="apellidosOcupante">Apellidos</label>
-                                    <input type="text" id="apellidosOcupante" formControlName="apellidosOcupante" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="celularOcupante">Celular</label>
-                                    <input type="tel" id="celularOcupante" formControlName="celularOcupante"
-                                        placeholder="Ej. 5534567890" />
-                                </div>
-                            </div>
-
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="emailOcupante">Correo Electrónico</label>
-                                    <input type="email" id="emailOcupante" formControlName="emailOcupante"
-                                        placeholder="ocupante@correo.com" />
                                 </div>
                             </div>
                         </div>
@@ -143,8 +90,8 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label for="observaciones">Observaciones</label>
-                                    <textarea id="observaciones" formControlName="observaciones" rows="3"
+                                    <label for="Observaciones">Observaciones</label>
+                                    <textarea id="Observaciones" formControlName="Observaciones" rows="3"
                                         placeholder="Notas o comentarios relevantes..."></textarea>
                                 </div>
                             </div>
@@ -158,5 +105,5 @@
 
 <mat-dialog-actions align="end">
     <button mat-raised-button (click)="cancelar()">Cancelar</button>
-    <button mat-raised-button (click)="mostrarConfirmacion()" color="primary">Actualizar Datos</button>
+    <button mat-raised-button (click)="mostrarConfirmacion()" color="primary">Guardar Registro</button>
 </mat-dialog-actions>

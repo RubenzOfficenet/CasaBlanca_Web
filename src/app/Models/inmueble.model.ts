@@ -1,15 +1,19 @@
 export interface ICasas {
     id: number;
     numeroCasa?: string;
+    idubicacion: number;
     nombreubicacion: string;
     cuotaDeMantenimientoBase: number;
+    idestadoocupacion: number;
     estadoInicialOcupacion: string;
-    nombreTitular?: string;
-    emailTitular?: string;
-    celularTitular?: string;
-    nombreOcupante? :string;
-    emailOcupante? : string;
-    celularOcupante? : string;
     numeroHabitantes: number;
-
+    observaciones?: string;
+    idusuario: number;
+    nombre?: string;
+    apellidos?: string;
+    idcasa: number;
+    rol?: string;
+    idRol: number;
 }
+
+

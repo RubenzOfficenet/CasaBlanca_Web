@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +9,7 @@ import { IEstadosOcupacion } from '../../../interfaces/iestadosocupacion.interfa
 import { InmueblesServices } from '../services/inmuebles-services';
 import { ConfirmDialog } from "../../shared/confirm-dialog/confirm-dialog";
 import { IUbicacion } from './DOT/IUbicacion.model';
+
 
 export const passwordsIgualesValidator: ValidatorFn = (form: AbstractControl): ValidationErrors | null => {
   const password = form.get('Password')?.value;
@@ -43,73 +44,44 @@ export class Nuevoinmueble implements OnInit {
   private readonly _inmueblesServices = inject(InmueblesServices);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
+
 
   estadosOcupacion: IEstadosOcupacion[] = [];
   numeroCasaVacio: boolean = true;
-  ubicaciones : IUbicacion[] = []; // Variable para almacenar las ubicaciones  
+  ubicaciones: IUbicacion[] = []; // Variable para almacenar las ubicaciones  
 
 
-  inmuebleForm: FormGroup = this.fb.group(
-    {
-      NumeroCasa: ['', [Validators.required, Validators.pattern(/^.*\S.*$/)]],
-      Ubicacion: [''],
-      CuotaDeMantenimientoBase: [''],
-      EstadoOcupacion: [''],
-      NumeroHabitantes: [''],
-      NombreTitular: [''],
-      ApellidosTitular: [''],
-      CelularTitular: [''],
-      EmailTitular: [''],
-      Usuario: ['', [Validators.required]],
-      Password: ['', [Validators.required, Validators.minLength(8)]],
-      ConfirmPassword: ['', Validators.required],
-      NombreOcupante: [''],
-      ApellidosOcupante: [''],
-      CelularOcupante: [''],
-      EmailOcupante: [''],
-      Observaciones: ['']
-    },
-    {
-      validators: passwordsIgualesValidator
-    }
-  );
 
-    nuevaCasa: ICasaCreate = {
-    numeroCasa: '',
-    idubicacion: 0,
-    ubicacion: '',
-    cuotaDeMantenimientoBase: 0,
-    estadoOcupacion: 0,
-    nombreTitular: '',
-    apellidosTitular: '',
-    emailTitular: '',
-    celularTitular: '',
-    Usuario: '',
-    Password: '',
-    ConfirmPassword: '',
-    nombreOcupante: '',
-    apellidosOcupante: '',
-    emailOcupante: '',
-    celularOcupante: '',
-    numeroHabitantes: 0,
-    observaciones: ''
-  };
+
+  inmuebleForm: FormGroup = this.fb.group({
+    Ubicacion: ['', Validators.required],
+    NumeroCasa: ['', [Validators.required, Validators.pattern(/^[^\s]+$/)]],
+    CuotaDeMantenimientoBase: ['', Validators.required],
+    EstadoOcupacion: ['-1', [Validators.required, Validators.min(0)]],
+    NumeroHabitantes: ['', Validators.required],
+    Observaciones: ['']
+  });
+
+nuevaCasa: ICasaCreate = {
+  numeroCasa: '',
+  idubicacion: 0,
+  cuotaDeMantenimientoBase: 0,
+  estadoOcupacion: 0,
+  numeroHabitantes: 0,
+  observaciones: ''
+};
 
   ngOnInit(): void {
     this.getEstadosOcupacion();
     this.getUbicaciones();
   }
 
-getUbicaciones(): void {
+  getUbicaciones(): void {
     this._inmueblesServices.getUbicaciones().subscribe({
       next: (data) => {
         this.ubicaciones = data;
-        console.log('Ubicaciones cargadas:', this.ubicaciones);
-        if (data.length > 0) {
-          this.inmuebleForm.patchValue({
-            Ubicacion: data[0].id
-          });
-        }
+        this.cdr.detectChanges(); // Fuerzas la re-evaluación en el momento justo
       },
       error: (err) => console.error('Error al cargar las Ubicaciones:', err)
     });
@@ -118,18 +90,22 @@ getUbicaciones(): void {
   getEstadosOcupacion(): void {
     this._inmueblesServices.getEstadosOcupacion().subscribe({
       next: (data) => {
-        this.estadosOcupacion = data;
-        if (data.length > 0) {
-          this.inmuebleForm.patchValue({
-            EstadoOcupacion: data[0].id
-          });
-        }
+        setTimeout(() => {
+          this.estadosOcupacion = data;
+        });
       },
-      error: (err) => console.error('Error al cargar los Estados de Ocupacion:', err)
+      error: (err) => console.error('Error al cargar los Estados de Ocupación:', err)
     });
   }
-
   mostrarConfirmacion(): void {
+
+    Object.keys(this.inmuebleForm.controls).forEach(key => {
+      const control = this.inmuebleForm.get(key);
+      if (control?.invalid) {
+        console.log(`Campo inválido: ${key}`, control.errors);
+      }
+    });
+
     if (this.inmuebleForm.invalid) {
       this.inmuebleForm.markAllAsTouched();
       this.snackBar.open(
@@ -147,8 +123,10 @@ getUbicaciones(): void {
       }
     });
 
+    console.log(this.inmuebleForm);
     ref.afterClosed().subscribe((confirmado) => {
       if (confirmado) {
+        console.log(2);
         this.guardar();
       }
     });
@@ -156,8 +134,6 @@ getUbicaciones(): void {
 
   guardar(): void {
     this.nuevaCasa = this.construirNuevaCasa();
-    debugger;
-    console.log('Datos a enviar al API:', this.nuevaCasa);
 
     this._inmueblesServices.postCreateHouse(this.nuevaCasa).subscribe({
       next: (respuesta) => {
@@ -165,7 +141,6 @@ getUbicaciones(): void {
         this.dialogRef.close(respuesta); // Se cierra retornando la respuesta del API
       },
       error: (err) => {
-        console.error('Error al guardar el inmueble:', err);
         this.snackBar.open(
           'Error al guardar el inmueble. Inténtalo de nuevo.',
           'Cerrar',
@@ -179,28 +154,18 @@ getUbicaciones(): void {
     this.dialogRef.close(null);
   }
 
-  private construirNuevaCasa(): ICasaCreate {
-    const f = this.inmuebleForm.getRawValue();
+private construirNuevaCasa(): ICasaCreate {
+  const f = this.inmuebleForm.getRawValue();
 
-    return {
-      numeroCasa: f.NumeroCasa,
-      idubicacion: f.Ubicacion,
-      ubicacion: f.Ubicacion,
-      cuotaDeMantenimientoBase: Number(f.CuotaDeMantenimientoBase) || 0,
-      estadoOcupacion: f.EstadoOcupacion ? Number(f.EstadoOcupacion) : undefined,
-      nombreTitular: f.NombreTitular,
-      apellidosTitular: f.ApellidosTitular,
-      emailTitular: f.EmailTitular,
-      Usuario: f.Usuario,
-      Password: f.Password,
-      ConfirmPassword: f.ConfirmPassword,
-      celularTitular: f.CelularTitular,
-      nombreOcupante: f.NombreOcupante,
-      apellidosOcupante: f.ApellidosOcupante,
-      emailOcupante: f.EmailOcupante,
-      celularOcupante: f.CelularOcupante,
-      numeroHabitantes: Number(f.NumeroHabitantes) || 0,
-      observaciones: f.Observaciones
-    };
-  }
+  return {
+    numeroCasa: f.NumeroCasa,
+    idubicacion: Number(f.Ubicacion) || 0,
+    cuotaDeMantenimientoBase: Number(f.CuotaDeMantenimientoBase) || 0,
+    estadoOcupacion: Number(f.EstadoOcupacion) || 0,
+    numeroHabitantes: Number(f.NumeroHabitantes) || 0,
+    observaciones: f.Observaciones || ''
+  };
 }
+
+
+}  // end class
