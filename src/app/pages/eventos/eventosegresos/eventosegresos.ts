@@ -76,7 +76,6 @@ export class Eventosegresos {
     'nombreUbicacion',
     'numeroCasa',
     'fechaEvento',
-    'nombreTitular',
     'estatusEvento',
     'acciones'];
 

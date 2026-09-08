@@ -17,10 +17,11 @@
                                     <label for="Ubicacion">Sección</label>
                                     <select id="Ubicacion" formControlName="Ubicacion">
                                         <option value="" disabled selected>Seleccione una Sección</option>
-                                        @for (ubicacion of ubicaciones; track ubicacion.id) {
-                                        <option [value]="ubicacion.id">
-                                            {{ ubicacion.nombreUbicacion }}
-                                        </option>
+                                        <!-- En Angular 20 se invoca la Signal con () -->
+                                        @for (ubicacion of ubicaciones(); track ubicacion.id) {
+                                            <option [value]="ubicacion.id">
+                                                {{ ubicacion.nombreUbicacion }}
+                                            </option>
                                         }
                                     </select>
                                 </div>
@@ -28,22 +29,22 @@
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="NumeroCasa">Número de Casa <span class="mensaje-error">*</span> </label>
-                                    <input type="text" id="NumeroCasa" formControlName="NumeroCasa"
-                                        placeholder="Ej. A99" />
+                                    <label for="NumeroCasa">Número de Casa <span class="mensaje-error">*</span></label>
+                                    <input type="text" id="NumeroCasa" formControlName="NumeroCasa" placeholder="Ej. A99" />
+                                    
                                     @if (
-                                    inmuebleForm.get('NumeroCasa')?.invalid &&
-                                    inmuebleForm.get('NumeroCasa')?.touched
+                                        inmuebleForm.get('NumeroCasa')?.invalid &&
+                                        inmuebleForm.get('NumeroCasa')?.touched
                                     ) {
-                                    <small class="text-danger">
-                                        @if (inmuebleForm.get('NumeroCasa')?.hasError('required')) {
-                                        El número de casa es obligatorio.
-                                        }
+                                        <small class="text-danger">
+                                            @if (inmuebleForm.get('NumeroCasa')?.hasError('required')) {
+                                                El número de casa es obligatorio.
+                                            }
 
-                                        @if (inmuebleForm.get('NumeroCasa')?.hasError('pattern')) {
-                                        El número de casa no puede contener solo espacios.
-                                        }
-                                    </small>
+                                            @if (inmuebleForm.get('NumeroCasa')?.hasError('pattern')) {
+                                                El número de casa no puede contener solo espacios.
+                                            }
+                                        </small>
                                     }
                                 </div>
                             </div>
@@ -63,11 +64,13 @@
                                 <div class="form-group">
                                     <label for="EstadoOcupacion">Estado</label>
                                     <select id="EstadoOcupacion" formControlName="EstadoOcupacion">
-                                        <option value="-1" disabled selected>Seleccione un estado</option>
-                                        @for (estado of estadosOcupacion; track estado.id) {
-                                        <option [value]="estado.id">
-                                            {{ estado.estadoInicialOcupacion }}
-                                        </option>
+                                        <!-- Se cambió value="-1" por value="" para coincidir con el valor inicial null/'' del TS -->
+                                        <option [ngValue]="null" disabled selected>Seleccione un estado</option>
+                                        <!-- En Angular 20 se invoca la Signal con () -->
+                                        @for (estado of estadosOcupacion(); track estado.id) {
+                                            <option [value]="estado.id">
+                                                {{ estado.estadoInicialOcupacion }}
+                                            </option>
                                         }
                                     </select>
                                 </div>
@@ -76,8 +79,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label for="NuneroHabitantes">Número de Habitantes</label>
-                                    <input type="number" id="NuneroHabitantes" formControlName="NumeroHabitantes"
-                                        placeholder="0" />
+                                    <input type="number" id="NuneroHabitantes" formControlName="NumeroHabitantes" placeholder="0" />
                                 </div>
                             </div>
                         </div>

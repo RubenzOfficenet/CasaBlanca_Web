@@ -23,10 +23,10 @@ export const routes: Routes = [
             { path: 'egresos', component: Egresos },
             { path: 'ingresos', component: Ingresos },
             { path: 'inmuebles', component: Inmuebles },
-            { path: 'usuarios', component: Usuarios },
             { path: 'eventos', component: Eventos },
             { path: 'eventos/eventosingresos', component: Eventosingresos },
-            { path: 'eventos/eventosegresos', component: Eventosegresos }
+            { path: 'eventos/eventosegresos', component: Eventosegresos },
+            { path: 'usuarios', component: Usuarios }
         ]
     },
 

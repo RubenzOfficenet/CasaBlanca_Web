@@ -17,25 +17,40 @@ import { MatSortModule } from '@angular/material/sort';
 import { Nuevousuario } from '../usuarios/nuevousuario/nuevousuario'
 import { IUsuario } from './nuevousuario/interface/iusuario';
 import { MatDialog } from '@angular/material/dialog';
+import { Editarusuario } from './editarusuario/editarusuario';
 
 
 @Component({
   selector: 'app-usuarios',
-  imports: [MatButtonModule, CommonModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule, MatIconModule, MatTooltipModule, MatTableModule, MatPaginatorModule, MatSortModule],
+  imports: [MatButtonModule,
+    CommonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.css',
 })
 export class Usuarios {
 
-  isLoading = true; // al inicio está cargando
+
+  private readonly usuarioService = inject(Usuarioservice);
+  private readonly dialog = inject(MatDialog);
+
+  isLoading = true;
   displayedColumns: string[] = [
-    'nombreUsuario',
-    'apellidosUsuario',
-    'emailUsuario',
-    'celularUsuario',
-    'rol',
-    'numeroCasa',
+    'nombre',
+    'apellidos',
+    'email',
+    'celular',
     'estatus',
+    'numeroCasa',
+    'nombreUbicacion',
+    'rol',
     'acciones'
   ];
 
@@ -58,18 +73,25 @@ export class Usuarios {
 
   casas = signal<IGetUsuariosResponse[]>([]);
   totalRegistros?: number;
-  data?: IUsuario;
+  data?: IGetUsuariosResponse;
 
-  constructor(private usuarioService: Usuarioservice, private dialog: MatDialog) {
+  constructor() {
     this.data = {
-      nombreUsuario: '',
-      apellidosUsuario: '',
-      emailUsuario: '',
-      password: '',
-      celularUsuario: '',
+      id: 0,
+      nombre: '',
+      apellidos: '',
+      email: '',
+      celular: '',
       idRol: 0,
-      idInmueble: 0,
-      idEstatus: 1
+      idCasa: 0,
+      idEstatus: 1,
+      estatus: '',
+      idUbicacion: 0,
+      nombreUbicacion: '',
+      numeroCasa: '',
+      rol: '',
+      idTipoRelacion: 0,
+      tipoRelacion: ''
     };
   }
 
@@ -80,7 +102,7 @@ export class Usuarios {
       minWidth: '320px',
       disableClose: false,
       hasBackdrop: true,
-      height: '700px'
+      height: '600px'
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -109,10 +131,13 @@ export class Usuarios {
     this.dataSource.filterPredicate = (data: IGetUsuariosResponse, filter: string): boolean => {
       const normalizedFilter = filter.trim().toLowerCase();
 
-      return (data.nombreUsuario?.toLowerCase().includes(normalizedFilter) ?? false)
-        || (data.apellidosUsuario?.toLowerCase().includes(normalizedFilter) ?? false)
-        || (data.estatus?.toLowerCase().includes(normalizedFilter) ?? false)
-        || (data.numeroCasa?.toLowerCase().includes(normalizedFilter) ?? false);
+      return (data.nombre?.toLowerCase().includes(normalizedFilter) ?? false)
+        || (data.apellidos?.toLowerCase().includes(normalizedFilter) ?? false)
+        || (data.email?.toLowerCase().includes(normalizedFilter) ?? false)
+        || (data.celular?.toLowerCase().includes(normalizedFilter) ?? false)
+        || (data.numeroCasa?.toLowerCase().includes(normalizedFilter) ?? false)
+        || (data.nombreUbicacion?.toLowerCase().includes(normalizedFilter) ?? false)
+        || (data.rol?.toLowerCase().includes(normalizedFilter) ?? false);
     };
 
     this.cargaUsuarios();
@@ -120,13 +145,11 @@ export class Usuarios {
 
   cargaUsuarios() {
     this.usuarioService.getUsuarios().subscribe({
-      next: (data : any) => {
-        //console.log('Datos de usuarios recibidos:', data);
+      next: (data) => {
+        console.log('Datos de usuarios recibidos:', data);
         this.dataSource.data = data;   // ✅ Actualizas los datos sin recrear el dataSource
         this.totalRegistros = data.length;
         this.isLoading = false;
-        //console.log("Se cargaron los datos de los usuarios");
-
       },
       error: (err: any) => {
         console.error('Error al cargar los usuarios:', err);
@@ -134,9 +157,30 @@ export class Usuarios {
     });
   }
 
+  editarUsuario(idUsuario: number) {
+    //console.log('Id : ', idUsuario);
+    const dialogRef = this.dialog.open(Editarusuario, {
+      width: '40vw',
+      maxWidth: '2000px',
+      minWidth: '320px',
+      disableClose: false,
+      hasBackdrop: true,
+      height: '600px',
+      data: { idUsuario: idUsuario }
+    });
 
-  editarUsuario(id: number) { }
-  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        debugger;
+        //console.log('Datos recibidos del popup:', result);
+        this.cargaUsuarios();
+      } else {
+        //console.log('El usuario canceló');
+      }
+    });
+  }
+
+
   eliminar(id: number) { }
 
 

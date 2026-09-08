@@ -1,4 +1,4 @@
-export interface ICasas {
+export interface ICatalogocasas {
     id: number;
     numeroCasa?: string;
     idubicacion: number;
@@ -8,12 +8,5 @@ export interface ICasas {
     estadoInicialOcupacion: string;
     numeroHabitantes: number;
     observaciones?: string;
-    idusuario: number;
-    nombre?: string;
-    apellidos?: string;
-    idcasa: number;
-    rol?: string;
-    idRol: number;
 }
-
 

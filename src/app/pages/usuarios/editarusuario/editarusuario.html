@@ -1,6 +1,7 @@
-<h2 mat-dialog-title>Registrar Nuevo Usuario</h2>
+
 
 <mat-dialog-content>
+    <h3 mat-dialog-title>Editar Usuario</h3>
     <form [formGroup]="usuarioForm" class="dialog-form">
 
         <!-- Sección: Configuración del Usuario -->
@@ -11,12 +12,11 @@
                 <div class="col-md-4">
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Ubicación</mat-label>
-                        <mat-select formControlName="idUbicacion"
-                            (selectionChange)="onUbicacionChange($event.value)">
+                        <mat-select formControlName="idUbicacion" (selectionChange)="onUbicacionChange($event.value)">
                             @for (item of ubicaciones; track item.id) {
-                            <mat-option [value]="item.id">
-                                {{ item.nombreUbicacion }}
-                            </mat-option>
+                                <mat-option [value]="item.id">
+                                    {{ item.nombreUbicacion }}
+                                </mat-option>
                             }
                         </mat-select>
                     </mat-form-field>
@@ -71,8 +71,7 @@
 
                     <mat-label>Nombre(s)</mat-label>
                     <input matInput type="text" formControlName="nombreUsuario" placeholder="Nombre(s)" required />
-                    @if (usuarioForm.get('nombreUsuario')?.hasError('required') &&
-                    usuarioForm.get('nombreUsuario')?.touched) {
+                    @if (usuarioForm.get('nombreUsuario')?.hasError('required') && usuarioForm.get('nombreUsuario')?.touched) {
                     <mat-error>El nombre es obligatorio.</mat-error>
                     }
                 </div>
@@ -82,8 +81,7 @@
 
                     <mat-label>Apellidos</mat-label>
                     <input matInput type="text" formControlName="apellidosUsuario" placeholder="Apellidos" required />
-                    @if (usuarioForm.get('apellidosUsuario')?.hasError('required') &&
-                    usuarioForm.get('apellidosUsuario')?.touched) {
+                    @if (usuarioForm.get('apellidosUsuario')?.hasError('required') && usuarioForm.get('apellidosUsuario')?.touched) {
                     <mat-error>Los apellidos son obligatorios.</mat-error>
                     }
 
@@ -111,20 +109,17 @@
                     </div>
 
                     <!-- Password -->
-                    <div class="col-md-4">
-
+                    <!-- <div class="col-md-4">
                         <mat-label>Contraseña</mat-label>
                         <input matInput type="password" formControlName="password" placeholder="********" required />
                         @if (usuarioForm.get('password')?.hasError('required') && usuarioForm.get('password')?.touched)
                         {
                         <mat-error>La contraseña es obligatoria.</mat-error>
                         }
-
-                    </div>
+                    </div> -->
 
                     <!-- Confirmar Password -->
-                    <div class="col-md-4">
-
+                    <!-- <div class="col-md-4">
                         <mat-label>Confirmar Contraseña</mat-label>
                         <input matInput type="password" formControlName="confirmarPassword" placeholder="********"
                             required />
@@ -137,7 +132,7 @@
                         <mat-error>Las contraseñas no coinciden.</mat-error>
                         }
 
-                    </div>
+                    </div> -->
                 </span>
             </div>
         </div>

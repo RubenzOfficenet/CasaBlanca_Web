@@ -16,6 +16,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Editarinmueble } from './editarinmueble/editarinmueble';
+import { ICatalogocasas } from './interface/icatalogocasas.interface';
 
 
 @Component({
@@ -41,14 +42,11 @@ export class Inmuebles implements AfterViewInit {
   isLoading = true; // al inicio está cargando
 
   displayedColumns: string[] = [
-    'nombreubicacion',
+    'nombreUbicacion',
     'numeroCasa',
     'cuotaDeMantenimientoBase',
     'estadoInicialOcupacion',
     'numeroHabitantes',
-    'nombre',
-    'apellidos',
-    'rol',
     'observaciones',
     'acciones'
   ];
@@ -56,11 +54,11 @@ export class Inmuebles implements AfterViewInit {
   
   
 
-  dataSource = new MatTableDataSource<ICasas>([]);
+  dataSource = new MatTableDataSource<ICatalogocasas>([]);
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  casas = signal<ICasas[]>([]);
+  casas = signal<ICatalogocasas[]>([]);
   totalRegistros?: number;
 
   constructor(private dialog: MatDialog, private _inmueblesServices: InmueblesServices) {
@@ -73,19 +71,16 @@ export class Inmuebles implements AfterViewInit {
   }
 
 ngOnInit() {
-  this.dataSource.filterPredicate = (data: ICasas, filter: string): boolean => {
+  this.dataSource.filterPredicate = (data: ICatalogocasas, filter: string): boolean => {
     const term = filter.trim().toLowerCase();
 
     return (
       (data.numeroCasa?.toString().toLowerCase().includes(term) ?? false) ||
-      (data.nombreubicacion?.toLowerCase().includes(term) ?? false) ||
+      (data.nombreUbicacion?.toLowerCase().includes(term) ?? false) ||
       (data.cuotaDeMantenimientoBase?.toString().toLowerCase().includes(term) ?? false) ||
       (data.estadoInicialOcupacion?.toLowerCase().includes(term) ?? false) ||
       (data.numeroHabitantes?.toString().toLowerCase().includes(term) ?? false) ||
-      (data.observaciones?.toLowerCase().includes(term) ?? false) ||
-      (data.nombre?.toLowerCase().includes(term) ?? false) ||
-      (data.apellidos?.toLowerCase().includes(term) ?? false) ||
-      (data.rol?.toLowerCase().includes(term) ?? false)
+      (data.observaciones?.toLowerCase().includes(term) ?? false)
     );
   };
 

@@ -17,6 +17,7 @@ import { InmuebleEditarDTO } from '../../../Models/InmuebleEditarDTO.model';
 import { IngresosService } from '../nuevoingreso/services/ingresoService';
 import { IIngresoUpdate } from '../nuevoingreso/DTO/ingresoUpdateDTO';
 import { IIngresoDataUpdate } from '../nuevoingreso/DTO/ingresoDataUpdate';
+import { ICatalogocasas } from '../../inmuebles/interface/icatalogocasas.interface';
 
 @Component({
   selector: 'app-editaringreso',
@@ -44,7 +45,7 @@ export class Editaringreso implements OnInit {
   ingresoForm!: FormGroup;
   casaDatos: CasaDTO[] = [];
   conceptoIngreso: ConceptoIngreso[] = [];
-  casas: ICasas[] = [];
+  casas: ICatalogocasas[] = [];
   ingredoData!: IIngresoUpdate;
   IngresoDataUpdate!: IIngresoDataUpdate;
 
@@ -112,7 +113,7 @@ export class Editaringreso implements OnInit {
 
   leerDatosCasa(): void {
     this.inmueblesServices.getInmuebles().subscribe({
-      next: (respuesta: ICasas[]) => {
+      next: (respuesta: ICatalogocasas[]) => {
         this.casas = respuesta;
         this.casaDatos = this.casas.map(casa => this.mapToCasaDTO(casa));
         this.cdr.detectChanges();
@@ -229,7 +230,7 @@ export class Editaringreso implements OnInit {
     });
   }
 
-  private mapToCasaDTO(casa: ICasas): CasaDTO {
+  private mapToCasaDTO(casa: ICatalogocasas): CasaDTO {
     return {
       id: casa.id,
       casa: casa.numeroCasa ?? ''

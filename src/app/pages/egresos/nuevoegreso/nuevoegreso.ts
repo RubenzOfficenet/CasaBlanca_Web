@@ -72,35 +72,35 @@ export class Nuevoegreso {
     concepto: ['', Validators.required],
     monto: [0, [Validators.required, Validators.min(0.01)]],
     observaciones: [''],
-    fechaEgreso: new FormControl<Date>(new Date(), { 
-    nonNullable: true, 
-    validators: Validators.required 
-  })
+    fechaEgreso: new FormControl<Date>(new Date(), {
+      nonNullable: true,
+      validators: Validators.required
+    })
   });
 
   constructor() { }
 
 
-mostrarConfirmacion(): void {
-  if (this.egresoForm.invalid) {
-    this.egresoForm.markAllAsTouched();
-    return;
+  mostrarConfirmacion(): void {
+    if (this.egresoForm.invalid) {
+      this.egresoForm.markAllAsTouched();
+      return;
+    }
+
+    const ref = this.dialog.open(ConfirmDialog, {
+      data: {
+        titulo: 'Guardar Datos',
+        mensaje: '¿Estás seguro de guardar los datos?'
+      }
+    });
+
+    ref.afterClosed().subscribe(confirmado => {
+      if (confirmado) {
+        this.guardar();
+      }
+      // Si presiona "No" en la confirmación, simplemente regresamos al formulario para corregir algo si lo desea.
+    });
   }
-
-  const ref = this.dialog.open(ConfirmDialog, {
-    data: {
-      titulo: 'Guardar Datos',  
-      mensaje: '¿Estás seguro de guardar los datos?'
-    }
-  });
-
-  ref.afterClosed().subscribe(confirmado => {
-    if (confirmado) {
-      this.guardar();
-    }
-    // Si presiona "No" en la confirmación, simplemente regresamos al formulario para corregir algo si lo desea.
-  });
-}
 
   guardar(): void {
     console.log('Formulario válido en OK:', this.egresoForm.valid);
@@ -125,20 +125,17 @@ mostrarConfirmacion(): void {
         : ''
     };
 
-    //console.log('DTO a enviar:', egresoDto);
-
-// --- Consumo del servicio ---
     this.egresoService.agregarEgreso(egresoDto).subscribe({
       next: (respuesta) => {
-        
+
 
         //this.guardando.set(false);
         //console.log('Respuesta del servicio:', respuesta);
 
         this.snackBar.open('Egreso registrado correctamente', 'Cerrar', {
           duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top'
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom'
         });
 
         // Cerramos la ventana modal pasando true para recargar la tabla principal
@@ -154,7 +151,7 @@ mostrarConfirmacion(): void {
         });
       }
     });
-    
+
 
   }
 

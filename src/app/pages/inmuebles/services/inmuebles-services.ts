@@ -9,6 +9,7 @@ import { InmuebleEditarDTO } from '../../../Models/InmuebleEditarDTO.model';
 import { type iupdateCasa } from '../interface/iupdateCasa';
 import { IUbicacion } from '../nuevoinmueble/DOT/IUbicacion.model';
 import { ICasaRsponse } from '../interface/casarequest.interface';
+import { ICatalogocasas } from '../interface/icatalogocasas.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +21,7 @@ export class InmueblesServices {
 
   constructor() { }
 
-  getInmuebles(): Observable<ICasas[]> {
+  getInmuebles(): Observable<ICatalogocasas[]> {
     var url = this._apiUrl + 'GetHouses';
     return this._http.get<ICasas[]>(url);
   }
@@ -54,7 +55,7 @@ export class InmueblesServices {
 
   leeCasasporSeccion(idSeccion: number): Observable<ICasaRsponse[]> {
     const url = this._apiUrl + 'GetHouseIdUbicacion/?idUbicacion=' + idSeccion;
-    return this._http.get<ICasaRsponse[]>(url);
+        return this._http.get<ICasaRsponse[]>(url);
   }
 
 

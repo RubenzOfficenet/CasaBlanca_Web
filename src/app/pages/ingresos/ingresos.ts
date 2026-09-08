@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit, inject } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -96,23 +96,23 @@ export class Ingresos implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
- ngOnInit(): void {
-  // Manejo personalizado del ordenamiento en la tabla
-  this.dataSource.sortingDataAccessor = (item: IIngresoResponse, property: string) => {
-    switch (property) {
-      case 'fechaRecepcion':
-      case 'fechaConcepto':
-        return item[property] ? new Date(item[property]).getTime() : 0;
-      case 'monto':
-        return Number(item.monto) || 0;
-      default:
-        return (item as Record<string, any>)[property];
-    }
-  };
+  ngOnInit(): void {
+    // Manejo personalizado del ordenamiento en la tabla
+    this.dataSource.sortingDataAccessor = (item: IIngresoResponse, property: string) => {
+      switch (property) {
+        case 'fechaRecepcion':
+        case 'fechaConcepto':
+          return item[property] ? new Date(item[property]).getTime() : 0;
+        case 'monto':
+          return Number(item.monto) || 0;
+        default:
+          return (item as Record<string, any>)[property];
+      }
+    };
 
-  this.configurarFiltro();
-  this.cargarIngresos();
-}
+    this.configurarFiltro();
+    this.cargarIngresos();
+  }
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
@@ -199,7 +199,8 @@ export class Ingresos implements OnInit, AfterViewInit {
     this.leeDatos();
   }
 
-  abrirPopup(): void {
+abrirPopup(): void {
+  setTimeout(() => {
     const dialogRef = this.dialog.open(Nuevoingreso, {
       width: '40vw',
       maxWidth: '2000px',
@@ -213,7 +214,8 @@ export class Ingresos implements OnInit, AfterViewInit {
         this.cargarIngresos();
       }
     });
-  }
+  });
+}
 
   editarIngreso(id: number): void {
     const dialogRef = this.dialog.open(Editaringreso, {

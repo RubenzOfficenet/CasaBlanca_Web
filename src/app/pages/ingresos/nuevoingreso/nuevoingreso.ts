@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -13,12 +13,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ICasas } from '../../../Models/inmueble.model';
 import { InmueblesServices } from '../../inmuebles/services/inmuebles-services';
 import { CasaDTO } from './DTO/casaDTO.model';
-import { InmuebleEditarDTO } from '../../../Models/InmuebleEditarDTO.model';
 import { ConceptoIngreso } from './DTO/conceptoIngresos.model';
 import { catalogosservice } from '../../../services/catalogos/catalogosservice';
 import { ConfirmDialog } from "../../shared/confirm-dialog/confirm-dialog";
 import { IIngresoDTO } from './DTO/ingresoDTO.model';
 import { IngresosService } from './services/ingresoService';
+import { ICatalogocasas } from '../../inmuebles/interface/icatalogocasas.interface';
 
 @Component({
   selector: 'app-nuevoingreso',
@@ -46,17 +46,17 @@ export class Nuevoingreso implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<Nuevoingreso>);
   private readonly dialog = inject(MatDialog);
 
-  casas: ICasas[] = [];
+  casas: ICatalogocasas[] = [];
   casaDatos: CasaDTO[] = [];
   casasFiltradas: CasaDTO[] = [];
   conceptoIngreso: ConceptoIngreso[] = [];
 
-  casaControl = new FormControl<string>('');
+casaControl = new FormControl<string>('', { nonNullable: true });
 
   ingresoForm: FormGroup = this.fb.group({
     casa: [null, Validators.required],
     nombre: [{ value: '', disabled: true }],
-    fechaRecepcion: [this.obtenerFechaActual(), Validators.required],
+    fechaRecepcion: ['', Validators.required], // Se inicializa vacío para no romper el Change Detection
     numeroRecibo: ['', Validators.required],
     concepto: [null, Validators.required],
     fechaConcepto: ['', Validators.required],
@@ -64,25 +64,30 @@ export class Nuevoingreso implements OnInit {
     observaciones: ['']
   });
 
-  constructor() {
-    // Escuchamos los cambios del autocompletar limpiando automáticamente al destruir el componente
-    this.casaControl.valueChanges
-      .pipe(takeUntilDestroyed())
-      .subscribe((texto) => {
-        const valor = texto ?? '';
-        this.filtrarCasas(valor);
+constructor(private cdRef: ChangeDetectorRef) {
+  this.casaControl.valueChanges
+    .pipe(takeUntilDestroyed())
+    .subscribe((texto) => {
+      const valor = texto ?? '';
+      this.filtrarCasas(valor);
 
-        // Si el usuario borra manualmente el texto, limpiamos la selección en el formulario principal
-        if (!valor.trim()) {
-          this.ingresoForm.patchValue({ casa: null, nombre: '' });
-        }
-      });
-  }
+      // Verificamos si realmente cambió antes de hacer patchValue
+      if (!valor.trim() && this.ingresoForm.get('casa')?.value !== null) {
+        this.ingresoForm.patchValue({ casa: null, nombre: '' }, { emitEvent: false });
+      }
+    });
+}
 
-  ngOnInit(): void {
+
+ngOnInit(): void {
+  setTimeout(() => {
+    this.ingresoForm.patchValue({
+      fechaRecepcion: this.obtenerFechaActual()
+    });
     this.leerConceptoIngreso();
     this.leerDatosCasa();
-  }
+  });
+}
 
   filtrarCasas(texto: string): void {
     const busqueda = texto.toLowerCase().trim();
@@ -91,10 +96,19 @@ export class Nuevoingreso implements OnInit {
     );
   }
 
+
+  onCasaChange(): void {
+    const idSeleccionado = this.ingresoForm.get('casa')?.value;
+    const casaEncontrada = this.casaDatos.find(c => c.id === idSeleccionado);
+
+    if (casaEncontrada) {
+      this.seleccionarCasa(casaEncontrada);
+    }
+  }
+
   seleccionarCasa(casa: CasaDTO): void {
     this.ingresoForm.get('casa')?.setValue(casa.id);
     this.casaControl.setValue(casa.casa, { emitEvent: false });
-    //this.leeNombreDeHabitante(casa.id ?? 0);
   }
 
   leerConceptoIngreso(): void {
@@ -108,30 +122,20 @@ export class Nuevoingreso implements OnInit {
     });
   }
 
-  leerDatosCasa(): void {
-    this.inmueblesServices.getInmuebles().subscribe({
-      next: (respuesta: ICasas[]) => {
-        this.casas = respuesta;
-        this.casaDatos = this.casas.map((casa) => this.mapToCasaDTO(casa));
-        this.casasFiltradas = [...this.casaDatos];
-      },
-      error: (error) => {
-        console.error('Error al obtener las casas:', error);
-      }
-    });
-  }
 
-  // leeNombreDeHabitante(id: number): void {
-  //   this.inmueblesServices.getInuebleById(id).subscribe({
-  //     next: (inmueble: InmuebleEditarDTO) => {
-  //       const nombreCompleto = `${inmueble.nombreTitular ?? ''} ${inmueble.apellidosTitular ?? ''}`.trim();
-  //       this.ingresoForm.patchValue({ nombre: nombreCompleto });
-  //     },
-  //     error: (error) => {
-  //       console.error('No se pudo obtener el inmueble:', error);
-  //     }
-  //   });
-  // }
+
+leerDatosCasa(): void {
+  this.inmueblesServices.getInmuebles().subscribe({
+    next: (respuesta: ICatalogocasas[]) => {
+      this.casas = respuesta;
+      this.casaDatos = this.casas.map((casa) => this.mapToCasaDTO(casa));
+      this.casasFiltradas = [...this.casaDatos];
+    },
+    error: (error) => {
+      console.error('Error al obtener las casas:', error);
+    }
+  });
+}
 
   mostrarConfirmacion(): void {
     if (this.ingresoForm.invalid) {
@@ -200,19 +204,10 @@ export class Nuevoingreso implements OnInit {
     return new Date().toISOString().split('T')[0];
   }
 
-  private mapToCasaDTO(casa: ICasas): CasaDTO {
+  private mapToCasaDTO(casa: ICatalogocasas): CasaDTO {
     return {
       id: casa.id,
       casa: casa.numeroCasa ?? ''
     };
   }
-
-  // alSeleccionarCasa(event: Event): void {
-  //   const idCasa = this.ingresoForm.get('casa')?.value;
-  //   if (idCasa) {
-  //     this.leeNombreDeHabitante(idCasa);
-  //   } else {
-  //     this.ingresoForm.patchValue({ nombre: '' });
-  //   }
-  // }
 }

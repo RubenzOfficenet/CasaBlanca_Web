@@ -74,7 +74,6 @@ export class Eventosingresos implements OnInit {
     'nombreUbicacion',
     'numeroCasa',
     'fechaEvento',
-    'nombreTitular',
     'reciboNumero',
     'fechaPago',
     'apartado',

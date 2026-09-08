@@ -35,6 +35,7 @@ export class IngresosService {
 
   leeIngresoById(Id : number): Observable<IIngresoUpdate> {
     var url = this._apiUrl + 'GetIngresoById/' + Id
+    console.log(url);
     return this._http.get<IIngresoUpdate>(url);
   }
 

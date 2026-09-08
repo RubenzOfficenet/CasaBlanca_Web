@@ -163,9 +163,7 @@ ngOnInit(): void {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
         setTimeout(() => this.leeDatos());
-      }
     });
   }
 

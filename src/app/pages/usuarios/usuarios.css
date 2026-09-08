@@ -216,3 +216,9 @@
     font-weight: bold;
     color: rgb(168, 1, 15);
 }
+
+
+.btn-navy-blue mat-icon {
+  color: #000080; /* Azul marino clásico */
+  /* color: #001f3f; Azul marino oscuro / Navy */
+}
