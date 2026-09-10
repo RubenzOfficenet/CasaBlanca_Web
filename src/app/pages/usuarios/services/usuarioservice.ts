@@ -5,6 +5,7 @@ import { map, Observable } from 'rxjs';
 import { IGetUsuariosResponse } from '../interface/iusuario.interface';
 import { IUsuarioNuevo } from '../nuevousuario/DTO/usuarioto.model';
 import { IUsuarioResponseDTO } from '../interface/UsuarioResponseDTO.interface';
+import { IUpdateUsuario } from '../interface/IUpdateusuario.intervace';
 
 export interface IUsuarioResponse {
   value: IUsuarioResponseDTO;
@@ -35,6 +36,11 @@ export class Usuarioservice {
   getUsuarioById(id: number): Observable<IUsuarioResponseDTO> {
     var url = this._apiUrl + 'GetUserById/' + id;
     return this._http.get<IUsuarioResponse>(url).pipe(map(response => response.value));
+  }
+
+  updateUsuario(usuario: IUpdateUsuario): Observable<IUpdateUsuario> {
+    var url = this._apiUrl + 'UpdateUsuario';
+    return this._http.put<IUpdateUsuario>(url, usuario);
   }
 
 

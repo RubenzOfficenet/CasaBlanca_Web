@@ -26,6 +26,7 @@ import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { IUsuarioEdit } from '../nuevousuario/DTO/usuarioEdit.intggerface';
 import { IUsuarioResponseDTO } from '../interface/UsuarioResponseDTO.interface';
+import { IUpdateUsuario } from '../interface/IUpdateusuario.intervace';
 
 export interface IUsuarioResponse {
   value: IUsuarioResponseDTO;
@@ -61,7 +62,7 @@ export class Editarusuario {
   private cdr = inject(ChangeDetectorRef);
 
   // Acceso directo a las propiedades recibidas
-  readonly idUsuario: number = 0;
+  idUsuario: number = 0;
 
   usuarioData: IUsuarioResponseDTO | null = null;
 
@@ -102,12 +103,17 @@ export class Editarusuario {
     borrado: false,
   };
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { idUsuario: number }, private dialogRef: MatDialogRef<Editarusuario> ) {}
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: { idUsuario: number },
+    private dialogRef: MatDialogRef<Editarusuario>,
+  ) {}
 
   leeDatosUsuario(): void {
     this.usuarioService.getUsuarioById(this.data.idUsuario).subscribe({
       next: (response: IUsuarioResponseDTO) => {
         this.usuarioData = response;
+
+        this.idUsuario = this.data.idUsuario;
 
         // Llenamos los datos básicos del formulario
         this.usuarioForm.patchValue({
@@ -152,14 +158,14 @@ export class Editarusuario {
     });
   }
 
-leeRoles(): void {
-  this.catalogosService.getRols().subscribe({
-    next: (roles) => {
-      this.roles = roles;
-    },
-    error: (err) => console.error(err),
-  });
-}
+  leeRoles(): void {
+    this.catalogosService.getRols().subscribe({
+      next: (roles) => {
+        this.roles = roles;
+      },
+      error: (err) => console.error(err),
+    });
+  }
 
   private passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password')?.value;
@@ -197,27 +203,39 @@ leeRoles(): void {
 
     ref.afterClosed().subscribe((confirmado) => {
       if (confirmado) {
-        this.guardar();
+        this.actualizar();
       }
     });
   }
 
-  guardar(): void {
-    // this.usuarioService.addUsuario().subscribe({
-    //   next: (data) => {
-    //     //console.log('Usuario agregado:', data);
-    //     this.snackBar.open('Usuario registrado con éxito', 'OK', { duration: 3000 });
-    //     this.dialogRef.close(data); // Cierra solo cuando el backend responde éxito
-    //   },
-    //   error: (err) => {
-    //     console.error('Error al agregar usuario:', err);
-    //     this.snackBar.open(
-    //       'Error al agregar usuario. Por favor, inténtalo de nuevo.',
-    //       'Cerrar',
-    //       { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
-    //     );
-    //   }
-    //});
+  actualizar(): void {
+    const usuarioUpdate: IUpdateUsuario = {
+      id: this.idUsuario,
+      nombre: this.usuarioForm.value.nombreUsuario ?? '',
+      apellidos: this.usuarioForm.value.apellidosUsuario ?? '',
+      email: this.usuarioForm.value.emailUsuario ?? '',
+      celular: this.usuarioForm.value.celularUsuario ?? '',
+      idRol: this.usuarioForm.value.idRol ?? -1,
+      idInmueble: this.usuarioForm.value.idInmueble ?? -1,
+      idTipoRelacion: this.usuarioForm.value.idTipoRelacion ?? 1,
+      idUbicacion: this.usuarioForm.value.idUbicacion ?? 0,
+    };
+
+    this.usuarioService.updateUsuario(usuarioUpdate).subscribe({
+      next: (data) => {
+        debugger;
+        this.snackBar.open('Usuario actualizado con éxito', 'OK', { duration: 3000 });
+        this.dialogRef.close(data); 
+      },
+      error: (err) => {
+        console.error('Error al actualizar usuario:', err);
+        this.snackBar.open('Error al actualizar usuario. Por favor, inténtalo de nuevo.', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+        });
+      },
+    });
   }
 
   onUbicacionChange(idUbicacion: number): void {
@@ -237,40 +255,33 @@ leeRoles(): void {
     }
   }
 
-LeerCasasDeSeccion(idSeccion: number, idInmueble: number | null): void {
-  this.inmueblesService.leeCasasporSeccion(idSeccion).subscribe({
-    next: (respuesta: ICasaRsponse[]) => {
+  LeerCasasDeSeccion(idSeccion: number, idInmueble: number | null): void {
+    this.inmueblesService.leeCasasporSeccion(idSeccion).subscribe({
+      next: (respuesta: ICasaRsponse[]) => {
+        this.casalist = respuesta;
 
-      this.casalist = respuesta;
+        console.log('Casas cargadas:', this.casalist);
+        console.log('Inmueble:', idInmueble);
 
-      console.log('Casas cargadas:', this.casalist);
-      console.log('Inmueble:', idInmueble);
+        // Si estamos editando un usuario y tenemos inmueble,
+        // lo seleccionamos.
+        if (idInmueble !== null) {
+          this.usuarioForm.patchValue({
+            idInmueble: idInmueble,
+          });
+        }
 
-      // Si estamos editando un usuario y tenemos inmueble,
-      // lo seleccionamos.
-      if (idInmueble !== null) {
-        this.usuarioForm.patchValue({
-          idInmueble: idInmueble
-        });
-      }
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error al leer las casas:', error);
 
-      this.cdr.detectChanges();
-    },
-    error: (error) => {
-      console.error('Error al leer las casas:', error);
-
-      this.snackBar.open(
-        'Error al leer las casas de la sección',
-        'Cerrar',
-        {
+        this.snackBar.open('Error al leer las casas de la sección', 'Cerrar', {
           duration: 3000,
           horizontalPosition: 'center',
-          verticalPosition: 'bottom'
-        }
-      );
-    }
-  });
-}
-
-
+          verticalPosition: 'bottom',
+        });
+      },
+    });
+  }
 }
