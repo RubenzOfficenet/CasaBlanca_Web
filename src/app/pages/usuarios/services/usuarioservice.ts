@@ -28,7 +28,6 @@ export class Usuarioservice {
   }
 
   addUsuario(usuario: IUsuarioNuevo): Observable<any> {
-    debugger;
     var url = this._apiUrl + 'CreateUser';
     return this._http.post<IUsuarioNuevo>(url, usuario);
   }

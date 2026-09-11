@@ -3,8 +3,6 @@ export interface IUsuarioNuevo {
     apellidosUsuario: string;
     celularUsuario: string;
     emailUsuario: string;
-    password: string;
-    confirmarPassword : string
     idUbicacion :number;
     idInmueble: number;
     idRol: number;
