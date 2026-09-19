@@ -1,12 +1,15 @@
-
 /* 1. Modificación al contenedor PADRE (ej. el body) */
 .principal {
     margin: 0;
     display: flex;
-    justify-content: center; /* Centrado horizontal */
-    align-items: center;     /* Centrado vertical */
-    min-height: 100vh;       /* Fuerza al body a medir el 100% de la altura de la pantalla */
-    background-color: #160f24; /* Opcional: un fondo para contrastar */
+    justify-content: center;
+    /* Centrado horizontal */
+    align-items: center;
+    /* Centrado vertical */
+    min-height: 100vh;
+    /* Fuerza al body a medir el 100% de la altura de la pantalla */
+    background-color: #160f24;
+    /* Opcional: un fondo para contrastar */
 }
 
 
@@ -172,4 +175,24 @@ input:focus {
 
 .login-footer a:hover {
     text-decoration: underline;
+}
+
+
+input.is-invalid {
+    border-color: #dc3545 !important;
+    background-color: #fff8f8;
+}
+
+/* Contenedor de errores */
+.error-container {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Texto del mensaje de error */
+.error-text {
+    color: #dc3545;
+    font-size: 0.8rem;
+    font-weight: 500;
 }

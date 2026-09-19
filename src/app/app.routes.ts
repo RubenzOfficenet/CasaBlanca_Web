@@ -9,6 +9,7 @@ import { Usuarios } from './pages/usuarios/usuarios';
 import { Eventos } from './pages/eventos/eventos';
 import { Eventosingresos } from './pages/eventos/eventosingresos/eventosingresos';
 import { Eventosegresos } from './pages/eventos/eventosegresos/eventosegresos';
+import { Changepassword } from './pages/login/changepassword/changepassword';
 
 
 export const routes: Routes = [
@@ -27,6 +28,7 @@ export const routes: Routes = [
             { path: 'eventos/eventosingresos', component: Eventosingresos },
             { path: 'eventos/eventosegresos', component: Eventosegresos },
             { path: 'usuarios', component: Usuarios }
+            // { path: 'changepassword', component:Changepassword }
         ]
     },
 

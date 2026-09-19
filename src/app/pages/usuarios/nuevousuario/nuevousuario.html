@@ -91,10 +91,8 @@
 
                 <!-- Celular -->
                 <div class="col-md-4">
-
                     <mat-label>Celular</mat-label>
-                    <input matInput type="tel" formControlName="celularUsuario" placeholder="5512345678" />
-
+                    <input matInput type="tel" formControlName="celularUsuario" placeholder="5512345678" maxlength="10" />
                 </div>
 
                 <span class="row" style="padding-top: 20px;">
@@ -102,42 +100,12 @@
                     <div class="col-md-4">
 
                         <mat-label>Correo Electrónico</mat-label>
-                        <input matInput type="email" formControlName="emailUsuario" placeholder="correo@dominio.com"
-                            required />
+                        <input matInput type="email" formControlName="emailUsuario" placeholder="correo@dominio.com" required email/>
                         @if (usuarioForm.get('emailUsuario')?.invalid && usuarioForm.get('emailUsuario')?.touched) {
                         <mat-error>Correo electrónico inválido.</mat-error>
                         }
 
                     </div>
-
-                    <!-- Password -->
-                    <!-- <div class="col-md-4">
-
-                        <mat-label>Contraseña</mat-label>
-                        <input matInput type="password" formControlName="password" placeholder="********" required />
-                        @if (usuarioForm.get('password')?.hasError('required') && usuarioForm.get('password')?.touched)
-                        {
-                        <mat-error>La contraseña es obligatoria.</mat-error>
-                        }
-
-                    </div> -->
-
-                    <!-- Confirmar Password -->
-                    <!-- <div class="col-md-4">
-
-                        <mat-label>Confirmar Contraseña</mat-label>
-                        <input matInput type="password" formControlName="confirmarPassword" placeholder="********"
-                            required />
-                        @if (usuarioForm.get('confirmarPassword')?.hasError('required') &&
-                        usuarioForm.get('confirmarPassword')?.touched) {
-                        <mat-error>Debe confirmar la contraseña.</mat-error>
-                        }
-                        @if (usuarioForm.hasError('passwordMismatch') && usuarioForm.get('confirmarPassword')?.touched)
-                        {
-                        <mat-error>Las contraseñas no coinciden.</mat-error>
-                        }
-
-                    </div> -->
                 </span>
             </div>
         </div>

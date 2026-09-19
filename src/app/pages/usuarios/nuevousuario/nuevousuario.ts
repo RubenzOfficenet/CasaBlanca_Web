@@ -12,7 +12,6 @@ import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
 import { catalogosservice } from '../../../services/catalogos/catalogosservice';
 import { IRol } from '../../catalogo/interface/IRol.interfase.';
 import { InmueblesServices } from '../../inmuebles/services/inmuebles-services';
-import { ICasas } from '../../../Models/inmueble.model';
 import { Usuarioservice } from '../services/usuarioservice';
 import { IUsuarioNuevo } from './DTO/usuarioto.model';
 import { IUbicacion } from '../../inmuebles/nuevoinmueble/DOT/IUbicacion.model';
@@ -68,7 +67,8 @@ export class Nuevousuario implements OnInit {
     idInmueble: 0,
     idRol: 0,
     idEstatus: 1,
-    idTipoRelacion : 1
+    idTipoRelacion : 1,
+    debeCambiarPassword : true
   };
 
 usuarioForm = this.fb.group(
@@ -81,7 +81,8 @@ usuarioForm = this.fb.group(
     idInmueble: [-1, Validators.required],
     idRol: [-1, Validators.required],
     idEstatus: [-1, Validators.required],
-    idTipoRelacion: [1, Validators.required]
+    idTipoRelacion: [1, Validators.required],
+    debeCambiarPassword: true
   },
   {
     validators: this.passwordMatchValidator
@@ -207,7 +208,8 @@ usuarioForm = this.fb.group(
 
     this.usuarioService.addUsuario(this.nuevoUsuario).subscribe({
       next: (data) => {
-        //console.log('Usuario agregado:', data);
+        console.log('Usuario agregado:', data);
+        debugger;
         this.snackBar.open('Usuario registrado con éxito', 'OK', { duration: 3000 });
         this.dialogRef.close(data); // Cierra solo cuando el backend responde éxito
       },
@@ -237,8 +239,9 @@ usuarioForm = this.fb.group(
       idInmueble: f.idInmueble ?? 0,
       idRol: f.idRol ?? 0,
       idEstatus: 1,
-      idTipoRelacion: f.idTipoRelacion ?? 1
-    };
+      idTipoRelacion: f.idTipoRelacion ?? 1,
+      debeCambiarPassword: f.debeCambiarPassword ?? true
+    };  
   }
 
   private passwordMatchValidator(control: AbstractControl): ValidationErrors | null {

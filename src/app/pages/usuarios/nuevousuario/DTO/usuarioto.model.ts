@@ -8,5 +8,6 @@ export interface IUsuarioNuevo {
     idRol: number;
     idEstatus: number;
     idTipoRelacion?: number;
+    debeCambiarPassword : boolean;
 }
 
