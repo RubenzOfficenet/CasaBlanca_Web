@@ -96,3 +96,9 @@ a.active {
 }
 
 
+
+
+
+.logout-link {
+  cursor: pointer;
+}

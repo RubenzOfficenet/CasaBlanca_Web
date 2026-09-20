@@ -1,5 +1,5 @@
-import { Component, signal } from '@angular/core';
-import { RouterLink, RouterModule } from "@angular/router";
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { Router, RouterLink, RouterModule } from "@angular/router";
 
 @Component({
   selector: 'app-navbar',
@@ -7,13 +7,42 @@ import { RouterLink, RouterModule } from "@angular/router";
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
-export class Navbar {
+export class Navbar implements OnInit {
 
-isSubmenuOpen = signal(false);
+  private router = inject(Router);
+
+  nonbreUsuairo: string = ''
+  rolUsuario: string = ''
+
+  ngOnInit(): void {
+    debugger;
+    this.nonbreUsuairo = window.localStorage.getItem('nombre-usuario') ?? 'no-name';
+    this.rolUsuario = window.localStorage.getItem('rol-usuario') ?? 'no-rol';
+
+    if (this.nonbreUsuairo == 'no-name') {
+      this.router.navigate(['/login']).then(() => {
+        window.location.reload();
+      });
+    }
+
+  }
+
+  isSubmenuOpen = signal(false);
+
 
   toggleSubmenu(event: Event): void {
     event.preventDefault();
     this.isSubmenuOpen.update((open) => !open);
+  }
+
+  cerrarSesion() {
+    // 1. Limpiar datos almacenados de la sesión
+    window.localStorage.removeItem('nombre-usuario');
+    window.localStorage.removeItem('rol-usuario');
+    // O limpiar todo el almacenamiento: window.localStorage.clear();
+
+    // 2. Redirigir a la vista de Login
+    this.router.navigate(['/login']);
   }
 
 }

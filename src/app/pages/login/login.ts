@@ -30,7 +30,11 @@ export class Login {
     id: 0,
     email: '',
     password: '',
-    debeCambiarPassword: false
+    debeCambiarPassword: true,
+    idUsuairo: 0, // Respeta el nombre de la propiedad C# (si corriges el typo en C# a IdUsuario, cámbialo aquí a idUsuario)
+    nombre: '',
+    apellidos: '',
+    rol: ''
   };
 
 
@@ -53,7 +57,6 @@ formularioLogin = this.fb.group({
       return;
     }
     console.log('Datos formulario: ', this.formularioLogin.value);
-
     const Pswd = this.formularioLogin.value.password ?? '';
     const Email = this.formularioLogin.value.email ?? '';
 
@@ -73,10 +76,20 @@ formularioLogin = this.fb.group({
       // valida si hay que cambiar el password:
       if (this.usuarioResult.debeCambiarPassword == true)
         this.abrirPopup();
-      else
+      else {
+        // guarda datos en el localstorage
+        const _nombre : string = this.usuarioResult.nombre + ' ' + this.usuarioResult.apellidos;
+        const _rol: string = this.usuarioResult.rol ?? '';
+
+        window.localStorage.setItem('nombre-usuario', _nombre);
+        window.localStorage.setItem('rol-usuario', _rol);
+        
         this.router.navigate(['/dashboard']).then(() => {
           window.location.reload();
         });
+
+
+      }
 
       // temporal esta linea
       //this.router.navigate(['/dashboard']);
