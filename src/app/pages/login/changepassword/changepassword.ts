@@ -66,26 +66,36 @@ export class Changepassword implements OnInit {
   public dialogRef = inject(MatDialogRef<Changepassword>);
   public data = inject<{ id: number }>(MAT_DIALOG_DATA);
   private usuarioService = inject(Loginservices);
-  
+
 
   usuarioUpdatePasswordResponse: UsuarioUpdatePasswordResponse = {
     title: '',
     status: 0,
     detail: ''
-  }
+  };
 
   // Propiedades para alternar visibilidad de los campos de contraseña
   hidePassword = true;
   hideConfirmPassword = true;
 
+  // Regex: al menos 1 mayúscula, 1 minúscula, 1 número y 1 carácter especial
+  strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+
   // Formulario Reactivo
-  changePasswordForm: FormGroup = this.fb.group(
-    {
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    },
-    { validators: matchPasswordsValidator }
-  );
+changePasswordForm: FormGroup = this.fb.group(
+  {
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.pattern(this.strongPasswordRegex)
+      ]
+    ],
+    confirmPassword: ['', [Validators.required]]
+  },
+  { validators: matchPasswordsValidator }
+);
 
   ngOnInit(): void {
     // Puedes acceder a this.data.id en cualquier momento
@@ -114,6 +124,7 @@ export class Changepassword implements OnInit {
       password: _password
     };
 
+    debugger;
     this.usuarioService.updatePassword(payload).subscribe({
       next: (response: UsuarioUpdatePasswordResponse) => {
         this.usuarioUpdatePasswordResponse = {
@@ -123,7 +134,7 @@ export class Changepassword implements OnInit {
         }
         console.log(this.usuarioUpdatePasswordResponse);
 
-        
+
       },
       error: (err) => {
         console.error('Error:', err);

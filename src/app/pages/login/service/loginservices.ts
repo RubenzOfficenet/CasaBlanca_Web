@@ -27,6 +27,7 @@ export class Loginservices {
 
   updatePassword(usuarioUpdatePassword: UpdateUserInterface): Observable<UsuarioUpdatePasswordResponse> {
     const url = this._apiUrl + 'UpdatePassword';
+    console.log(url);
     return this._http.put<UsuarioUpdatePasswordResponse>(url, usuarioUpdatePassword);
   }
 }

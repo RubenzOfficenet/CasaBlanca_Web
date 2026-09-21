@@ -3,7 +3,7 @@ export interface LoginRespondeDTO {
     email?: string;
     password?: string;
     debeCambiarPassword: boolean;
-    idUsuairo: number; // Respeta el nombre de la propiedad C# (si corriges el typo en C# a IdUsuario, cámbialo aquí a idUsuario)
+    idUsuario: number; // Respeta el nombre de la propiedad C# (si corriges el typo en C# a IdUsuario, cámbialo aquí a idUsuario)
     nombre?: string;
     apellidos?: string;
     rol?: string;

@@ -31,16 +31,15 @@ export class Login {
     email: '',
     password: '',
     debeCambiarPassword: true,
-    idUsuairo: 0, // Respeta el nombre de la propiedad C# (si corriges el typo en C# a IdUsuario, cámbialo aquí a idUsuario)
+    idUsuario: 0, // Respeta el nombre de la propiedad C# (si corriges el typo en C# a IdUsuario, cámbialo aquí a idUsuario)
     nombre: '',
     apellidos: '',
     rol: ''
   };
 
-
 formularioLogin = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]] // Puedes cambiar la longitud mínima según tus requerimientos
+    password: ['', [Validators.required, Validators.minLength(8)]] // Puedes cambiar la longitud mínima según tus requerimientos
   });
 
   isFieldInvalid(field: string): boolean {
@@ -50,6 +49,7 @@ formularioLogin = this.fb.group({
 
   constructor() { }
 
+  
 
   async validarDatos() {
     if (this.formularioLogin.invalid) {
@@ -63,7 +63,8 @@ formularioLogin = this.fb.group({
     // Pausa la ejecución de la función hasta que el backend responde
     this.usuarioResult = await firstValueFrom(this.loginService.getPassword(Email, Pswd));
 
-    if (!this.usuarioResult || this.usuarioResult.id === 0) {
+    debugger;
+    if (!this.usuarioResult || this.usuarioResult.idUsuario === 0) {
       console.log('El usuario no existe.');
       this.snackBar.open(
         'El usuario no existe.',
@@ -100,6 +101,8 @@ formularioLogin = this.fb.group({
 
 
   abrirPopup() {
+
+    debugger;
     const dialogRef = this.dialog.open(Changepassword, {
       width: '30vw',
       maxWidth: '1500px',
@@ -107,7 +110,7 @@ formularioLogin = this.fb.group({
       disableClose: false,
       hasBackdrop: true,
       height: '450px',
-      data: { id: this.usuarioResult.id }
+      data: { id: this.usuarioResult.idUsuario }
     });
 
     dialogRef.afterClosed().subscribe(result => {
