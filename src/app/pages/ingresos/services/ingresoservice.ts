@@ -12,12 +12,14 @@ export class Ingresoservice {
   private readonly _http = inject(HttpClient);
   private readonly _apiUrl = APP_CONSTANTS.URL_LOCAL;
 
-  getIngresos(year: number, month: number): Observable<any> {
-
+  getIngresos(year: number, month: number, rol : string, idUser : number): Observable<any> {
     var url = this._apiUrl + 'GetIngresos';
     var params = new HttpParams()
       .set('year', year.toString())
-      .set('month', month.toString());
+      .set('month', month.toString())
+      .set('rol', rol)
+      .set('IdUser', idUser.toString());
+
     return this._http.get<IIngreso[]>(url, { params });
   }
 

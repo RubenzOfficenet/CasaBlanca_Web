@@ -18,6 +18,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIcon } from "@angular/material/icon";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -41,6 +42,15 @@ import { MatIcon } from "@angular/material/icon";
 export class Dashboard {
 
   private readonly resumenAnaliticoService = inject(Resumenanaliticoservice);
+  router = inject(Router);
+
+  constructor() {
+    const _rol = window.localStorage.getItem('rol-usuario') ?? '';
+    console.log('este Rol : ', _rol);
+    if (_rol == 'Usuario') {
+      this.router.navigate(['/ingresos']);
+    }
+  }
 
   displayedColumns: string[] = [
     'fechaDeOperacion',
@@ -72,9 +82,6 @@ export class Dashboard {
   mesActual: number = new Date().getMonth() + 1;
 
 
-
-
-
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -88,22 +95,22 @@ export class Dashboard {
     this.dataSource.paginator = this.paginator;
   }
 
-  
 
-configurarFiltro(): void {
-  this.dataSource.filterPredicate = (data: IResumenanalitico, filter: string): boolean => {
-    const textoFiltro = filter.trim().toLowerCase();
 
-    const concepto = (data.concepto ?? '').toLowerCase();
-    const ubicacion = (data.ubicacion ?? '').toLowerCase();
-    const casa = (data.casa ?? '').toLowerCase();
-    const tipo = (data.tipo ?? '').toLowerCase();
-    return concepto.includes(textoFiltro) ||
-      ubicacion.includes(textoFiltro) ||
-      casa.includes(textoFiltro) ||
-      tipo.includes(textoFiltro);
-  };
-}
+  configurarFiltro(): void {
+    this.dataSource.filterPredicate = (data: IResumenanalitico, filter: string): boolean => {
+      const textoFiltro = filter.trim().toLowerCase();
+
+      const concepto = (data.concepto ?? '').toLowerCase();
+      const ubicacion = (data.ubicacion ?? '').toLowerCase();
+      const casa = (data.casa ?? '').toLowerCase();
+      const tipo = (data.tipo ?? '').toLowerCase();
+      return concepto.includes(textoFiltro) ||
+        ubicacion.includes(textoFiltro) ||
+        casa.includes(textoFiltro) ||
+        tipo.includes(textoFiltro);
+    };
+  }
 
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;

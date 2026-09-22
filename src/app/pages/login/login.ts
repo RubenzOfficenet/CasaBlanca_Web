@@ -63,7 +63,6 @@ formularioLogin = this.fb.group({
     // Pausa la ejecución de la función hasta que el backend responde
     this.usuarioResult = await firstValueFrom(this.loginService.getPassword(Email, Pswd));
 
-    debugger;
     if (!this.usuarioResult || this.usuarioResult.idUsuario === 0) {
       console.log('El usuario no existe.');
       this.snackBar.open(
@@ -81,9 +80,12 @@ formularioLogin = this.fb.group({
         // guarda datos en el localstorage
         const _nombre : string = this.usuarioResult.nombre + ' ' + this.usuarioResult.apellidos;
         const _rol: string = this.usuarioResult.rol ?? '';
+        const _idUsuario = this.usuarioResult.idUsuario;
 
         window.localStorage.setItem('nombre-usuario', _nombre);
         window.localStorage.setItem('rol-usuario', _rol);
+        window.localStorage.setItem('id-usuario', _idUsuario.toString());
+
         
         this.router.navigate(['/dashboard']).then(() => {
           window.location.reload();

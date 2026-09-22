@@ -1,6 +1,12 @@
 <div class="layout-container">
-  <app-navbar></app-navbar>
-
+  @if(rolUsuario == 'Administrador')
+  {
+    <app-navbar></app-navbar>
+  }
+  @else if(rolUsuario == 'Usuario')
+  {
+    <app-navbaruser></app-navbaruser>
+  }
   <div class="view-content">
     <router-outlet></router-outlet>
   </div>

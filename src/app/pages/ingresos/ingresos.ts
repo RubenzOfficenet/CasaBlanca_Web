@@ -54,6 +54,8 @@ export class Ingresos implements OnInit, AfterViewInit {
   private readonly dialog = inject(MatDialog);
   private readonly ingresosService = inject(Ingresoservice);
 
+  rolUsuario : string = '';
+
   fechaActual = new Date();
   today: Date = new Date();
 
@@ -112,6 +114,10 @@ export class Ingresos implements OnInit, AfterViewInit {
 
     this.configurarFiltro();
     this.cargarIngresos();
+  }
+
+  constructor(){
+    this.rolUsuario = window.localStorage.getItem('rol-usuario') ?? '';
   }
 
   ngAfterViewInit(): void {
@@ -239,8 +245,10 @@ abrirPopup(): void {
     const indiceYear: number = Number(this.anioSeleccionado);
     const anio: number = YEAR_CONSTATS[indiceYear];
     const indiceMonth: number = Number(this.mesActual);
+    const _rol = window.localStorage.getItem('rol-usuario') ?? '';
+    const _idUsuario = Number(window.localStorage.getItem('id-usuario')) ?? 0;
 
-    this.ingresosService.getIngresos(anio, indiceMonth).subscribe({
+    this.ingresosService.getIngresos(anio, indiceMonth, _rol, _idUsuario).subscribe({
       next: (response: IIngresoResponse[]) => {
         this.dataSource.data = response;
         this.totalRegistros = response.length;

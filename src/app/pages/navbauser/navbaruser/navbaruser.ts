@@ -2,12 +2,14 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink, RouterModule } from "@angular/router";
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'app-navbaruser',
   imports: [RouterLink, RouterModule],
-  templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
+  templateUrl: './navbaruser.html',
+  styleUrl: './navbaruser.css',
 })
-export class Navbar implements OnInit {
+export class Navbaruser {
+
+  isSubmenuOpen = signal(false);
 
   private router = inject(Router);
 
@@ -23,11 +25,7 @@ export class Navbar implements OnInit {
         window.location.reload();
       });
     }
-
   }
-
-  isSubmenuOpen = signal(false);
-
 
   toggleSubmenu(event: Event): void {
     event.preventDefault();

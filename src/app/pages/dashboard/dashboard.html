@@ -14,37 +14,17 @@
             <div class="metric-label">Total Egresos</div>
             <div class="metric-value negative">{{ totalEgresos | currency:'MXN':'symbol':'1.2-2' }}</div>
         </div>
-<div class="metric-card metric-card-balance" style="text-align: right;">
-    <div class="metric-label">Balance</div>
-    <div class="metric-value" [ngClass]="{'balance-negativo': (totalIngresos - totalEgresos) < 0}">
-        {{ (totalIngresos - totalEgresos) | currency:'MXN':'symbol':'1.2-2' }}
-    </div>
-</div>
+        <div class="metric-card metric-card-balance" style="text-align: right;">
+            <div class="metric-label">Balance</div>
+            <div class="metric-value" [ngClass]="{'balance-negativo': (totalIngresos - totalEgresos) < 0}">
+                {{ (totalIngresos - totalEgresos) | currency:'MXN':'symbol':'1.2-2' }}
+            </div>
+        </div>
     </section>
 
     <section class="table-container">
         <div class="table-header-area">
             <div class="table-title">Detalle de Operaciones</div>
-
-            <!-- <div>
-                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
-                    <mat-label>Año</mat-label>
-                    <mat-select [(ngModel)]="anioSeleccionado" (selectionChange)="cambiaAnio($event.value)">
-                        @for (year of yearList; track year.value) {
-                        <mat-option [value]="year.value">{{year.viewValue}}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-
-                <mat-form-field style="margin-right: 10px;" class="mi-select-personalizado">
-                    <mat-label>Mes</mat-label>
-                    <mat-select [(ngModel)]="mesActual" (selectionChange)="cambiaMes($event.value)">
-                        @for (mes of monthList; track mes.value) {
-                        <mat-option [value]="mes.value">{{mes.viewValue}}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-            </div> -->
 
             <!-- Campo de búsqueda -->
             <mat-form-field appearance="outline" style="width: 300px; margin-bottom: 0px;" class="campo-busqueda">
