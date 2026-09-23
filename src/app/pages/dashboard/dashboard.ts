@@ -50,6 +50,11 @@ export class Dashboard {
     if (_rol == 'Usuario') {
       this.router.navigate(['/ingresos']);
     }
+    else if (_rol == '') {
+      this.router.navigate(['/login']).then(() => {
+        window.location.reload();
+      });
+    }
   }
 
   displayedColumns: string[] = [

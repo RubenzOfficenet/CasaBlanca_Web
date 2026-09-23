@@ -22,6 +22,7 @@ import { Nuevoingreso } from './nuevoingreso/nuevoingreso';
 import { Editaringreso } from './editaringreso/editaringreso';
 import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
 import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../Constants/app.constants';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-ingresos',
@@ -53,6 +54,7 @@ export class Ingresos implements OnInit, AfterViewInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly ingresosService = inject(Ingresoservice);
+  router = inject(Router);
 
   rolUsuario : string = '';
 
@@ -118,6 +120,16 @@ export class Ingresos implements OnInit, AfterViewInit {
 
   constructor(){
     this.rolUsuario = window.localStorage.getItem('rol-usuario') ?? '';
+    
+
+    if (this.rolUsuario == 'Usuario') {
+      this.router.navigate(['/ingresos']);
+    }
+    else if (this.rolUsuario == '') {
+      this.router.navigate(['/login']).then(() => {
+        window.location.reload();
+      });
+    }
   }
 
   ngAfterViewInit(): void {

@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Navbar } from "../navbar/navbar";
-import { RouterOutlet } from "@angular/router";
+import { Router, RouterOutlet } from "@angular/router";
 import { Navbaruser } from '../navbauser/navbaruser/navbaruser';
 
 @Component({
@@ -11,9 +11,19 @@ import { Navbaruser } from '../navbauser/navbaruser/navbaruser';
 })
 export class MainLayout {
 
-  rolUsuario : string = '';
-constructor(){
-  this.rolUsuario = window.localStorage.getItem('rol-usuario') ?? '';
-}
+  private router = inject(Router);
+  
+  rolUsuario: string = '';
+  nombreUsuairo: string = '';
+  constructor() {
+    this.rolUsuario = window.localStorage.getItem('rol-usuario') ?? '';
+    this.nombreUsuairo = window.localStorage.getItem('nombre-usuario') ?? '';
+
+    if (this.nombreUsuairo == 'no-name' || this.nombreUsuairo == '') {
+      this.router.navigate(['/login']).then(() => {
+        window.location.reload();
+      });
+    }
+  }
 
 }

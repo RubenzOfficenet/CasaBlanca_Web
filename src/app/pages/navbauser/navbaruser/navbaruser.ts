@@ -20,7 +20,9 @@ export class Navbaruser {
     this.nonbreUsuairo = window.localStorage.getItem('nombre-usuario') ?? 'no-name';
     this.rolUsuario = window.localStorage.getItem('rol-usuario') ?? 'no-rol';
 
-    if (this.nonbreUsuairo == 'no-name') {
+    console.log(this.nonbreUsuairo);
+
+    if (this.nonbreUsuairo == 'no-name' || this.nonbreUsuairo == '') {
       this.router.navigate(['/login']).then(() => {
         window.location.reload();
       });
@@ -36,10 +38,15 @@ export class Navbaruser {
     // 1. Limpiar datos almacenados de la sesión
     window.localStorage.removeItem('nombre-usuario');
     window.localStorage.removeItem('rol-usuario');
+    window.localStorage.removeItem('id-usuario');
     // O limpiar todo el almacenamiento: window.localStorage.clear();
 
     // 2. Redirigir a la vista de Login
-    this.router.navigate(['/login']);
+    //this.router.navigate(['/login']);
+
+    this.router.navigate(['/login']).then(() => {
+      window.location.reload();
+    });
   }
 
 }
