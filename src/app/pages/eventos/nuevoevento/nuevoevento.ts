@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { MatDialog, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogRef } from "@angular/material/dialog";
+import { Component, inject, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { MatDialog, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatFormField, MatLabel, MatError } from "@angular/material/form-field";
 import { MatDatepickerToggle, MatDatepicker, MatDatepickerModule } from "@angular/material/datepicker";
@@ -16,12 +16,12 @@ import { EventosingresoService } from '../services/eventosingresoService';
 import { Nuevoingreso } from '../../ingresos/nuevoingreso/nuevoingreso';
 import { InmueblesServices } from '../../inmuebles/services/inmuebles-services';
 import { ICasaRsponse } from '../../inmuebles/interface/casarequest.interface';
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-nuevoevento',
-  imports: [MatDialogContent,
+  imports: [
+    MatDialogContent,
     MatFormField,
     MatLabel,
     MatDatepickerToggle,
@@ -33,14 +33,15 @@ import { MAT_DIALOG_DATA } from "@angular/material/dialog";
     ReactiveFormsModule,
     MatSelectModule,
     MatInputModule,
-    MatButtonModule],
+    MatButtonModule
+  ],
   providers: [
     provideNativeDateAdapter()
   ],
   templateUrl: './nuevoevento.html',
   styleUrl: './nuevoevento.css'
 })
-export class Nuevoevento implements OnInit {
+export class Nuevoevento implements OnInit, AfterViewInit {
 
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
@@ -49,15 +50,16 @@ export class Nuevoevento implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<Nuevoingreso>);
   private readonly inmueblesServices = inject(InmueblesServices);
   private readonly dialogData = inject<{ ubicaciones: Ubicacion[]; estatus: EstatusEvento[] }>(MAT_DIALOG_DATA);
+  private readonly cdr = inject(ChangeDetectorRef);
 
-
-  ubicacionList: Ubicacion[] = this.dialogData.ubicaciones;
-  estatusList: EstatusEvento[] = this.dialogData.estatus;
+  ubicacionList: Ubicacion[] = this.dialogData?.ubicaciones ?? [];
+  estatusList: EstatusEvento[] = this.dialogData?.estatus ?? [];
 
   casalist: ICasaRsponse[] = [];
 
   seccionSelected: number = 0;
   casaSelected: number = 0;
+
   eventoForm = this.fb.nonNullable.group({
     idinmueble: [0, [Validators.required, Validators.min(1)]],
     idestatusevento: [0, [Validators.required, Validators.min(1)]],
@@ -75,19 +77,90 @@ export class Nuevoevento implements OnInit {
     rentainmobiliario: [0, [Validators.min(0)]]
   });
 
-
   ngOnInit(): void {
-    //this.leeSecciones();
-    // this.leeEstatusEvento();
-
-    //console.log('Lista de secciones: ', this.ubicacionList)
+    // Escuchamos los cambios del formulario
+    this.escucharCambiosFormulario();
   }
 
+  ngAfterViewInit(): void {
+    // Forzamos la detección de cambios para evitar NG0100 en el renderizado inicial del modal
+    this.cdr.detectChanges();
+  }
+
+  private escucharCambiosFormulario(): void {
+    // Escucha cambios en la ubicación
+    this.eventoForm.controls.idubicacion.valueChanges.subscribe((idUbicacion) => {
+      if (idUbicacion && idUbicacion > 0) {
+        this.onUbicacionChange(idUbicacion);
+      }
+    });
+
+    // Escucha cambios en la casa/inmueble
+    this.eventoForm.controls.idinmueble.valueChanges.subscribe((idCasa) => {
+      if (idCasa && idCasa > 0) {
+        this.onCasaChange(idCasa);
+      }
+    });
+  }
+
+  onUbicacionChange(idUbicacion: number): void {
+    const ubicacionSeleccionada = this.ubicacionList.find(u => u.id === idUbicacion);
+
+    // Evitamos mutar variables de vista en medio del ciclo actual
+    setTimeout(() => {
+      this.seccionSelected = Number(ubicacionSeleccionada?.id || 0);
+
+      this.eventoForm.patchValue({
+        idinmueble: 0,
+        nombretitular: '',
+        nombreOcupante: ''
+      }, { emitEvent: false });
+
+      if (this.seccionSelected > 0) {
+        this.LeerCasasDeSeccion(this.seccionSelected);
+      }
+    }, 0);
+  }
+
+  LeerCasasDeSeccion(idSeccion: number): void {
+    if (!idSeccion) {
+      this.casalist = [];
+      return;
+    }
+
+    this.inmueblesServices.leeCasasporSeccion(idSeccion)
+      .pipe(take(1))
+      .subscribe({
+        next: (respuesta: ICasaRsponse[]) => {
+          this.casalist = respuesta;
+          // Notificamos a Angular de la nueva lista cargada por la API
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.snackBar.open(
+            'Error al leer las secciones',
+            'Cerrar',
+            { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
+          );
+        }
+      });
+  }
+
+  onCasaChange(idCasa: number): void {
+    const casaSeleccionada = this.casalist.find(u => u.id === idCasa);
+    console.log('Casa seleccionada:', casaSeleccionada);
+    if (casaSeleccionada) {
+      setTimeout(() => {
+        this.eventoForm.patchValue({
+          nombretitular: casaSeleccionada.nombretitular,
+          nombreOcupante: casaSeleccionada.nombreocupante
+        }, { emitEvent: false });
+      }, 0);
+    }
+  }
 
   mostrarConfirmacion(): void {
-
     if (this.eventoForm.invalid) {
-
       this.eventoForm.markAllAsTouched();
       this.snackBar.open(
         'Por favor, completa todos los campos requeridos.',
@@ -104,10 +177,9 @@ export class Nuevoevento implements OnInit {
       }
     });
 
-    ref.afterClosed().subscribe((confirmado) => {
+    ref.afterClosed().pipe(take(1)).subscribe((confirmado) => {
       if (confirmado) {
         this.guardar();
-        
       }
     });
   }
@@ -129,108 +201,22 @@ export class Nuevoevento implements OnInit {
       rentaInmobiliario: Number(datos.rentainmobiliario)
     };
 
-    // console.log(eventoDto);
+    console.log('Evento DTO a enviar:', eventoDto);
 
-    this.eventosingresoService.agregaEvento(eventoDto).subscribe({
-      next: (respuesta) => {
-        this.snackBar.open('Evento registrado con éxito', 'OK', { duration: 3000 });
-        this.dialogRef.close(respuesta);
-      },
-      error: (error) => {
-        //console.error('Error al crear el evento:', error);
-        this.snackBar.open(
-          'Error al registrar el evento. Inténtalo de nuevo.',
-          'Cerrar',
-          { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
-        );
-      }
-    });
-  }
-
-
-  // leeSecciones(): void {
-
-  //   this.catalogosService.leeSecciones().subscribe({
-  //     next: (respuesta: Ubicacion[]) => {
-  //       this.ubicacionList = respuesta;
-  //       //console.log('Lista: ', this.ubicacionList);
-  //       //this.cdr.detectChanges();
-  //       //this.snackBar.open('Evento registrado con éxito', 'OK', { duration: 3000 });
-  //       //this.dialogRef.close(respuesta);
-  //     },
-  //     error: (error) => {
-  //       //console.error('Error leer las secciones:', error);
-  //       this.snackBar.open(
-  //         'Error leer las secciones',
-  //         'Cerrar',
-  //         { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
-  //       );
-  //     }
-  //   });
-  // }
-
-  // leeEstatusEvento(): void {
-  //   this.catalogosService.leeEstatusEvento().subscribe({
-  //     next: (respuesta: EstatusEvento[]) => {
-  //       this.estatusList = respuesta;
-  //       //console.log('Lista: ', this.estatusList);
-  //       //this.cdr.detectChanges();
-  //       //this.snackBar.open('Evento registrado con éxito', 'OK', { duration: 3000 });
-  //       //this.dialogRef.close(respuesta);
-  //     },
-  //     error: (error) => {
-  //       //console.error('Error leer las secciones:', error);
-  //       this.snackBar.open(
-  //         'Error leer las secciones',
-  //         'Cerrar',
-  //         { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
-  //       );
-  //     }
-  //   });
-  // }
-
-onUbicacionChange(idUbicacion: number): void {
-  const ubicacionSeleccionada = this.ubicacionList.find(u => u.id === idUbicacion);
-  this.seccionSelected = Number(ubicacionSeleccionada?.id);
-
-  this.eventoForm.patchValue({
-    idinmueble: 0,
-    nombretitular: '',
-    nombreOcupante: ''
-  });
-
-  this.LeerCasasDeSeccion(this.seccionSelected);
-}
-
-
-LeerCasasDeSeccion(idSeccion: number) {
-  this.inmueblesServices.leeCasasporSeccion(idSeccion).subscribe({
-    next: (respuesta: ICasaRsponse[]) => {
-      setTimeout(() => {
-        this.casalist = respuesta;
+    this.eventosingresoService.agregaEvento(eventoDto)
+      .pipe(take(1))
+      .subscribe({
+        next: (respuesta) => {
+          this.snackBar.open('Evento registrado con éxito', 'OK', { duration: 3000 });
+          this.dialogRef.close(respuesta);
+        },
+        error: () => {
+          this.snackBar.open(
+            'Error al registrar el evento. Inténtalo de nuevo.',
+            'Cerrar',
+            { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
+          );
+        }
       });
-    },
-    error: (error) => {
-      this.snackBar.open(
-        'Error leer las secciones',
-        'Cerrar',
-        { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
-      );
-    }
-  });
-}
-
-onCasaChange(idCasa: number) {
-  const casaSeleccionada = this.casalist.find(u => u.id === idCasa);
-
-  if (casaSeleccionada) {
-    queueMicrotask(() => {
-      this.eventoForm.patchValue({
-        nombretitular: casaSeleccionada.nombretitular,
-        nombreOcupante: casaSeleccionada.nombreocupante
-      });
-    });
   }
 }
-
-} // end class

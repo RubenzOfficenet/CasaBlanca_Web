@@ -10,7 +10,8 @@
             <div class="form-row">
                 <mat-form-field appearance="outline" class="third-width">
                     <mat-label>Ubicación</mat-label>
-                    <mat-select formControlName="idubicacion" (selectionChange)="onUbicacionChange($event.value)">
+                    <!-- <mat-select formControlName="idubicacion" (selectionChange)="onUbicacionChange($event.value)"> -->
+                    <mat-select formControlName="idubicacion">
                         @for (ubicacion of ubicacionList; track ubicacion.id) {
                             <mat-option [value]="ubicacion.id">{{ ubicacion.nombreUbicacion }}</mat-option>
                         }
@@ -44,7 +45,7 @@
             </div>
             
             <!-- Renglón 2: Fecha Evento + Nombre Titular + Apellidos Titular -->
-            <div class="form-row">
+            <!-- <div class="form-row">
                 <mat-form-field appearance="outline" class="third-width">
                     <mat-label>Nombre Titular</mat-label>
                     <input matInput formControlName="nombretitular" readonly>
@@ -54,7 +55,7 @@
                     <mat-label>Nombre Ocupante</mat-label>
                     <input matInput formControlName="nombreOcupante" readonly>
                 </mat-form-field>
-            </div>
+            </div> -->
             <!-- Renglón 3: Recibo Número + Fecha Pago + Estatus Evento -->
             <div class="form-row">
                 

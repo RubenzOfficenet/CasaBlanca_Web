@@ -20,6 +20,7 @@ export class Loginservices {
 
   getPassword(email: string, password: string): Observable<LoginRespondeDTO> {
     var url = `${this._apiUrl}GetUserByEmailAndPassword?email=${email}&password=${password}`;
+    console.log(url);
     return this._http.get<LoginRespondeDTO>(url);
 
   }

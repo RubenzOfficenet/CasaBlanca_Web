@@ -56,7 +56,7 @@ formularioLogin = this.fb.group({
       this.formularioLogin.markAllAsTouched(); // Marca todos los campos para mostrar los errores si intentan enviar sin llenar
       return;
     }
-    console.log('Datos formulario: ', this.formularioLogin.value);
+
     const Pswd = this.formularioLogin.value.password ?? '';
     const Email = this.formularioLogin.value.email ?? '';
 
@@ -103,8 +103,6 @@ formularioLogin = this.fb.group({
 
 
   abrirPopup() {
-
-    debugger;
     const dialogRef = this.dialog.open(Changepassword, {
       width: '30vw',
       maxWidth: '1500px',
