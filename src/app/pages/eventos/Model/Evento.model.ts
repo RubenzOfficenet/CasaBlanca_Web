@@ -21,5 +21,6 @@ export interface IEventoIngreso {
   estatusevento: string;
   total: number;
   TotalEgresos : number;
+  totalMontoEgresos : number;
 }
 

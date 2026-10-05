@@ -316,3 +316,13 @@ table {
     background-color: #D4EDDA;
     color: #155724;
 }
+
+/* Centrado general de texto para celdas y encabezados */
+.texto-centrado {
+  text-align: center !important;
+}
+
+/* Ajuste específico para mat-sort-header */
+th.mat-sort-header.texto-centrado ::ng-deep .mat-sort-header-container {
+  justify-content: center;
+}

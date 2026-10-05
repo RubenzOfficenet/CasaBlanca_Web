@@ -77,6 +77,7 @@ export class Eventosegresos {
     'numeroCasa',
     'fechaEvento',
     'estatusEvento',
+    'totalMontoEgresos',
     'acciones'];
 
 
