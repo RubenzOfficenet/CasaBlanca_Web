@@ -1,0 +1,67 @@
+<div class="header-reporte">
+    <div class="header-contenido">
+        <!-- <span class="tag-reporte">Financiero</span> -->
+        <h1 class="titulo-reporte tag-reporte">Reporte de Ingresos</h1>
+        <p class="subtitulo-reporte">Seleccione el año y la fecha de inicio y final</p>
+    </div>
+</div>
+
+<form [formGroup]="ingresoForm" (ngSubmit)="mostrarConfirmacion()" class="contenedor-formulario">
+    <div class="grupo-fechas">
+        <div class="fechas-grid">
+
+            <!-- Campo Año -->
+            <mat-form-field class="mi-select-personalizado">
+                <mat-label>Año</mat-label>
+                <mat-select formControlName="year">
+                    @for (year of yearList; track year.value) {
+                    <mat-option [value]="year.value">{{year.viewValue}}</mat-option>
+                    }
+                </mat-select>
+                @if (ingresoForm.get('year')?.hasError('required')) {
+                <mat-error>El año es obligatorio</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Campo Mes Inicio -->
+            <mat-form-field class="mi-select-personalizado">
+                <mat-label>Mes Inicio</mat-label>
+                <mat-select formControlName="mesInicio">
+                    @for (mes of monthList; track mes.value) {
+                    <mat-option [value]="mes.value">{{mes.viewValue}}</mat-option>
+                    }
+                </mat-select>
+                @if (ingresoForm.get('mesInicio')?.hasError('required')) {
+                <mat-error>El mes de inicio es obligatorio</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Campo Mes Final -->
+            <mat-form-field class="mi-select-personalizado">
+                <mat-label>Mes Final</mat-label>
+                <mat-select formControlName="mesFinal">
+                    @for (mes of monthList; track mes.value) {
+                    <mat-option [value]="mes.value">{{mes.viewValue}}</mat-option>
+                    }
+                </mat-select>
+                @if (ingresoForm.get('mesFinal')?.hasError('required')) {
+                <mat-error>El mes final es obligatorio</mat-error>
+                }
+                @if (ingresoForm.hasError('rangoInvalido') && ingresoForm.get('mesFinal')?.touched) {
+                <mat-error>El mes final no puede ser menor al de inicio</mat-error>
+                }
+            </mat-form-field>
+
+        </div>
+    </div>
+
+    <mat-dialog-actions align="end">
+        <button type="button" mat-button [mat-dialog-close]="false">
+            Cancelar
+        </button>
+
+        <button type="submit" mat-raised-button color="primary" [disabled]="ingresoForm.invalid">
+            Generar Reporte 
+        </button>
+    </mat-dialog-actions>
+</form>

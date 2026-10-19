@@ -279,5 +279,38 @@ table {
 
 
 :host ::ng-deep .mi-select-personalizado .mat-mdc-text-field-wrapper {
-  background-color: #c3f3db !important;
+    background-color: #c3f3db !important;
+}
+
+
+/* Clase personalizada para el botón verde */
+.btn-excel {
+    background-color: #21a366 !important;
+    /* Verde característico de Excel */
+    color: #ffffff !important;
+    /* Texto e ícono en color blanco */
+}
+
+/* Opcional: efecto al pasar el cursor (hover) */
+.btn-excel:hover {
+    background-color: #1e8e59 !important;
+}
+
+/* Espaciado para el ícono dentro del botón */
+.btn-excel mat-icon {
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Clase personalizada para Snackbar Azul Marino */
+.snackbar-azul-marino {
+  --mdc-snackbar-container-color: #1a2530; /* Azul marino oscuro para el fondo */
+  --mdc-snackbar-supporting-text-color: #ffffff; /* Texto de color blanco */
+  --mat-snack-bar-button-color: #64b5f6; /* Azul claro para los botones de acción */
+}
+
+/* Opcional: si deseas bordes levemente redondeados o sombra personalizada */
+.snackbar-azul-marino .mdc-snackbar__surface {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }

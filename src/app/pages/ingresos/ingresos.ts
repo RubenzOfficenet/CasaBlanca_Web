@@ -23,6 +23,7 @@ import { Editaringreso } from './editaringreso/editaringreso';
 import { ConfirmDialog } from '../shared/confirm-dialog/confirm-dialog';
 import { MONTH_CONSTANTS, YEAR_CONSTATS } from '../../Constants/app.constants';
 import { Router } from '@angular/router';
+import { ParamReporteIngresos } from '../reportes/ingresos/param-reporte-ingresos/param-reporte-ingresos';
 
 @Component({
   selector: 'app-ingresos',
@@ -56,7 +57,7 @@ export class Ingresos implements OnInit, AfterViewInit {
   private readonly ingresosService = inject(Ingresoservice);
   router = inject(Router);
 
-  rolUsuario : string = '';
+  rolUsuario: string = '';
 
   fechaActual = new Date();
   today: Date = new Date();
@@ -118,9 +119,9 @@ export class Ingresos implements OnInit, AfterViewInit {
     this.cargarIngresos();
   }
 
-  constructor(){
+  constructor() {
     this.rolUsuario = window.localStorage.getItem('rol-usuario') ?? '';
-    
+
 
     if (this.rolUsuario == 'Usuario') {
       this.router.navigate(['/ingresos']);
@@ -217,8 +218,26 @@ export class Ingresos implements OnInit, AfterViewInit {
     this.leeDatos();
   }
 
-abrirPopup(): void {
-  setTimeout(() => {
+  // abrirPopup(): void {
+  //   setTimeout(() => {
+  //     const dialogRef = this.dialog.open(Nuevoingreso, {
+  //       width: '40vw',
+  //       maxWidth: '2000px',
+  //       minWidth: '320px',
+  //       disableClose: false,
+  //       hasBackdrop: true
+  //     });
+
+  //     dialogRef.afterClosed().subscribe((result) => {
+  //       if (result) {
+  //         this.cargarIngresos();
+  //       }
+  //     });
+  //   });
+  // }
+
+
+  abrirPopup(): void {
     const dialogRef = this.dialog.open(Nuevoingreso, {
       width: '40vw',
       maxWidth: '2000px',
@@ -232,8 +251,8 @@ abrirPopup(): void {
         this.cargarIngresos();
       }
     });
-  });
-}
+  }
+
 
   editarIngreso(id: number): void {
     const dialogRef = this.dialog.open(Editaringreso, {
@@ -309,4 +328,34 @@ abrirPopup(): void {
   }
 
   onCancelar(): void { }
+
+
+  generarReporte() {
+    // this.snackBar.open('El reporte se esta generando...', 'Cerrar', {
+    //   horizontalPosition: 'center', // 'start' | 'center' | 'end' | 'left' | 'right'
+    //   verticalPosition: 'top',  // 'top' | 'bottom'
+    //   duration: 3000,
+    //   panelClass: ['snackbar-azul-marino']
+    // });
+
+    const dialogRef = this.dialog.open(ParamReporteIngresos, {
+      width: '40vw',
+      maxWidth: '500px',
+      minWidth: '250px',
+      disableClose: false,
+      hasBackdrop: true,
+      data: { id: 6 }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.cargarIngresos();
+      }
+    });
+
+  }  // end class Ingresos  
+
+
+
+
 }

@@ -45,18 +45,19 @@ export class Nuevoingreso implements OnInit {
   private readonly ingresoService = inject(IngresosService);
   private readonly dialogRef = inject(MatDialogRef<Nuevoingreso>);
   private readonly dialog = inject(MatDialog);
+  //private readonly cdRef = inject(ChangeDetectorRef);
 
   casas: ICatalogocasas[] = [];
   casaDatos: CasaDTO[] = [];
   casasFiltradas: CasaDTO[] = [];
   conceptoIngreso: ConceptoIngreso[] = [];
 
-casaControl = new FormControl<string>('', { nonNullable: true });
+  casaControl = new FormControl<string>('', { nonNullable: true });
 
   ingresoForm: FormGroup = this.fb.group({
     casa: [null, Validators.required],
     nombre: [{ value: '', disabled: true }],
-    fechaRecepcion: ['', Validators.required], // Se inicializa vacío para no romper el Change Detection
+    fechaRecepcion: ['', Validators.required],
     numeroRecibo: ['', Validators.required],
     concepto: [null, Validators.required],
     fechaConcepto: ['', Validators.required],
@@ -64,30 +65,41 @@ casaControl = new FormControl<string>('', { nonNullable: true });
     observaciones: ['']
   });
 
-constructor(private cdRef: ChangeDetectorRef) {
-  this.casaControl.valueChanges
-    .pipe(takeUntilDestroyed())
-    .subscribe((texto) => {
-      const valor = texto ?? '';
-      this.filtrarCasas(valor);
+  // constructor() {
+  //   this.casaControl.valueChanges
+  //     .pipe(takeUntilDestroyed())
+  //     .subscribe((texto) => {
+  //       const valor = texto ?? '';
+  //       this.filtrarCasas(valor);
 
-      // Verificamos si realmente cambió antes de hacer patchValue
-      if (!valor.trim() && this.ingresoForm.get('casa')?.value !== null) {
-        this.ingresoForm.patchValue({ casa: null, nombre: '' }, { emitEvent: false });
+  //       if (!valor.trim() && this.ingresoForm.get('casa')?.value !== null) {
+  //         // Desplazamos la actualización de la propiedad al siguiente microtick
+  //         queueMicrotask(() => {
+  //           this.ingresoForm.patchValue({ casa: null, nombre: '' }, { emitEvent: false });
+  //         });
+  //       }
+  //     });
+  // }
+constructor(private cdRef: ChangeDetectorRef) {
+  // Escuchar cambios en el selector de casas del formulario principal
+  this.ingresoForm.get('casa')?.valueChanges
+    .pipe(takeUntilDestroyed())
+    .subscribe((idCasa) => {
+      const casaEncontrada = this.casaDatos.find(c => c.id === idCasa);
+      if (casaEncontrada) {
+        this.casaControl.setValue(casaEncontrada.casa, { emitEvent: false });
       }
     });
 }
 
-
-ngOnInit(): void {
-  setTimeout(() => {
+  ngOnInit(): void {
     this.ingresoForm.patchValue({
       fechaRecepcion: this.obtenerFechaActual()
     });
-    this.leerConceptoIngreso();
+
     this.leerDatosCasa();
-  });
-}
+    this.leerConceptoIngreso();
+  }
 
   filtrarCasas(texto: string): void {
     const busqueda = texto.toLowerCase().trim();
@@ -95,7 +107,6 @@ ngOnInit(): void {
       casa.casa.toLowerCase().includes(busqueda)
     );
   }
-
 
   onCasaChange(): void {
     const idSeleccionado = this.ingresoForm.get('casa')?.value;
@@ -109,12 +120,14 @@ ngOnInit(): void {
   seleccionarCasa(casa: CasaDTO): void {
     this.ingresoForm.get('casa')?.setValue(casa.id);
     this.casaControl.setValue(casa.casa, { emitEvent: false });
+    this.cdRef.detectChanges(); // Asegura la sincronización limpia si ocurre desde una vista de autocompletado
   }
 
   leerConceptoIngreso(): void {
     this.conceptoIngresosService.getConceptoIngresos().subscribe({
       next: (respuesta: ConceptoIngreso[]) => {
         this.conceptoIngreso = respuesta;
+        this.cdRef.markForCheck();
       },
       error: (error) => {
         console.error('Error al obtener los conceptos de ingreso:', error);
@@ -122,20 +135,19 @@ ngOnInit(): void {
     });
   }
 
-
-
-leerDatosCasa(): void {
-  this.inmueblesServices.getInmuebles().subscribe({
-    next: (respuesta: ICatalogocasas[]) => {
-      this.casas = respuesta;
-      this.casaDatos = this.casas.map((casa) => this.mapToCasaDTO(casa));
-      this.casasFiltradas = [...this.casaDatos];
-    },
-    error: (error) => {
-      console.error('Error al obtener las casas:', error);
-    }
-  });
-}
+  leerDatosCasa(): void {
+    this.inmueblesServices.getInmuebles().subscribe({
+      next: (respuesta: ICatalogocasas[]) => {
+        this.casas = respuesta;
+        this.casaDatos = this.casas.map((casa) => this.mapToCasaDTO(casa));
+        this.casasFiltradas = [...this.casaDatos];
+        this.cdRef.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error al obtener las casas:', error);
+      }
+    });
+  }
 
   mostrarConfirmacion(): void {
     if (this.ingresoForm.invalid) {

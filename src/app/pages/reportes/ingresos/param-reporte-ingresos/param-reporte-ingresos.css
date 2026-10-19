@@ -1,0 +1,76 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+.contenedor-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 480px;
+  padding-left: 24px;
+}
+
+.ancho-completo {
+  width: 100%;
+}
+
+.grupo-fechas {
+  display: flex;
+  gap: 16px;
+}
+
+.grupo-fechas mat-form-field {
+  flex: 1;
+}
+
+.acciones {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+
+.fechas-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 16px; /* Espacio uniforme entre columnas */
+    width: 100%;
+}
+
+.fechas-grid .mi-select-personalizado {
+    flex: 1; /* Hace que los 3 elementos tengan el mismo ancho de columna */
+    width: 100%;
+}
+
+.header-reporte {
+  margin-left: 24px;
+    padding: 24px 0 16px 0;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 24px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.tag-reporte {
+    display: inline-block;
+    background-color: #e0f2fe;
+    color: #0369a1;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.titulo-reporte {
+    color: #0f172a;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.5px;
+}
+
+.subtitulo-reporte {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+    font-weight: 400;
+}
