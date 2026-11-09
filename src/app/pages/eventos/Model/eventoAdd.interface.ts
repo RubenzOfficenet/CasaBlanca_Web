@@ -10,4 +10,5 @@ export interface EventoAddRequest {
     depositoGarantia: number;
     limpiezaDomingo: number;
     rentaInmobiliario: number;
+    comentarios: string;
 }

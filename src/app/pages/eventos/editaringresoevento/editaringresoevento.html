@@ -1,6 +1,6 @@
 <mat-dialog-content>
     <div class="form-container">
-        <h3>Nuevo Evento</h3>
+        <h3>Editar Evento</h3>
         <hr>
 
         <form [formGroup]="eventoForm" class="evento-form">
@@ -142,6 +142,14 @@
                     }
                 </mat-form-field>
             </div>
+
+            <!-- Renglón 6: Comentarios -->
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Comentarios</mat-label>
+                    <textarea matInput formControlName="comentarios" rows="3" placeholder="Ingrese comentarios adicionales..."></textarea>
+                </mat-form-field>
+            </div>                
 
         </form>
     </div>

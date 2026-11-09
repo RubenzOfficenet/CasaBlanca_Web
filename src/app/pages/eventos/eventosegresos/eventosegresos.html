@@ -192,9 +192,7 @@
                 <ng-container matColumnDef="totalMontoEgresos">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header class="texto-negrita texto-centrado">Total de Egresos</th>
                     <td mat-cell *matCellDef="let evento" class="texto-centrado">
-                        @if (evento.totalMontoEgresos > 0) {
                         {{ evento.totalMontoEgresos | currency:'MXN':'symbol':'1.2-2' }}
-                        }
                     </td>
                 </ng-container>                  
 

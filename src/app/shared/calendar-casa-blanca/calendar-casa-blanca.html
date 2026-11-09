@@ -1,0 +1,210 @@
+<div class="calendar-container">
+  
+  <!-- Encabezado Superior -->
+  <header class="calendar-header">
+    <div class="header-left">
+      <button (click)="goToToday()" class="btn-primary">
+        📅 Hoy
+      </button>
+
+      <div class="title-box">
+        <span class="selected-date-text">{{ selectedDateTitle() }}</span>
+        <span class="week-info-subtext">Semana {{ activeWeekNumber() }} ({{ activeWeekRange() }})</span>
+      </div>
+    </div>
+
+    <!-- Parte Central: Selectores de Año y Mes -->
+    <div class="header-center">
+
+      <!-- Selector de Año (Vinculado a la Input yearsListInput) -->
+    <div class="select-wrapper">
+      <select 
+        [value]="currentDate().getFullYear()" 
+        (change)="onYearChange($event)" 
+        class="header-select">
+        @for (year of yearsList(); track year) {
+          <option [value]="year" [selected]="year === currentDate().getFullYear()">
+            {{ year }}
+          </option>
+        }
+      </select>
+      <span class="select-arrow">▼</span>
+    </div>
+
+      <!-- Selector de Mes -->
+<div class="select-wrapper">
+  <select 
+    [value]="currentDate().getMonth()" 
+    (change)="onMonthChange($event)" 
+    class="header-select">
+    @for (monthName of monthNames; track $index) {
+      <option [value]="$index" [selected]="$index === currentDate().getMonth()">
+        {{ monthName }}
+      </option>
+    }
+  </select>
+  <span class="select-arrow">▼</span>
+</div>
+    </div>
+
+    <!-- Parte Derecha: Información contextual -->
+    <div class="header-right">
+      <div class="hint-badge">
+        <span class="dot-pulse"></span>
+        Click derecho para crear | Click en evento para editar
+      </div>
+    </div>
+  </header>
+
+  <!-- Rejilla del Calendario -->
+  <main class="calendar-grid-card">
+    <div class="weekdays-grid">
+      @for (dayName of daysOfWeek; track dayName) {
+        <div class="weekday-header" [class.weekend]="dayName === 'Dom' || dayName === 'Sáb'">
+          {{ dayName }}
+        </div>
+      }
+    </div>
+
+    <div class="days-matrix">
+      @for (day of calendarDays(); track day.dateString) {
+        <div 
+          (contextmenu)="onRightClick($event, day)"
+          [class.other-month]="!day.isCurrentMonth"
+          [class.today]="day.isToday"
+          class="day-cell">
+          
+          <div class="day-header-number">
+            <span class="day-badge">{{ day.dayNumber }}</span>
+            @if (day.isToday) {
+              <span class="today-label">Hoy</span>
+            }
+          </div>
+
+          <div class="events-list custom-scrollbar">
+            @for (event of day.events; track event.id) {
+              <div 
+                (click)="onEventClick(event, $event)"
+                [style.borderLeftColor]="event.color" 
+                class="event-card"
+                title="Haz clic para editar este evento">
+                
+                <div class="event-title">{{ event.NombreEvento }}</div>
+                <div class="event-house">
+                  🏠 {{ event.houseName || event.IdInmueble }} {{ event.personName ? '(' + event.personName + ')' : '' }}
+                </div>
+                <div class="event-time">
+                  <span>{{ extractTimeFromDateStr(event.FehaInicio) }} - {{ extractTimeFromDateStr(event.FechaFiin) }}</span>
+                  <button (click)="requestDeleteEvent(event, $event)" class="btn-delete-event" title="Eliminar">✕</button>
+                </div>              
+              </div>
+            }
+          </div>
+
+          
+        </div>
+      }
+    </div>
+  </main>
+
+  <!-- Modal para Crear / Editar Eventos -->
+  @if (showModal()) {
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">
+            {{ isEditMode() ? '✏️ Editar Evento' : '➕ Nuevo Evento' }}
+          </h3>
+          <span class="modal-date-badge">{{ selectedDayDate() }}</span>
+        </div>
+
+        <form [formGroup]="eventForm" (ngSubmit)="requestSaveConfirmation()" class="modal-form">
+          <div class="form-group">
+            <label class="form-label">Nombre del Evento *</label>
+            <input type="text" formControlName="NombreEvento" placeholder="Ej. Evento de Vecindad" class="form-control">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Hora Inicio *</label>
+              <input type="time" formControlName="startTime" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora Fin *</label>
+              <input type="time" formControlName="endTime" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Sección *</label>
+            <select formControlName="IdUbicaccion" (change)="onSectionChange()" class="form-control">
+              <option value="" disabled selected>Seleccione sección...</option>
+              @for (sec of sections(); track sec.id) {
+                <option [value]="sec.id">{{ sec.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Casa / Lote *</label>
+            <select formControlName="IdInmueble" [attr.disabled]="availableHouses().length === 0 ? true : null" class="form-control">
+              <option value="" disabled selected>
+                {{ availableHouses().length === 0 ? 'Seleccione sección primero' : 'Seleccione casa...' }}
+              </option>
+              @for (casa of availableHouses(); track casa.id) {
+                <option [value]="casa.id">{{ casa.name }} - {{ casa.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" (click)="closeModal()" class="btn-secondary">Cancelar</button>
+            <button type="submit" [disabled]="eventForm.invalid" class="btn-primary">
+              {{ isEditMode() ? 'Actualizar Evento' : 'Guardar Evento' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Modal Secundario de Confirmación -->
+  @if (showConfirmModal()) {
+    <div class="modal-overlay confirm-overlay">
+      <div class="modal-card confirm-card">
+        <div class="confirm-header">
+          <span class="confirm-icon">⚠️</span>
+          <h3>¿Confirmar guardado?</h3>
+        </div>
+        <p class="confirm-message">
+          ¿Estás seguro de que deseas {{ isEditMode() ? 'actualizar' : 'guardar' }} este evento en el calendario?
+        </p>
+        <div class="confirm-actions">
+          <button type="button" (click)="cancelSaveConfirmation()" class="btn-secondary">Cancelar</button>
+          <button type="button" (click)="confirmSaveEvent()" class="btn-primary">Guardar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+@if (showDeleteModal()) {
+  <div class="modal-overlay confirm-overlay">
+    <div class="modal-card confirm-card">
+      <div class="confirm-header">
+        <span class="confirm-icon">🗑️</span>
+        <h3>¿Eliminar evento?</h3>
+      </div>
+      <p class="confirm-message">
+        ¿Estás seguro de que deseas eliminar el evento
+        <strong>{{ eventToDelete()?.NombreEvento }}</strong>? Esta acción no se puede deshacer.
+      </p>
+      <div class="confirm-actions">
+        <button type="button" (click)="cancelDelete()" class="btn-secondary">Cancelar</button>
+        <button type="button" (click)="confirmDeleteEvent()" class="btn-danger">Eliminar</button>
+      </div>
+    </div>
+  </div>
+}

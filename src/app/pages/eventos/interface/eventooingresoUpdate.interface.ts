@@ -11,4 +11,5 @@ export interface IEventoIngresoUpdate {
     depositoGarantia: number;
     limpiezaDomingo: number;
     rentaInmobiliario: number;
+    comentarios: string;    
 }

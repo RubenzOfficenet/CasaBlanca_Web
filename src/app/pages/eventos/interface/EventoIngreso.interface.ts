@@ -19,4 +19,5 @@ export interface IEventoIngresoEdit {
   rentaInmobiliario: number;
   estatusEvento: string;
   total: number;
+  comentarios: string;
 }

@@ -326,3 +326,8 @@ table {
     background-color: #D4EDDA;
     color: #155724;
 }
+
+
+.text-center {
+    text-align: center !important;
+}

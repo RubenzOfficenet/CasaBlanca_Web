@@ -26,6 +26,7 @@ export class EventosingresoService {
 
   agregaEvento(eventoDTO: EventoAddRequest): Observable<number> {
     const url = this._apiUrl + 'AddEventoIngreso';
+    debugger;
     return this._http.post<number>(url, eventoDTO);
   }
 
@@ -43,7 +44,6 @@ export class EventosingresoService {
 
   leeEventosIngresoById(idEvento: number) {
     const url = this._apiUrl + 'GetEventoingresosById?IdEvento=' + idEvento;
-    console.log('url: ', url);
     return this._http.get<IEventoIngresoEdit>(url);
   }
 
@@ -55,7 +55,6 @@ export class EventosingresoService {
 
   deleteEventosIngresoById(idEventoIngrso: number) {
     const url = this._apiUrl + 'DeleteEventoIngreso?idEvento=' + idEventoIngrso;
-    console.log('url: ', url);
     return this._http.put<IEventoIngresoUpdate>(url, idEventoIngrso);
   }
 

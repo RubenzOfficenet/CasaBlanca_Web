@@ -68,7 +68,8 @@ export class Editaringresoevento implements OnInit {
     luz: [0, [Validators.min(0)]],
     depositogarantia: [0, [Validators.min(0)]],
     limpiezadomingo: [0, [Validators.min(0)]],
-    rentainmobiliario: [0, [Validators.min(0)]]
+    rentainmobiliario: [0, [Validators.min(0)]],
+    comentarios: [''] 
   });
 
   ngOnInit(): void {
@@ -100,7 +101,8 @@ export class Editaringresoevento implements OnInit {
                 luz: data.luz,
                 depositogarantia: data.depositoGarantia,
                 limpiezadomingo: data.limpiezaDomingo,
-                rentainmobiliario: data.rentaInmobiliario
+                rentainmobiliario: data.rentaInmobiliario,
+                comentarios: data.comentarios || ''
               });
             },
             error: () => this.mostrarErrorCasas()
@@ -176,7 +178,8 @@ export class Editaringresoevento implements OnInit {
       luz: Number(datos.luz),
       depositoGarantia: Number(datos.depositogarantia),
       limpiezaDomingo: Number(datos.limpiezadomingo),
-      rentaInmobiliario: Number(datos.rentainmobiliario)
+      rentaInmobiliario: Number(datos.rentainmobiliario),
+      comentarios: datos.comentarios || ''
     };
 
     this.eventosingresoService.updateEventosIngresoById(eventoDto).subscribe({

@@ -44,18 +44,7 @@
                 </mat-form-field>
             </div>
             
-            <!-- Renglón 2: Fecha Evento + Nombre Titular + Apellidos Titular -->
-            <!-- <div class="form-row">
-                <mat-form-field appearance="outline" class="third-width">
-                    <mat-label>Nombre Titular</mat-label>
-                    <input matInput formControlName="nombretitular" readonly>
-                </mat-form-field>
 
-                <mat-form-field appearance="outline" class="third-width">
-                    <mat-label>Nombre Ocupante</mat-label>
-                    <input matInput formControlName="nombreOcupante" readonly>
-                </mat-form-field>
-            </div> -->
             <!-- Renglón 3: Recibo Número + Fecha Pago + Estatus Evento -->
             <div class="form-row">
                 
@@ -144,6 +133,14 @@
                     }
                 </mat-form-field>
             </div>
+
+            <!-- Renglón 6: Comentarios -->
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Comentarios</mat-label>
+                    <textarea matInput formControlName="comentarios" rows="3" placeholder="Ingrese comentarios adicionales..."></textarea>
+                </mat-form-field>
+            </div>            
 
         </form>
     </div>

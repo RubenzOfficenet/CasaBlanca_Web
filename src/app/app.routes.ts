@@ -57,6 +57,10 @@ export const routes: Routes = [
       { 
         path: 'eventos/eventosegresos', 
         loadComponent: () => import('./pages/eventos/eventosegresos/eventosegresos').then(m => m.Eventosegresos) 
+      },
+     { 
+        path: 'shared/calendar-casa-blanca', 
+        loadComponent: () => import('./shared/calendar-casa-blanca/calendar-casa-blanca').then(m => m.CalendarCasaBlanca  ) 
       }
     ]
   },
