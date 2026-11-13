@@ -30,3 +30,44 @@ export const MONTH_CONSTANTS : { [key: number]: string } = {
     11 : 'Noviembre',
     12 : 'Diciembre',
 }
+
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD-MM-YYYY',
+  },
+  display: {
+    dateInput: 'dd-MMM-yyyy',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
+
+export const DAYS_OF_WEEK = [
+  'Dom', 
+  'Lun', 
+  'Mar', 
+  'Mié', 
+  'Jue', 
+  'Vie', 
+  'Sáb'
+];
+
+
+export const MONTH_NAMES = [
+    'Enero', 
+    'Febrero', 
+    'Marzo', 
+    'Abril', 
+    'Mayo', 
+    'Junio',
+    'Julio', 
+    'Agosto', 
+    'Septiembre', 
+    'Octubre', 
+    'Noviembre', 
+    'Diciembre'
+]
+
+

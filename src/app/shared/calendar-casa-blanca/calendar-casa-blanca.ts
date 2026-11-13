@@ -1,46 +1,82 @@
-import { Component, signal, computed, inject, input, output, effect } from '@angular/core';
+import { Component, signal, computed, inject, input, output, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { EventosService } from './services/eventos-service';
+import { DAYS_OF_WEEK, MONTH_NAMES } from '../../Constants/app.constants';
 
-export interface SectionOption {
-  id: number;
-  name: string;
-}
+import { EstatusOption } from './interfaces/EstatusOption.interface';
+import { SectionOption } from './interfaces/SectionOption.interface';
+import { CasaOption    } from './interfaces/CasaOption.interace';
+import { CalendarEvent } from './interfaces/CalendarEvent.ingterface';
+import { CalendarDay } from './interfaces/CalendarDay.interface';
 
-export interface CasaOption {
-  id: number;
-  sectionId: number;
-  name: string;
-  nombre: string;
-}
 
-export interface CalendarEvent {
-  id: string;
-  NombreEvento: string;
-  FehaInicio: string; // Formato YYYY-MM-DDTHH:mm
-  FechaFiin: string;
-  IdUbicaccion: number;
-  IdInmueble: number;
-  imagenEvento?: string;
-  DateAdded?: string;
-  DateUpdated?: string;
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD-MM-YYYY',
+  },
+  display: {
+    dateInput: 'dd-MMM-yyyy',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
-  // Propiedades auxiliares de presentación UI
-  sectionName?: string;
-  houseName?: string;
-  personName?: string;
-  color?: string;
-}
+// export interface EstatusOption {
+//   id: number;
+//   nombre: string;
+// }
 
-export interface CalendarDay {
-  date: Date;
-  dateString: string;
-  dayNumber: number;
-  isCurrentMonth: boolean;
-  isToday: boolean;
-  events: CalendarEvent[];
-}
+// export interface SectionOption {
+//   id: number;
+//   name: string;
+// }
+
+// export interface CasaOption {
+//   id: number;
+//   sectionId?: number;
+//   idSeccion?: number;
+//   seccionId?: number;
+//   name: string;
+//   nombre: string;
+// }
+
+// export interface CalendarEvent {
+//   id: string;
+//   idInmueble: number;
+//   idEstatusEvento: number;
+//   fechaEvento: string;
+//   reciboNumero: string;
+//   fechaPago: string;
+//   apartado: number;
+//   liquida: number;
+//   luz: number;
+//   depositoGarantia: number;
+//   limpiezaDomingo: number;
+//   rentaInmobiliario: number;
+//   comentarios: string;
+//   // Propiedades auxiliares de presentación UI
+//   houseName?: string;
+//   personName?: string;
+//   color?: string;
+// }
+
+// export interface CalendarDay {
+//   date: Date;
+//   dateString: string;
+//   dayNumber: number;
+//   isCurrentMonth: boolean;
+//   isToday: boolean;
+//   events: CalendarEvent[];
+// }
 
 @Component({
   selector: 'app-calendar-casa-blanca',
@@ -48,69 +84,84 @@ export interface CalendarDay {
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSelectModule
+  ],
+  providers: [
+    provideNativeDateAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: 'es-MX' },
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS }
   ],
   templateUrl: './calendar-casa-blanca.html',
   styleUrl: './calendar-casa-blanca.css'
 })
-export class CalendarCasaBlanca {
+export class CalendarCasaBlanca implements OnInit {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
+  private eventosService = inject(EventosService);
 
-  // ----------------------------------------------------
-  // ENTRADAS DESDE EL COMPONENTE PADRE (Inputs)
-  // ----------------------------------------------------
-  /** Años configurables enviables desde el padre */
+  // Inputs y Outputs
+  casasPadreInput = input<CasaOption[]>([], { alias: 'casasPadre' });
   yearsListInput = input<number[]>(
-    Array.from({ length: 12 }, (_, i) => 2020 + i),
-    { alias: 'yearsList' }
+    Array.from({ length: 12 }, (_, i) => 2020 + i), { alias: 'yearsList' }
   );
-
-  /** Eventos cargados dinámicamente desde el padre */
   eventsInput = input<CalendarEvent[]>([], { alias: 'events' });
 
-  // ----------------------------------------------------
-  // SALIDAS HACIA EL COMPONENTE PADRE (Outputs)
-  // ----------------------------------------------------
   eventCreated = output<CalendarEvent>();
   eventUpdated = output<CalendarEvent>();
   eventDeleted = output<string>();
 
-  readonly daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-  readonly monthNames = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-  ];
+  // Signals de estado y catálogos
+  secciones = signal<SectionOption[]>([]);
+  casasPadre = signal<CasaOption[]>([]);
+  selectedSectionId = signal<number | null>(null);
+  storedEvents = signal<CalendarEvent[]>([]);
 
+  estatusOptions = signal<EstatusOption[]>([
+    { id: 1, nombre: 'Apartado' },
+    { id: 2, nombre: 'Liquidado' },
+    { id: 3, nombre: 'Cancelado' }
+  ]);
+
+  // Modales y control de UI
+  showModal = signal<boolean>(false);
+  showConfirmModal = signal<boolean>(false);
   showDeleteModal = signal<boolean>(false);
   eventToDelete = signal<CalendarEvent | null>(null);
 
-  currentDate = signal<Date>(new Date());
-  showModal = signal<boolean>(false);
-  showConfirmModal = signal<boolean>(false);
   isEditMode = signal<boolean>(false);
   editingEventId = signal<string | null>(null);
   selectedDayDate = signal<string>('');
+  currentDate = signal<Date>(new Date());
 
-  sections = signal<SectionOption[]>([
-    { id: 1, name: 'Sección I' },
-    { id: 2, name: 'Sección II' }
-  ]);
+  readonly daysOfWeek = DAYS_OF_WEEK;
+  readonly monthNames = MONTH_NAMES;
 
-  casas = signal<CasaOption[]>([
-    { id: 101, sectionId: 1, name: '1-A', nombre: 'Juan' },
-    { id: 102, sectionId: 1, name: '2-B', nombre: 'Pedro' },
-    { id: 103, sectionId: 1, name: '3-C', nombre: 'Maria' },
-    { id: 104, sectionId: 1, name: '4-H', nombre: 'Jose' },
-    { id: 201, sectionId: 2, name: '16-A', nombre: 'Martha' },
-    { id: 202, sectionId: 2, name: '44-C', nombre: 'Carlos' },
-    { id: 203, sectionId: 2, name: '22-A', nombre: 'Ana' }
-  ]);
+  // Signal computada: casas filtradas por la sección seleccionada
+  availableHouses = computed(() => {
+    const secId = Number(this.selectedSectionId());
+    const todasLasCasas = this.casasPadre();
 
-  availableHouses = signal<CasaOption[]>([]);
-  storedEvents = signal<CalendarEvent[]>([]);
+    if (!secId || !todasLasCasas.length) return [];
 
-  // Garantiza que la lista de años contenga el año seleccionado actualmente
+    return todasLasCasas.filter((c: any) => {
+      const rawSecId =
+        c.sectionId ??
+        c.idSeccion ??
+        c.seccionId ??
+        c.IdSeccion ??
+        c.SectionId ??
+        c.SeccionId ??
+        c.seccion?.id;
+
+      return Number(rawSecId) === secId;
+    });
+  });
+
   yearsList = computed(() => {
     const list = [...this.yearsListInput()];
     const currentYear = this.currentDate().getFullYear();
@@ -121,22 +172,107 @@ export class CalendarCasaBlanca {
     return list;
   });
 
-  eventForm: FormGroup = this.fb.group({
-    NombreEvento: ['', Validators.required],
-    startTime: ['09:00', Validators.required],
-    endTime: ['10:00', Validators.required],
-    IdUbicaccion: ['', Validators.required],
-    IdInmueble: ['', Validators.required],
-    imagenEvento: ['']
+  eventoForm: FormGroup = this.fb.nonNullable.group({
+    idSeccion: [0, [Validators.required, Validators.min(1)]],
+    idInmueble: [{ value: 0, disabled: true }, [Validators.required, Validators.min(1)]],
+    idEstatusEvento: [0, [Validators.required, Validators.min(1)]],
+    fechaEvento: [new Date(), [Validators.required]],
+    reciboNumero: ['', [Validators.required, Validators.maxLength(50)]],
+    fechaPago: [new Date(), [Validators.required]],
+    apartado: [0, [Validators.required, Validators.min(0)]],
+    liquida: [0, [Validators.required, Validators.min(0)]],
+    luz: [0, [Validators.min(0)]],
+    depositoGarantia: [0, [Validators.min(0)]],
+    limpiezaDomingo: [0, [Validators.min(0)]],
+    rentaInmobiliario: [0, [Validators.min(0)]],
+    comentarios: ['']
   });
 
   constructor() {
+    // Sincronizar casas si el componente padre envía un catálogo completo
     effect(() => {
-      const incomingEvents = this.eventsInput();
-      if (incomingEvents) {
-        this.storedEvents.set(incomingEvents);
+      const inputCasas = this.casasPadreInput();
+      if (Array.isArray(inputCasas) && inputCasas.length > 0 && this.casasPadre().length === 0) {
+        this.casasPadre.set(inputCasas);
       }
     });
+
+    // Sincronizar eventos desde el padre
+    effect(() => {
+      const inputEvts = this.eventsInput();
+      if (inputEvts) {
+        this.storedEvents.set(inputEvts);
+      }
+    });
+
+    // Suscripción directa al cambio de sección en el formulario
+    this.eventoForm.get('idSeccion')?.valueChanges.subscribe(value => {
+      const sectionId = Number(value);
+      const isValid = !isNaN(sectionId) && sectionId > 0;
+
+      this.selectedSectionId.set(isValid ? sectionId : null);
+
+      const inmuebleCtrl = this.eventoForm.get('idInmueble');
+      inmuebleCtrl?.setValue(0, { emitEvent: false });
+
+      if (isValid && this.availableHouses().length > 0) {
+        inmuebleCtrl?.enable({ emitEvent: false });
+      } else {
+        inmuebleCtrl?.disable({ emitEvent: false });
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    // Cargar secciones desde el servicio
+    this.eventosService.getSecciones().subscribe({
+      next: (res: any) => {
+        const lista = Array.isArray(res) ? res : (res?.data ?? res?.result ?? []);
+        this.secciones.set(lista);
+      },
+      error: (err) => console.error('Error al cargar secciones:', err)
+    });
+
+    // Cargar todas las casas desde el servicio
+    this.eventosService.getCasas().subscribe({
+      next: (res: any) => {
+        const lista = Array.isArray(res) ? res : (res?.data ?? res?.result ?? []);
+        if (lista.length > 0) {
+          this.casasPadre.set(lista);
+        }
+      },
+      error: (err: any) => console.error('Error al cargar casas:', err)
+    });
+  }
+
+  private extractSectionId(houseObj: any): number {
+    if (!houseObj) return 0;
+    const rawSecId =
+      houseObj.sectionId ??
+      houseObj.idSeccion ??
+      houseObj.seccionId ??
+      houseObj.IdSeccion ??
+      houseObj.SectionId ??
+      houseObj.SeccionId ??
+      houseObj.seccion?.id ??
+      0;
+    return Number(rawSecId) || 0;
+  }
+
+  private toDateString(value: any): string {
+    if (!value) return '';
+    if (value instanceof Date) {
+      return this.formatDate(value);
+    }
+    return String(value).split('T')[0];
+  }
+
+  private parseToDate(value: any): Date {
+    if (!value) return new Date();
+    if (value instanceof Date) return value;
+    const cleanStr = String(value).split('T')[0];
+    const [year, month, day] = cleanStr.split('-').map(Number);
+    return year && month && day ? new Date(year, month - 1, day) : new Date(value);
   }
 
   requestDeleteEvent(event: CalendarEvent, mouseEvent: MouseEvent): void {
@@ -190,7 +326,6 @@ export class CalendarCasaBlanca {
     return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
   });
 
-  // Corregido: sintaxis de string limpia
   activeWeekRange = computed(() => {
     const curr = new Date(this.currentDate());
     const first = curr.getDate() - curr.getDay();
@@ -205,16 +340,14 @@ export class CalendarCasaBlanca {
     return `${firstDay.getDate()} ${fMonth} - ${lastDay.getDate()} ${lMonth}`;
   });
 
-  onYearChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const newYear = parseInt(select.value, 10);
+  onYearChange(event: Event | number): void {
+    const newYear = typeof event === 'number' ? event : parseInt((event.target as HTMLSelectElement).value, 10);
     const current = this.currentDate();
     this.currentDate.set(new Date(newYear, current.getMonth(), 1));
   }
 
-  onMonthChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const newMonth = parseInt(select.value, 10);
+  onMonthChange(event: Event | number): void {
+    const newMonth = typeof event === 'number' ? event : parseInt((event.target as HTMLSelectElement).value, 10);
     const current = this.currentDate();
     this.currentDate.set(new Date(current.getFullYear(), newMonth, 1));
   }
@@ -294,90 +427,72 @@ export class CalendarCasaBlanca {
     this.isEditMode.set(false);
     this.editingEventId.set(null);
     this.selectedDayDate.set(day.dateString);
-    this.eventForm.reset({
-      NombreEvento: '',
-      startTime: '09:00',
-      endTime: '10:00',
-      IdUbicaccion: '',
-      IdInmueble: '',
-      imagenEvento: ''
-    });
-    this.availableHouses.set([]);
+
+    const targetDate = day.dateString ? this.parseToDate(day.dateString) : new Date();
+
+    this.selectedSectionId.set(null);
+
+    this.eventoForm.reset({
+      idSeccion: 0,
+      idInmueble: 0,
+      idEstatusEvento: 1,
+      fechaEvento: targetDate,
+      reciboNumero: '',
+      fechaPago: new Date(),
+      apartado: 0,
+      liquida: 0,
+      luz: 0,
+      depositoGarantia: 0,
+      limpiezaDomingo: 0,
+      rentaInmobiliario: 0,
+      comentarios: ''
+    }, { emitEvent: false });
+
+    this.eventoForm.get('idInmueble')?.disable({ emitEvent: false });
     this.showModal.set(true);
   }
 
-  // onEventClick(event: CalendarEvent, mouseEvent: MouseEvent): void {
-  //   mouseEvent.stopPropagation();
-  //   this.isEditMode.set(true);
-  //   this.editingEventId.set(event.id);
-
-  //   const eventDateStr = event.FehaInicio.split('T')[0] || event.FehaInicio;
-  //   this.selectedDayDate.set(eventDateStr);
-
-  //   const housesForSection = this.casas().filter(c => c.sectionId === event.IdUbicaccion);
-  //   this.availableHouses.set(housesForSection);
-
-  //   const startTimeStr = this.extractTimeFromDateStr(event.FehaInicio) || '09:00';
-  //   const endTimeStr = this.extractTimeFromDateStr(event.FechaFiin) || '10:00';
-
-  //   this.eventForm.patchValue({
-  //     NombreEvento: event.NombreEvento,
-  //     startTime: startTimeStr,
-  //     endTime: endTimeStr,
-  //     IdUbicaccion: event.IdUbicaccion,
-  //     IdInmueble: event.IdInmueble,
-  //     imagenEvento: event.imagenEvento || ''
-  //   });
-
-  //   this.showModal.set(true);
-  // }
-
-
   onEventClick(event: CalendarEvent, mouseEvent: MouseEvent): void {
-  mouseEvent.stopPropagation();
-  this.isEditMode.set(true);
-  this.editingEventId.set(event.id);
+    mouseEvent.stopPropagation();
+    this.isEditMode.set(true);
+    this.editingEventId.set(event.id);
 
-  const eventDateStr = event.FehaInicio.split('T')[0] || event.FehaInicio;
-  this.selectedDayDate.set(eventDateStr);
+    const eventDateStr = this.toDateString(event.fechaEvento);
+    this.selectedDayDate.set(eventDateStr);
 
-  const housesForSection = this.casas().filter(c => c.sectionId === event.IdUbicaccion);
-  this.availableHouses.set(housesForSection);
+    const houseObj = this.casasPadre().find(c => Number(c.id) === Number(event.idInmueble));
+    const sectionId = this.extractSectionId(houseObj);
 
-  // 1. Extraemos la hora en formato 24h (HH:mm) que entiende el <input type="time">
-  const startTimeStr = this.extractRawTime24h(event.FehaInicio);
-  const endTimeStr = this.extractRawTime24h(event.FechaFiin);
+    this.selectedSectionId.set(sectionId > 0 ? sectionId : null);
 
-  // 2. Parcheamos el formulario con las horas en 24h
-  this.eventForm.patchValue({
-    NombreEvento: event.NombreEvento,
-    startTime: startTimeStr,
-    endTime: endTimeStr,
-    IdUbicaccion: event.IdUbicaccion,
-    IdInmueble: event.IdInmueble,
-    imagenEvento: event.imagenEvento || ''
-  });
-
-  this.showModal.set(true);
-}
-
-
-
-
-  onSectionChange(): void {
-    const selectedSectionId = Number(this.eventForm.get('IdUbicaccion')?.value);
-    const housesForSection = this.casas().filter(c => c.sectionId === selectedSectionId);
-
-    if (housesForSection.length > 0) {
-      this.availableHouses.set(housesForSection);
-      this.eventForm.patchValue({ IdInmueble: '' });
+    const inmuebleCtrl = this.eventoForm.get('idInmueble');
+    if (sectionId > 0 && this.availableHouses().length > 0) {
+      inmuebleCtrl?.enable({ emitEvent: false });
     } else {
-      this.availableHouses.set([]);
+      inmuebleCtrl?.disable({ emitEvent: false });
     }
+
+    this.eventoForm.patchValue({
+      idSeccion: sectionId,
+      idInmueble: Number(event.idInmueble),
+      idEstatusEvento: Number(event.idEstatusEvento),
+      fechaEvento: this.parseToDate(event.fechaEvento),
+      reciboNumero: event.reciboNumero,
+      fechaPago: this.parseToDate(event.fechaPago),
+      apartado: event.apartado,
+      liquida: event.liquida,
+      luz: event.luz || 0,
+      depositoGarantia: event.depositoGarantia || 0,
+      limpiezaDomingo: event.limpiezaDomingo || 0,
+      rentaInmobiliario: event.rentaInmobiliario || 0,
+      comentarios: event.comentarios || ''
+    }, { emitEvent: false });
+
+    this.showModal.set(true);
   }
 
   requestSaveConfirmation(): void {
-    if (this.eventForm.invalid) return;
+    if (this.eventoForm.invalid) return;
     this.showConfirmModal.set(true);
   }
 
@@ -386,32 +501,34 @@ export class CalendarCasaBlanca {
   }
 
   confirmSaveEvent(): void {
-    const formValues = this.eventForm.value;
-    const locationId = Number(formValues.IdUbicaccion);
-    const inmuebleId = Number(formValues.IdInmueble);
+    if (this.eventoForm.invalid) return;
 
-    const sectionObj = this.sections().find(s => s.id === locationId);
-    const houseObj = this.casas().find(c => c.id === inmuebleId);
+    const formValues = this.eventoForm.getRawValue();
+    const inmuebleId = Number(formValues.idInmueble);
+    const houseObj = this.casasPadre().find(c => Number(c.id) === inmuebleId);
 
-    const fullStartDate = `${this.selectedDayDate()}T${formValues.startTime}:00`;
-    const fullEndDate = `${this.selectedDayDate()}T${formValues.endTime}:00`;
-    const nowIso = new Date().toISOString();
+    const fechaEventoStr = this.toDateString(formValues.fechaEvento);
+    const fechaPagoStr = this.toDateString(formValues.fechaPago);
 
-    if (this.isEditMode() && this.editingEventId()) {
+    if (this.isEditMode() && this.editingEventId() !== null) {
       let updatedEvent: CalendarEvent | null = null;
 
       this.storedEvents.update(prev => prev.map(e => {
         if (e.id === this.editingEventId()) {
           updatedEvent = {
             ...e,
-            NombreEvento: formValues.NombreEvento,
-            FehaInicio: fullStartDate,
-            FechaFiin: fullEndDate,
-            IdUbicaccion: locationId,
-            IdInmueble: inmuebleId,
-            imagenEvento: formValues.imagenEvento || '',
-            DateUpdated: nowIso,
-            sectionName: sectionObj?.name || '',
+            idInmueble: inmuebleId,
+            idEstatusEvento: Number(formValues.idEstatusEvento),
+            fechaEvento: fechaEventoStr,
+            reciboNumero: String(formValues.reciboNumero || ''),
+            fechaPago: fechaPagoStr,
+            apartado: Number(formValues.apartado || 0),
+            liquida: Number(formValues.liquida || 0),
+            luz: Number(formValues.luz || 0),
+            depositoGarantia: Number(formValues.depositoGarantia || 0),
+            limpiezaDomingo: Number(formValues.limpiezaDomingo || 0),
+            rentaInmobiliario: Number(formValues.rentaInmobiliario || 0),
+            comentarios: formValues.comentarios || '',
             houseName: houseObj?.name || '',
             personName: houseObj?.nombre || ''
           };
@@ -428,16 +545,19 @@ export class CalendarCasaBlanca {
       const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
       const newEvent: CalendarEvent = {
-        id: 'evt-' + Date.now(),
-        NombreEvento: formValues.NombreEvento,
-        FehaInicio: fullStartDate,
-        FechaFiin: fullEndDate,
-        IdUbicaccion: locationId,
-        IdInmueble: inmuebleId,
-        imagenEvento: formValues.imagenEvento || '',
-        DateAdded: nowIso,
-        DateUpdated: nowIso,
-        sectionName: sectionObj?.name || '',
+        id: Date.now().toString(),
+        idInmueble: inmuebleId,
+        idEstatusEvento: Number(formValues.idEstatusEvento),
+        fechaEvento: fechaEventoStr,
+        reciboNumero: String(formValues.reciboNumero || ''),
+        fechaPago: fechaPagoStr,
+        apartado: Number(formValues.apartado || 0),
+        liquida: Number(formValues.liquida || 0),
+        luz: Number(formValues.luz || 0),
+        depositoGarantia: Number(formValues.depositoGarantia || 0),
+        limpiezaDomingo: Number(formValues.limpiezaDomingo || 0),
+        rentaInmobiliario: Number(formValues.rentaInmobiliario || 0),
+        comentarios: formValues.comentarios || '',
         houseName: houseObj?.name || '',
         personName: houseObj?.nombre || '',
         color: randomColor
@@ -473,58 +593,29 @@ export class CalendarCasaBlanca {
 
   private filterEventsForDate(dateStr: string): CalendarEvent[] {
     return this.storedEvents().filter(e => {
-      const startDateStr = e.FehaInicio.split('T')[0] || e.FehaInicio;
+      const startDateStr = this.toDateString(e.fechaEvento);
       return startDateStr === dateStr;
     });
   }
 
-  // extractTimeFromDateStr(dateStr: string): string {
-  //   if (!dateStr) return '';
-  //   if (dateStr.includes('T')) {
-  //     return dateStr.split('T')[1].substring(0, 5);
-  //   }
-  //   return dateStr;
-  // }
+  extractTimeFromDateStr(dateStr: string): string {
+    if (!dateStr) return '';
+    let timePart = dateStr;
+    if (dateStr.includes('T')) {
+      timePart = dateStr.split('T')[1].substring(0, 5);
+    }
+    const parts = timePart.split(':');
+    if (parts.length < 2) return dateStr;
 
-extractTimeFromDateStr(dateStr: string): string {
-  if (!dateStr) return '';
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+    if (isNaN(hours)) return dateStr;
 
-  let timePart = dateStr;
+    const period = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
 
-  // Si viene en formato ISO (ej. "2026-10-15T14:30:00"), extraemos la parte de la hora "14:30"
-  if (dateStr.includes('T')) {
-    timePart = dateStr.split('T')[1].substring(0, 5);
+    const formattedHours = hours < 10 ? `0${hours}` : `${hours}`;
+    return `${formattedHours}:${minutes} ${period}`;
   }
-
-  // Dividimos horas y minutos
-  const parts = timePart.split(':');
-  if (parts.length < 2) return dateStr; // Retorna el valor original si no cumple formato de hora
-
-  let hours = parseInt(parts[0], 10);
-  const minutes = parts[1];
-
-  if (isNaN(hours)) return dateStr;
-
-  // Determinamos si es AM o PM
-  const period = hours >= 12 ? 'PM' : 'AM';
-
-  // Convertimos de formato 24h a 12h
-  hours = hours % 12;
-  if (hours === 0) hours = 12; // Las 00:00 representan las 12 AM y las 12:00 las 12 PM
-
-  // Formateamos la hora para mantener dos dígitos si lo prefieres (ej. 09:30 AM o 9:30 AM)
-  const formattedHours = hours < 10 ? `0${hours}` : `${hours}`;
-
-  return `${formattedHours}:${minutes} ${period}`;
-}
-
-private extractRawTime24h(dateStr: string): string {
-  if (!dateStr) return '09:00';
-  if (dateStr.includes('T')) {
-    return dateStr.split('T')[1].substring(0, 5);
-  }
-  return dateStr.substring(0, 5);
-}
-
-
 }

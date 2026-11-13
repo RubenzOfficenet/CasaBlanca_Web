@@ -598,3 +598,51 @@ color: #ffffff !important;
 .btn-danger:hover {
   background: #b91c1c;
 }
+
+
+/* Ampliar ancho máximo del modal */
+.modal-card.modal-lg {
+  max-width: 900px;
+  width: 95%;
+}
+
+/* Grilla de 3 columnas */
+.form-row.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+  .form-row.grid-3 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+
+
+.w-100 {
+  width: 100%;
+}
+
+.form-group mat-form-field {
+  margin-top: 0;
+  display: block;
+}
+
+
+
+
+
+:host ::ng-deep .header-select-field {
+  /* Sobreescribe la variable interna del contenedor MDC de Material */
+  --mdc-filled-text-field-container-color: #eef2ff !important;
+}
+
+:host ::ng-deep .header-select-field .mat-mdc-text-field-wrapper {
+  background-color: #eef2ff !important; /* Azul sutil corporativo */
+  border-radius: 8px !important;
+}
