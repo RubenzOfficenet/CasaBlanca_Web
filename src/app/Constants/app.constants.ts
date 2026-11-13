@@ -55,6 +55,10 @@ export const DAYS_OF_WEEK = [
 ];
 
 
+export const DAYS_NAME = [
+  'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+]
+
 export const MONTH_NAMES = [
     'Enero', 
     'Febrero', 

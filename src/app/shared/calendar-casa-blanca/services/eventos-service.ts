@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { CalendarEvent, CasaOption, SectionOption } from '../calendar-casa-blanca';
+import { CalendarEvent  } from '../interfaces/CalendarEvent.interface';
+import { CasaOption     } from '../interfaces/CasaOption.interace';
+import { SectionOption  } from '../interfaces/SectionOption.interface';
 
 @Injectable({
   providedIn: 'root',

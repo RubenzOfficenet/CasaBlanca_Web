@@ -2,21 +2,15 @@ import { Component, signal, computed, inject, input, output, effect, OnInit } fr
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+
 import { MatSelectModule } from '@angular/material/select';
 import { EventosService } from './services/eventos-service';
-import { DAYS_OF_WEEK, MONTH_NAMES } from '../../Constants/app.constants';
-
-import { EstatusOption } from './interfaces/EstatusOption.interface';
-import { SectionOption } from './interfaces/SectionOption.interface';
-import { CasaOption    } from './interfaces/CasaOption.interace';
-import { CalendarEvent } from './interfaces/CalendarEvent.ingterface';
-import { CalendarDay } from './interfaces/CalendarDay.interface';
-
 
 export const MY_DATE_FORMATS = {
   parse: {
@@ -30,53 +24,54 @@ export const MY_DATE_FORMATS = {
   },
 };
 
-// export interface EstatusOption {
-//   id: number;
-//   nombre: string;
-// }
+export interface EstatusOption {
+  id: number;
+  nombre: string;
+}
 
-// export interface SectionOption {
-//   id: number;
-//   name: string;
-// }
+export interface SectionOption {
+  id: number;
+  name: string;
+}
 
-// export interface CasaOption {
-//   id: number;
-//   sectionId?: number;
-//   idSeccion?: number;
-//   seccionId?: number;
-//   name: string;
-//   nombre: string;
-// }
+export interface CasaOption {
+  id: number;
+  sectionId?: number;
+  idSeccion?: number;
+  seccionId?: number;
+  name: string;
+  nombre: string;
+}
 
-// export interface CalendarEvent {
-//   id: string;
-//   idInmueble: number;
-//   idEstatusEvento: number;
-//   fechaEvento: string;
-//   reciboNumero: string;
-//   fechaPago: string;
-//   apartado: number;
-//   liquida: number;
-//   luz: number;
-//   depositoGarantia: number;
-//   limpiezaDomingo: number;
-//   rentaInmobiliario: number;
-//   comentarios: string;
-//   // Propiedades auxiliares de presentación UI
-//   houseName?: string;
-//   personName?: string;
-//   color?: string;
-// }
+export interface CalendarEvent {
+  id: string;
+  idInmueble: number;
+  idEstatusEvento: number;
+  fechaEvento: string;
+  reciboNumero: string;
+  fechaPago: string;
+  apartado: number;
+  liquida: number;
+  luz: number;
+  depositoGarantia: number;
+  limpiezaDomingo: number;
+  rentaInmobiliario: number;
+  comentarios: string;
 
-// export interface CalendarDay {
-//   date: Date;
-//   dateString: string;
-//   dayNumber: number;
-//   isCurrentMonth: boolean;
-//   isToday: boolean;
-//   events: CalendarEvent[];
-// }
+  // Propiedades auxiliares de presentación UI
+  houseName?: string;
+  personName?: string;
+  color?: string;
+}
+
+export interface CalendarDay {
+  date: Date;
+  dateString: string;
+  dayNumber: number;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  events: CalendarEvent[];
+}
 
 @Component({
   selector: 'app-calendar-casa-blanca',
@@ -99,27 +94,31 @@ export const MY_DATE_FORMATS = {
   templateUrl: './calendar-casa-blanca.html',
   styleUrl: './calendar-casa-blanca.css'
 })
+
+
+
 export class CalendarCasaBlanca implements OnInit {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
   private eventosService = inject(EventosService);
 
-  // Inputs y Outputs
+  // Inputs opcionales (por si en algún escenario aún se pasan desde fuera)
   casasPadreInput = input<CasaOption[]>([], { alias: 'casasPadre' });
   yearsListInput = input<number[]>(
     Array.from({ length: 12 }, (_, i) => 2020 + i), { alias: 'yearsList' }
   );
   eventsInput = input<CalendarEvent[]>([], { alias: 'events' });
 
+  // Outputs opcionales (se siguen emitiendo por compatibilidad)
   eventCreated = output<CalendarEvent>();
   eventUpdated = output<CalendarEvent>();
   eventDeleted = output<string>();
 
-  // Signals de estado y catálogos
+  // Signals de estado y catálogos (integradas desde el controlador padre)
   secciones = signal<SectionOption[]>([]);
-  casasPadre = signal<CasaOption[]>([]);
+  casas = signal<CasaOption[]>([]);
+  misEventosDesdeApi = signal<CalendarEvent[]>([]);
   selectedSectionId = signal<number | null>(null);
-  storedEvents = signal<CalendarEvent[]>([]);
 
   estatusOptions = signal<EstatusOption[]>([
     { id: 1, nombre: 'Apartado' },
@@ -138,13 +137,16 @@ export class CalendarCasaBlanca implements OnInit {
   selectedDayDate = signal<string>('');
   currentDate = signal<Date>(new Date());
 
-  readonly daysOfWeek = DAYS_OF_WEEK;
-  readonly monthNames = MONTH_NAMES;
+  readonly daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  readonly monthNames = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
 
   // Signal computada: casas filtradas por la sección seleccionada
   availableHouses = computed(() => {
     const secId = Number(this.selectedSectionId());
-    const todasLasCasas = this.casasPadre();
+    const todasLasCasas = this.casas();
 
     if (!secId || !todasLasCasas.length) return [];
 
@@ -189,19 +191,19 @@ export class CalendarCasaBlanca implements OnInit {
   });
 
   constructor() {
-    // Sincronizar casas si el componente padre envía un catálogo completo
+    // Sincronización opcional si un componente padre envía casas por Input
     effect(() => {
       const inputCasas = this.casasPadreInput();
-      if (Array.isArray(inputCasas) && inputCasas.length > 0 && this.casasPadre().length === 0) {
-        this.casasPadre.set(inputCasas);
+      if (Array.isArray(inputCasas) && inputCasas.length > 0 && this.casas().length === 0) {
+        this.casas.set(inputCasas);
       }
     });
 
-    // Sincronizar eventos desde el padre
+    // Sincronización opcional si un componente padre envía eventos por Input
     effect(() => {
       const inputEvts = this.eventsInput();
-      if (inputEvts) {
-        this.storedEvents.set(inputEvts);
+      if (Array.isArray(inputEvts) && inputEvts.length > 0 && this.misEventosDesdeApi().length === 0) {
+        this.misEventosDesdeApi.set(inputEvts);
       }
     });
 
@@ -224,7 +226,14 @@ export class CalendarCasaBlanca implements OnInit {
   }
 
   ngOnInit(): void {
-    // Cargar secciones desde el servicio
+    this.cargarSecciones();
+    this.getCasas();
+    this.cargarEventos();
+  }
+
+  // --- MÉTODOS INTEGRADOS DEL CONTROLADOR PADRE ---
+
+  cargarSecciones(): void {
     this.eventosService.getSecciones().subscribe({
       next: (res: any) => {
         const lista = Array.isArray(res) ? res : (res?.data ?? res?.result ?? []);
@@ -232,18 +241,55 @@ export class CalendarCasaBlanca implements OnInit {
       },
       error: (err) => console.error('Error al cargar secciones:', err)
     });
+  }
 
-    // Cargar todas las casas desde el servicio
+  getCasas(): void {
+    // Nota: Si necesitas todas las secciones para el selector del modal, llama sin argumento: getCasas()
+    // Si solo deseas cargar la sección 1 como en el padre, usa getCasas(1)
     this.eventosService.getCasas().subscribe({
       next: (res: any) => {
         const lista = Array.isArray(res) ? res : (res?.data ?? res?.result ?? []);
         if (lista.length > 0) {
-          this.casasPadre.set(lista);
+          this.casas.set(lista);
         }
       },
       error: (err: any) => console.error('Error al cargar casas:', err)
     });
   }
+
+  cargarEventos(): void {
+    this.eventosService.getEventos().subscribe({
+      next: (eventosObtenidos: any) => {
+        const lista = Array.isArray(eventosObtenidos)
+          ? eventosObtenidos
+          : (eventosObtenidos?.data ?? eventosObtenidos?.result ?? []);
+        console.log('Eventos obtenidos desde la API:', lista);
+        this.misEventosDesdeApi.set(lista);
+      },
+      error: (err) => console.error('Error al cargar eventos:', err)
+    });
+  }
+
+  onEventCreated(nuevoEvento: CalendarEvent): void {
+    this.misEventosDesdeApi.update(lista => [...lista, nuevoEvento]);
+    this.eventCreated.emit(nuevoEvento);
+  }
+
+  onEventUpdated(eventoEditado: CalendarEvent): void {
+    this.misEventosDesdeApi.update(lista =>
+      lista.map(e => e.id === eventoEditado.id ? eventoEditado : e)
+    );
+    this.eventUpdated.emit(eventoEditado);
+  }
+
+  onEventDeleted(eventId: string): void {
+    this.misEventosDesdeApi.update(lista =>
+      lista.filter(e => e.id !== eventId)
+    );
+    this.eventDeleted.emit(eventId);
+  }
+
+  // --- MÉTODOS AUXILIARES Y DE INTERFAZ ---
 
   private extractSectionId(houseObj: any): number {
     if (!houseObj) return 0;
@@ -290,8 +336,7 @@ export class CalendarCasaBlanca implements OnInit {
     const event = this.eventToDelete();
     if (!event) return;
 
-    this.storedEvents.update(prev => prev.filter(e => e.id !== event.id));
-    this.eventDeleted.emit(event.id);
+    this.onEventDeleted(event.id);
 
     this.snackBar.open('Evento eliminado exitosamente', 'Cerrar', {
       duration: 3500,
@@ -460,7 +505,7 @@ export class CalendarCasaBlanca implements OnInit {
     const eventDateStr = this.toDateString(event.fechaEvento);
     this.selectedDayDate.set(eventDateStr);
 
-    const houseObj = this.casasPadre().find(c => Number(c.id) === Number(event.idInmueble));
+    const houseObj = this.casas().find(c => Number(c.id) === Number(event.idInmueble));
     const sectionId = this.extractSectionId(houseObj);
 
     this.selectedSectionId.set(sectionId > 0 ? sectionId : null);
@@ -505,40 +550,33 @@ export class CalendarCasaBlanca implements OnInit {
 
     const formValues = this.eventoForm.getRawValue();
     const inmuebleId = Number(formValues.idInmueble);
-    const houseObj = this.casasPadre().find(c => Number(c.id) === inmuebleId);
+    const houseObj = this.casas().find(c => Number(c.id) === inmuebleId);
 
     const fechaEventoStr = this.toDateString(formValues.fechaEvento);
     const fechaPagoStr = this.toDateString(formValues.fechaPago);
 
     if (this.isEditMode() && this.editingEventId() !== null) {
-      let updatedEvent: CalendarEvent | null = null;
+      const existingEvent = this.misEventosDesdeApi().find(e => e.id === this.editingEventId());
+      if (existingEvent) {
+        const updatedEvent: CalendarEvent = {
+          ...existingEvent,
+          idInmueble: inmuebleId,
+          idEstatusEvento: Number(formValues.idEstatusEvento),
+          fechaEvento: fechaEventoStr,
+          reciboNumero: String(formValues.reciboNumero || ''),
+          fechaPago: fechaPagoStr,
+          apartado: Number(formValues.apartado || 0),
+          liquida: Number(formValues.liquida || 0),
+          luz: Number(formValues.luz || 0),
+          depositoGarantia: Number(formValues.depositoGarantia || 0),
+          limpiezaDomingo: Number(formValues.limpiezaDomingo || 0),
+          rentaInmobiliario: Number(formValues.rentaInmobiliario || 0),
+          comentarios: formValues.comentarios || '',
+          houseName: houseObj?.name || '',
+          personName: houseObj?.nombre || ''
+        };
 
-      this.storedEvents.update(prev => prev.map(e => {
-        if (e.id === this.editingEventId()) {
-          updatedEvent = {
-            ...e,
-            idInmueble: inmuebleId,
-            idEstatusEvento: Number(formValues.idEstatusEvento),
-            fechaEvento: fechaEventoStr,
-            reciboNumero: String(formValues.reciboNumero || ''),
-            fechaPago: fechaPagoStr,
-            apartado: Number(formValues.apartado || 0),
-            liquida: Number(formValues.liquida || 0),
-            luz: Number(formValues.luz || 0),
-            depositoGarantia: Number(formValues.depositoGarantia || 0),
-            limpiezaDomingo: Number(formValues.limpiezaDomingo || 0),
-            rentaInmobiliario: Number(formValues.rentaInmobiliario || 0),
-            comentarios: formValues.comentarios || '',
-            houseName: houseObj?.name || '',
-            personName: houseObj?.nombre || ''
-          };
-          return updatedEvent;
-        }
-        return e;
-      }));
-
-      if (updatedEvent) {
-        this.eventUpdated.emit(updatedEvent);
+        this.onEventUpdated(updatedEvent);
       }
     } else {
       const colors = ['#4f46e5', '#059669', '#d97706', '#db2777', '#7c3aed'];
@@ -563,8 +601,7 @@ export class CalendarCasaBlanca implements OnInit {
         color: randomColor
       };
 
-      this.storedEvents.update(prev => [...prev, newEvent]);
-      this.eventCreated.emit(newEvent);
+      this.onEventCreated(newEvent);
     }
 
     this.snackBar.open('El evento se ha guardado con éxito', 'Cerrar', {
@@ -592,7 +629,7 @@ export class CalendarCasaBlanca implements OnInit {
   }
 
   private filterEventsForDate(dateStr: string): CalendarEvent[] {
-    return this.storedEvents().filter(e => {
+    return this.misEventosDesdeApi().filter(e => {
       const startDateStr = this.toDateString(e.fechaEvento);
       return startDateStr === dateStr;
     });

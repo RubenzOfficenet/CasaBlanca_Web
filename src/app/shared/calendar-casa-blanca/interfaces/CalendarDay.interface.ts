@@ -1,5 +1,5 @@
 
-import { CalendarEvent } from './CalendarEvent.ingterface';
+import { CalendarEvent } from './CalendarEvent.interface';
 
 export interface CalendarDay {
   date: Date;
