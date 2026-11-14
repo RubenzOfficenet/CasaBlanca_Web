@@ -24,6 +24,12 @@
                 <!-- Nuevo control de flujo nativo de Angular -->
                 @if (isSubmenuOpen()) {
                 <ul class="sub-menu">
+
+                    <li class="menu-item">
+                        <a routerLink="/shared/calendar-casa-blanca" routerLinkActive="active">
+                            📅 Calendario
+                        </a>
+                    </li>
                     
                     <li class="menu-item">
                         <a routerLink="/eventos/eventosingresos" routerLinkActive="active">
@@ -33,11 +39,6 @@
                     <li class="menu-item">
                         <a routerLink="/eventos/eventosegresos" routerLinkActive="active">
                             💷 Egresos
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a routerLink="/shared/calendar-casa-blanca" routerLinkActive="active">
-                            📅 Calendario
                         </a>
                     </li>
                     

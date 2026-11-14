@@ -1,4 +1,3 @@
-
 import { CalendarEvent } from './CalendarEvent.interface';
 
 export interface CalendarDay {
@@ -7,5 +6,5 @@ export interface CalendarDay {
   dayNumber: number;
   isCurrentMonth: boolean;
   isToday: boolean;
-  events: CalendarEvent[];  
+  events: CalendarEvent[];
 }

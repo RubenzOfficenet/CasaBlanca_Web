@@ -2,15 +2,22 @@ import { Component, signal, computed, inject, input, output, effect, OnInit } fr
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
-
 import { MatSelectModule } from '@angular/material/select';
 import { EventosService } from './services/eventos-service';
+
+import { EstatusOption } from './interfaces/EstatusOption.interace';
+import { SectionOption } from './interfaces/SectionOption.interface';
+import { CasaOption } from './interfaces/CasaOption.interface';
+import { CalendarEvent } from './interfaces/CalendarEvent.interface';
+import { CalendarDay } from './interfaces/CalendarDay.interface';
+
+import { DAYS_OF_WEEK, MONTH_NAMES } from '../../Constants/app.constants';
+
 
 export const MY_DATE_FORMATS = {
   parse: {
@@ -24,54 +31,6 @@ export const MY_DATE_FORMATS = {
   },
 };
 
-export interface EstatusOption {
-  id: number;
-  nombre: string;
-}
-
-export interface SectionOption {
-  id: number;
-  name: string;
-}
-
-export interface CasaOption {
-  id: number;
-  sectionId?: number;
-  idSeccion?: number;
-  seccionId?: number;
-  name: string;
-  nombre: string;
-}
-
-export interface CalendarEvent {
-  id: string;
-  idInmueble: number;
-  idEstatusEvento: number;
-  fechaEvento: string;
-  reciboNumero: string;
-  fechaPago: string;
-  apartado: number;
-  liquida: number;
-  luz: number;
-  depositoGarantia: number;
-  limpiezaDomingo: number;
-  rentaInmobiliario: number;
-  comentarios: string;
-
-  // Propiedades auxiliares de presentación UI
-  houseName?: string;
-  personName?: string;
-  color?: string;
-}
-
-export interface CalendarDay {
-  date: Date;
-  dateString: string;
-  dayNumber: number;
-  isCurrentMonth: boolean;
-  isToday: boolean;
-  events: CalendarEvent[];
-}
 
 @Component({
   selector: 'app-calendar-casa-blanca',
@@ -94,9 +53,6 @@ export interface CalendarDay {
   templateUrl: './calendar-casa-blanca.html',
   styleUrl: './calendar-casa-blanca.css'
 })
-
-
-
 export class CalendarCasaBlanca implements OnInit {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
@@ -137,12 +93,10 @@ export class CalendarCasaBlanca implements OnInit {
   selectedDayDate = signal<string>('');
   currentDate = signal<Date>(new Date());
 
-  readonly daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-  readonly monthNames = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-  ];
+  readonly daysOfWeek = DAYS_OF_WEEK; 
+  readonly monthNames = MONTH_NAMES; 
 
+  
   // Signal computada: casas filtradas por la sección seleccionada
   availableHouses = computed(() => {
     const secId = Number(this.selectedSectionId());
