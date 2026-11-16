@@ -69,8 +69,9 @@
           }
         </div>
 
+        <!-- TARJETA DE EVENTOS DEL DÍA -->
         <div class="events-list custom-scrollbar">
-          @for (event of day.events; track event.id) {
+          <!-- @for (event of day.events; track event.id) {
           <div (click)="onEventClick(event, $event)" [style.borderLeftColor]="event.color" class="event-card"
             title="Haz clic para editar este evento">
 
@@ -83,8 +84,36 @@
               <button (click)="requestDeleteEvent(event, $event)" class="btn-delete-event" title="Eliminar">✕</button>
             </div>
           </div>
-          }
+          } -->
+@for (event of day.events; track event.id) {
+<div (click)="onEventClick(event, $event)" 
+  [style.borderLeftColor]="event.idEstatusEvento === 2 ? '#059669' : (event.idEstatusEvento === 3 ? '#dc2626' : '#4f46e5')" 
+  class="event-card"
+  title="Haz clic para editar este evento">
+
+  <!-- Línea 1: Recibo y Estatus -->
+  <div class="event-title">
+    Recibo: {{ event.reciboNumero }} - {{ event.estatusEvento }}
+  </div>
+
+  <!-- Línea 2: Icono de casa, Ubicación, Número de casa y Nombre completo -->
+  <div class="event-house">
+    🏠 {{ event.nombreUbicacion }} - {{ event.numeroCasa }}
+    @if (event.nombre || event.apellidos) {
+      - {{ event.nombre }} {{ event.apellidos }}
+    }
+  </div>
+
+  <!-- Línea 3: Montos y botón de eliminar -->
+  <div class="event-time">
+    <span>Apartado: ${{ event.apartado }} | Liquida: ${{ event.liquida }}</span>
+    <button (click)="requestDeleteEvent(event, $event)" class="btn-delete-event" title="Eliminar">✕</button>
+  </div>
+</div>
+}     
         </div>
+
+
       </div>
       }
     </div>
@@ -104,12 +133,13 @@
 
         <!-- Fila 1: Datos principales de la reserva (3 columnas) -->
         <div class="form-row grid-3">
+          
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Sección / Ubicación *</mat-label>
             <mat-select formControlName="idSeccion">
               <mat-option [value]="0" disabled>Seleccione sección...</mat-option>
-              @for (sec of secciones(); track sec.id) {
-              <mat-option [value]="sec.id">{{ sec.name }}</mat-option>
+              @for (sec of ubicacionList; track sec.id) {
+              <mat-option [value]="sec.id">{{ sec.nombreUbicacion }}</mat-option>
               }
             </mat-select>
           </mat-form-field>

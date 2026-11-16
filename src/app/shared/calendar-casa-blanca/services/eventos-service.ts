@@ -6,33 +6,35 @@ import { Observable, of } from 'rxjs';
 import { CalendarEvent  } from '../interfaces/CalendarEvent.interface';
 import { CasaOption     } from '../interfaces/CasaOption.interface';
 import { SectionOption  } from '../interfaces/SectionOption.interface';
+import { EventoCalendarYearMont } from '../interfaces/EventoCalendarYearMont.interface';
+
+import { APP_CONSTANTS } from '../../../Constants/app.constants';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventosService {
   private http = inject(HttpClient);
-  private apiUrl = '/api/eventos'; // Ajustar con el endpoint correspondiente
+
+  private readonly _apiUrl = APP_CONSTANTS.URL_LOCAL;
+
+  eventos : EventoCalendarYearMont[] = [];
+
 
   Evento(evento: CalendarEvent): Observable<CalendarEvent> {
-    return this.http.post<CalendarEvent>(this.apiUrl, evento);
+    return this.http.post<CalendarEvent>(this._apiUrl, evento);
   }
 
   updateEvento(evento: CalendarEvent): Observable<CalendarEvent> {
-    return this.http.put<CalendarEvent>(`${this.apiUrl}/${evento.id}`, evento);
+    return this.http.put<CalendarEvent>(`${this._apiUrl}/${evento.id}`, evento);
   }
 
   deleteEvento(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this._apiUrl}/${id}`);
   }
 
   // Obtener la lista de casas
   getCasas(sectionId?: number): Observable<CasaOption[]> {
-    // -------------------------------------------------------------------------
-    // Llamado real al Web API con HttpParams (descomentar al conectar backend):
-    // const options = sectionId ? { params: new HttpParams().set('sectionId', sectionId) } : {};
-    // return this.http.get<CasaOption[]>(this.apiCasasUrl, options);
-    // -------------------------------------------------------------------------
 
     const mockCasas: CasaOption[] = [
       { id: 101, sectionId: 1, name: '1-A', nombre: 'Juan' },
@@ -51,6 +53,8 @@ export class EventosService {
     return of(result);
   }
 
+
+
   // Obtener la lista de secciones
   getSecciones(): Observable<SectionOption[]> {
     // -------------------------------------------------------------------------
@@ -66,100 +70,11 @@ export class EventosService {
     return of(mockSecciones);
   }
 
-  getEventos(): Observable<CalendarEvent[]> {
-    const mockEvents: CalendarEvent[] = [
-      {
-        id: 'evt-101',
-        idInmueble: 101,
-        idEstatusEvento: 1,
-        fechaEvento: '2026-11-15',
-        reciboNumero: '1001',
-        fechaPago: '2026-11-01',
-        apartado: 1500.00,
-        liquida: 3500.00,
-        luz: 250.00,
-        depositoGarantia: 1000.00,
-        limpiezaDomingo: 200.00,
-        rentaInmobiliario: 0.00,
-        comentarios: 'Apartado realizado para evento familiar. Pendiente saldo de liquidación.',
-        houseName: 'Casa 1-A',
-        personName: 'Juan Pérez',
-        color: '#4f46e5'
-      },
-      {
-        id: 'evt-102',
-        idInmueble: 102,
-        idEstatusEvento: 2,
-        fechaEvento: '2026-11-18',
-        reciboNumero: '1002',
-        fechaPago: '2026-11-05',
-        apartado: 2000.00,
-        liquida: 0.00,
-        luz: 300.00,
-        depositoGarantia: 1500.00,
-        limpiezaDomingo: 200.00,
-        rentaInmobiliario: 500.00,
-        comentarios: 'Pago completo recibido. Incluye renta de mobiliario adicional.',
-        houseName: 'Casa 2-B',
-        personName: 'Pedro Gómez',
-        color: '#059669'
-      },
-      {
-        id: 'evt-103',
-        idInmueble: 103,
-        idEstatusEvento: 1,
-        fechaEvento: '2026-11-22',
-        reciboNumero: '1003',
-        fechaPago: '2026-11-08',
-        apartado: 1000.00,
-        liquida: 4000.00,
-        luz: 0.00,
-        depositoGarantia: 1000.00,
-        limpiezaDomingo: 200.00,
-        rentaInmobiliario: 0.00,
-        comentarios: 'Cliente solicita confirmación de limpieza de domingo.',
-        houseName: 'Casa 3-C',
-        personName: 'María López',
-        color: '#d97706'
-      },
-      {
-        id: 'evt-104',
-        idInmueble: 201,
-        idEstatusEvento: 3,
-        fechaEvento: '2026-11-25',
-        reciboNumero: '1004',
-        fechaPago: '2026-11-02',
-        apartado: 500.00,
-        liquida: 0.00,
-        luz: 0.00,
-        depositoGarantia: 0.00,
-        limpiezaDomingo: 0.00,
-        rentaInmobiliario: 0.00,
-        comentarios: 'Evento cancelado por el cliente. Devolución de depósito no aplicable.',
-        houseName: 'Casa 16-A',
-        personName: 'Martha Sánchez',
-        color: '#db2777'
-      },
-      {
-        id: 'evt-105',
-        idInmueble: 202,
-        idEstatusEvento: 2,
-        fechaEvento: '2026-11-28',
-        reciboNumero: '1005',
-        fechaPago: '2026-11-09',
-        apartado: 2500.00,
-        liquida: 0.00,
-        luz: 400.00,
-        depositoGarantia: 2000.00,
-        limpiezaDomingo: 250.00,
-        rentaInmobiliario: 800.00,
-        comentarios: 'Reserva para fin de año liquidad con depósito de garantía completo.',
-        houseName: 'Casa 44-C',
-        personName: 'Carlos Ramírez',
-        color: '#7c3aed'
-      }
-    ];
 
-    return of(mockEvents);
-  }
+
+getCalendarEventsByYearMonth(year: number, month: number): Observable<EventoCalendarYearMont[]> {
+  return this.http.get<EventoCalendarYearMont[]>(`${this._apiUrl}GetEventosCalendario?year=${year}&month=${month}`);
 }
+
+
+} // END CLASS
