@@ -1,23 +1,28 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 
 import { CalendarEvent  } from '../interfaces/CalendarEvent.interface';
-import { CasaOption     } from '../interfaces/CasaOption.interface';
+import { CasasList     } from '../interfaces/ICasasList.interfgace';
 import { SectionOption  } from '../interfaces/SectionOption.interface';
 import { EventoCalendarYearMont } from '../interfaces/EventoCalendarYearMont.interface';
 
 import { APP_CONSTANTS } from '../../../Constants/app.constants';
+import { InmuebleEditarDTO } from '../../../Models/InmuebleEditarDTO.model';
+import { InmueblesServices } from '../../../pages/inmuebles/services/inmuebles-services';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventosService {
   private http = inject(HttpClient);
-
+  private readonly catalogosService = inject(InmueblesServices);
+  private readonly apiSeccionesUrl = APP_CONSTANTS.URL_LOCAL + 'GetAllUbicaciones'
   private readonly _apiUrl = APP_CONSTANTS.URL_LOCAL;
+  private readonly _http = inject(HttpClient);
 
+  inmuebleSeleccionado = signal<InmuebleEditarDTO | null>(null);
   eventos : EventoCalendarYearMont[] = [];
 
 
@@ -34,24 +39,10 @@ export class EventosService {
   }
 
   // Obtener la lista de casas
-  getCasas(sectionId?: number): Observable<CasaOption[]> {
-
-    const mockCasas: CasaOption[] = [
-      { id: 101, sectionId: 1, name: '1-A', nombre: 'Juan' },
-      { id: 102, sectionId: 1, name: '2-B', nombre: 'Pedro' },
-      { id: 103, sectionId: 1, name: '3-C', nombre: 'Maria' },
-      { id: 104, sectionId: 1, name: '4-H', nombre: 'Jose' },
-      { id: 201, sectionId: 2, name: '16-A', nombre: 'Martha' },
-      { id: 202, sectionId: 2, name: '44-C', nombre: 'Carlos' },
-      { id: 203, sectionId: 2, name: '22-A', nombre: 'Ana' }
-    ];
-
-    const result = sectionId !== undefined
-      ? mockCasas.filter(casa => casa.sectionId === sectionId)
-      : mockCasas;
-
-    return of(result);
-  }
+getCasas(sectionId: number): Observable<CasasList[]> {
+  const url = `${this._apiUrl}GetCasasByUbicacion?IdUbicacion=${sectionId}`;
+  return this._http.get<CasasList[]>(url);
+}
 
 
 

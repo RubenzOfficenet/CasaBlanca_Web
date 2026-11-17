@@ -71,48 +71,33 @@
 
         <!-- TARJETA DE EVENTOS DEL DÍA -->
         <div class="events-list custom-scrollbar">
-          <!-- @for (event of day.events; track event.id) {
-          <div (click)="onEventClick(event, $event)" [style.borderLeftColor]="event.color" class="event-card"
+          @for (event of day.events; track event.id) {
+          <div (click)="onEventClick(event, $event)" 
+            [style.borderLeftColor]="event.idEstatusEvento === 2 ? '#059669' : (event.idEstatusEvento === 3 ? '#dc2626' : '#4f46e5')" 
+            class="event-card"
             title="Haz clic para editar este evento">
 
-            <div class="event-title">Recibo: {{ event.reciboNumero }}</div>
-            <div class="event-house">
-              🏠 {{ event.houseName || event.idInmueble }} {{ event.personName ? '(' + event.personName + ')' : '' }}
+            <!-- Línea 1: Recibo y Estatus -->
+            <div class="event-title">
+              Recibo: {{ event.reciboNumero }} - {{ event.estatusEvento }}
             </div>
+
+            <!-- Línea 2: Icono de casa, Ubicación, Número de casa y Nombre completo -->
+            <div class="event-house">
+              🏠 {{ event.nombreUbicacion }} - {{ event.numeroCasa }}
+              @if (event.nombre || event.apellidos) {
+                - {{ event.nombre }} {{ event.apellidos }}
+              }
+            </div>
+
+            <!-- Línea 3: Montos y botón de eliminar -->
             <div class="event-time">
               <span>Apartado: ${{ event.apartado }} | Liquida: ${{ event.liquida }}</span>
               <button (click)="requestDeleteEvent(event, $event)" class="btn-delete-event" title="Eliminar">✕</button>
             </div>
           </div>
-          } -->
-@for (event of day.events; track event.id) {
-<div (click)="onEventClick(event, $event)" 
-  [style.borderLeftColor]="event.idEstatusEvento === 2 ? '#059669' : (event.idEstatusEvento === 3 ? '#dc2626' : '#4f46e5')" 
-  class="event-card"
-  title="Haz clic para editar este evento">
-
-  <!-- Línea 1: Recibo y Estatus -->
-  <div class="event-title">
-    Recibo: {{ event.reciboNumero }} - {{ event.estatusEvento }}
-  </div>
-
-  <!-- Línea 2: Icono de casa, Ubicación, Número de casa y Nombre completo -->
-  <div class="event-house">
-    🏠 {{ event.nombreUbicacion }} - {{ event.numeroCasa }}
-    @if (event.nombre || event.apellidos) {
-      - {{ event.nombre }} {{ event.apellidos }}
-    }
-  </div>
-
-  <!-- Línea 3: Montos y botón de eliminar -->
-  <div class="event-time">
-    <span>Apartado: ${{ event.apartado }} | Liquida: ${{ event.liquida }}</span>
-    <button (click)="requestDeleteEvent(event, $event)" class="btn-delete-event" title="Eliminar">✕</button>
-  </div>
-</div>
-}     
+          }
         </div>
-
 
       </div>
       }
@@ -146,14 +131,14 @@
 
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Inmueble / Casa *</mat-label>
-            <mat-select formControlName="idInmueble">
-              <mat-option [value]="0" disabled>
-                {{ !selectedSectionId() ? 'Seleccione sección primero' : (availableHouses().length === 0 ? 'Sin casas en esta sección' : 'Seleccione casa...') }}
-              </mat-option>
-              @for (casa of availableHouses(); track casa.id) {
-              <mat-option [value]="casa.id">{{ casa.name }}{{ casa.nombre ? ' - ' + casa.nombre : '' }}</mat-option>
-              }
-            </mat-select>
+      <mat-select formControlName="idInmueble">
+        <mat-option [value]="0" disabled>
+          {{ !selectedSectionId() ? 'Seleccione sección primero' : (casasList().length === 0 ? 'Sin casas en esta sección' : 'Seleccione casa...') }}
+        </mat-option>
+        @for (casa of casasList(); track casa.id) {
+        <mat-option [value]="casa.id">{{ casa.numeroCasa }}</mat-option>
+        }
+      </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="w-100">

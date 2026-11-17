@@ -19,6 +19,8 @@ import { EventoCalendarYearMont } from './interfaces/EventoCalendarYearMont.inte
 import { DAYS_OF_WEEK, MONTH_NAMES, MY_DATE_FORMATS } from '../../Constants/app.constants';
 import { Ubicacion } from '../../pages/eventos/Model/ubicacion.interface';
 import { EventosingresoService } from '../../pages/eventos/services/eventosingresoService';
+import { InmueblesServices } from '../../pages/inmuebles/services/inmuebles-services';
+import { CasasList } from './interfaces/ICasasList.interfgace';
 
 @Component({
   selector: 'app-calendar-casa-blanca',
@@ -46,25 +48,26 @@ export class CalendarCasaBlanca implements OnInit {
   private snackBar = inject(MatSnackBar);
   private eventosService = inject(EventosService);
   private readonly catalogosService = inject(EventosingresoService);
-  
-  ubicacionList : Ubicacion[] = [] ;
+  private readonly inmueblesServices = inject(InmueblesServices);
 
+  ubicacionList: Ubicacion[] = [];
 
-  // Inputs opcionales (por si en algún escenario aún se pasan desde fuera)
+  // Inputs opcionales
   casasPadreInput = input<CasaOption[]>([], { alias: 'casasPadre' });
   yearsListInput = input<number[]>(
     Array.from({ length: 12 }, (_, i) => 2020 + i), { alias: 'yearsList' }
   );
   eventsInput = input<EventoCalendarYearMont[]>([], { alias: 'events' });
 
-  // Outputs opcionales (se siguen emitiendo por compatibilidad)
+  // Outputs opcionales
   eventCreated = output<EventoCalendarYearMont>();
   eventUpdated = output<EventoCalendarYearMont>();
   eventDeleted = output<number>();
 
-  // Signals de estado y catálogos (integradas desde el controlador padre)
+  // Signals de estado y catálogos
   secciones = signal<SectionOption[]>([]);
-  casas = signal<CasaOption[]>([]);
+  casasList = signal<CasasList[]>([]);
+  casas = signal<EventoCalendarYearMont[]>([]);
   misEventosDesdeApi = signal<EventoCalendarYearMont[]>([]);
   selectedSectionId = signal<number | null>(null);
 
@@ -91,7 +94,7 @@ export class CalendarCasaBlanca implements OnInit {
   // Signal computada: casas filtradas por la sección seleccionada
   availableHouses = computed(() => {
     const secId = Number(this.selectedSectionId());
-    const todasLasCasas = this.casas();
+    const todasLasCasas = this.casasList();
 
     if (!secId || !todasLasCasas.length) return [];
 
@@ -105,7 +108,7 @@ export class CalendarCasaBlanca implements OnInit {
         c.SeccionId ??
         c.seccion?.id;
 
-      return Number(rawSecId) === secId;
+      return rawSecId === undefined || Number(rawSecId) === secId;
     });
   });
 
@@ -135,18 +138,14 @@ export class CalendarCasaBlanca implements OnInit {
     comentarios: ['']
   });
 
-  EventoCalendar: EventoCalendarYearMont[] = [];
-
   constructor() {
-    // Sincronización opcional si un componente padre envía casas por Input
     effect(() => {
       const inputCasas = this.casasPadreInput();
-      if (Array.isArray(inputCasas) && inputCasas.length > 0 && this.casas().length === 0) {
-        this.casas.set(inputCasas);
+      if (Array.isArray(inputCasas) && inputCasas.length > 0 && this.casasList().length === 0) {
+        this.casasList.set(inputCasas as unknown as CasasList[]);
       }
     });
 
-    // Sincronización opcional si un componente padre envía eventos por Input
     effect(() => {
       const inputEvts = this.eventsInput();
       if (Array.isArray(inputEvts) && inputEvts.length > 0 && this.misEventosDesdeApi().length === 0) {
@@ -154,13 +153,11 @@ export class CalendarCasaBlanca implements OnInit {
       }
     });
 
-    // Recarga automática al cambiar el año o mes en currentDate
     effect(() => {
       const fecha = this.currentDate();
       this.cargarEventos(fecha.getFullYear(), fecha.getMonth() + 1);
     });
 
-    // Suscripción directa al cambio de sección en el formulario
     this.eventoForm.get('idSeccion')?.valueChanges.subscribe(value => {
       const sectionId = Number(value);
       const isValid = !isNaN(sectionId) && sectionId > 0;
@@ -169,29 +166,26 @@ export class CalendarCasaBlanca implements OnInit {
 
       const inmuebleCtrl = this.eventoForm.get('idInmueble');
       inmuebleCtrl?.setValue(0, { emitEvent: false });
-
-      if (isValid && this.availableHouses().length > 0) {
-        inmuebleCtrl?.enable({ emitEvent: false });
+      inmuebleCtrl?.disable({ emitEvent: false });
+debugger;
+      if (isValid) {
+        this.getCasas(sectionId);
       } else {
-        inmuebleCtrl?.disable({ emitEvent: false });
+        this.casasList.set([]);
       }
     });
   }
 
   ngOnInit(): void {
     this.cargarSecciones();
-    //this.getCasas();
   }
-
-  // --- MÉTODOS INTEGRADOS DEL CONTROLADOR PADRE ---
 
   cargarSecciones(): void {
     this.catalogosService.leeSecciones().subscribe({
       next: (res: any) => {
-        this.ubicacionList = Array.isArray(res) 
-          ? res 
+        this.ubicacionList = Array.isArray(res)
+          ? res
           : (res?.data ?? res?.result ?? []);
-          console.log('Secciones obtenidas desde la API:', this.ubicacionList);
       },
       error: (err) => {
         console.error('Error al cargar las ubicaciones:', err);
@@ -199,15 +193,25 @@ export class CalendarCasaBlanca implements OnInit {
     });
   }
 
-  getCasas(sectionId?: number): void {
+  getCasas(sectionId: number): void {
     this.eventosService.getCasas(sectionId).subscribe({
       next: (res: any) => {
         const lista = Array.isArray(res) ? res : (res?.data ?? res?.result ?? []);
+        debugger;
+        this.casasList.set(lista);
+
+        const inmuebleCtrl = this.eventoForm.get('idInmueble');
         if (lista.length > 0) {
-          this.casas.set(lista);
+          inmuebleCtrl?.enable({ emitEvent: false });
+        } else {
+          inmuebleCtrl?.disable({ emitEvent: false });
         }
       },
-      error: (err: any) => console.error('Error al cargar casas:', err)
+      error: (err: any) => {
+        console.error('Error al cargar casas:', err);
+        this.casasList.set([]);
+        this.eventoForm.get('idInmueble')?.disable({ emitEvent: false });
+      }
     });
   }
 
@@ -217,9 +221,6 @@ export class CalendarCasaBlanca implements OnInit {
         const lista = Array.isArray(EventoCalendar)
           ? EventoCalendar
           : (EventoCalendar?.data ?? EventoCalendar?.result ?? []);
-
-        console.log('Eventos obtenidos desde la API:', lista);
-
         this.misEventosDesdeApi.set(lista);
       },
       error: (err) => console.error('Error al cargar eventos:', err)
@@ -244,8 +245,6 @@ export class CalendarCasaBlanca implements OnInit {
     );
     this.eventDeleted.emit(eventId);
   }
-
-  // --- MÉTODOS AUXILIARES Y DE INTERFAZ ---
 
   private extractSectionId(houseObj: any): number {
     if (!houseObj) return 0;
@@ -311,13 +310,6 @@ export class CalendarCasaBlanca implements OnInit {
     const month = this.monthNames[date.getMonth()];
     const year = date.getFullYear();
     return `${dayName}, ${dayNumber} de ${month} de ${year}`;
-  });
-
-  currentMonthYearTitle = computed(() => {
-    const date = this.currentDate();
-    const month = this.monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    return `${month} ${year}`;
   });
 
   activeWeekNumber = computed(() => {
@@ -413,16 +405,6 @@ export class CalendarCasaBlanca implements OnInit {
     this.currentDate.set(new Date());
   }
 
-  previousMonth(): void {
-    const current = this.currentDate();
-    this.currentDate.set(new Date(current.getFullYear(), current.getMonth() - 1, 1));
-  }
-
-  nextMonth(): void {
-    const current = this.currentDate();
-    this.currentDate.set(new Date(current.getFullYear(), current.getMonth() + 1, 1));
-  }
-
   onRightClick(event: MouseEvent, day: CalendarDay): void {
     event.preventDefault();
     this.isEditMode.set(false);
@@ -432,6 +414,7 @@ export class CalendarCasaBlanca implements OnInit {
     const targetDate = day.dateString ? this.parseToDate(day.dateString) : new Date();
 
     this.selectedSectionId.set(null);
+    this.casasList.set([]);
 
     this.eventoForm.reset({
       idSeccion: 0,
@@ -461,16 +444,13 @@ export class CalendarCasaBlanca implements OnInit {
     const eventDateStr = this.toDateString(event.fechaEvento);
     this.selectedDayDate.set(eventDateStr);
 
-    const houseObj = this.casas().find(c => Number(c.id) === Number(event.idInmueble));
-    const sectionId = this.extractSectionId(houseObj);
+    const houseObj = this.casasList().find(c => Number(c.id) === Number(event.idInmueble));
+    const sectionId = Number(event.idUbicacion) || this.extractSectionId(houseObj);
 
     this.selectedSectionId.set(sectionId > 0 ? sectionId : null);
 
-    const inmuebleCtrl = this.eventoForm.get('idInmueble');
-    if (sectionId > 0 && this.availableHouses().length > 0) {
-      inmuebleCtrl?.enable({ emitEvent: false });
-    } else {
-      inmuebleCtrl?.disable({ emitEvent: false });
+    if (sectionId > 0) {
+      this.getCasas(sectionId);
     }
 
     this.eventoForm.patchValue({
@@ -510,7 +490,7 @@ export class CalendarCasaBlanca implements OnInit {
     const estatusId = Number(formValues.idEstatusEvento);
 
     const houseObj = this.casas().find(c => Number(c.id) === inmuebleId);
-    const seccionObj = this.secciones().find(s => Number(s.id) === seccionId);
+    const ubicacionObj = this.ubicacionList.find(u => Number(u.id) === seccionId);
     const estatusObj = this.estatusOptions().find(e => Number(e.id) === estatusId);
 
     const fechaEventoStr = this.toDateString(formValues.fechaEvento);
@@ -534,9 +514,9 @@ export class CalendarCasaBlanca implements OnInit {
           limpiezaDomingo: Number(formValues.limpiezaDomingo || 0),
           rentaInmobiliario: Number(formValues.rentaInmobiliario || 0),
           comentarios: formValues.comentarios || '',
-          numeroCasa: houseObj?.name || existingEvent.numeroCasa,
+          numeroCasa: houseObj?.numeroCasa || existingEvent.numeroCasa,
           idUbicacion: seccionId || existingEvent.idUbicacion,
-          nombreUbicacion: seccionObj?.name || existingEvent.nombreUbicacion,
+          nombreUbicacion: ubicacionObj?.nombreUbicacion || existingEvent.nombreUbicacion,
           nombre: houseObj?.nombre ?? existingEvent.nombre
         };
 
@@ -544,7 +524,7 @@ export class CalendarCasaBlanca implements OnInit {
       }
     } else {
       const newEvent: EventoCalendarYearMont = {
-        id: Date.now(), // Número temporal hasta que se guarde en la BD
+        id: Date.now(),
         idInmueble: inmuebleId,
         idEstatusEvento: estatusId,
         estatusEvento: estatusObj?.nombre || '',
@@ -559,11 +539,11 @@ export class CalendarCasaBlanca implements OnInit {
         rentaInmobiliario: Number(formValues.rentaInmobiliario || 0),
         comentarios: formValues.comentarios || '',
         idCasa: inmuebleId,
-        numeroCasa: houseObj?.name || '',
+        numeroCasa: houseObj?.numeroCasa || '',
         idUbicacion: seccionId,
-        nombreUbicacion: seccionObj?.name || '',
+        nombreUbicacion: ubicacionObj?.nombreUbicacion || '',
         borrado: false,
-        nombre: houseObj?.nombre ?? null,
+        nombre: houseObj?.nombre || null,
         apellidos: null
       };
 
