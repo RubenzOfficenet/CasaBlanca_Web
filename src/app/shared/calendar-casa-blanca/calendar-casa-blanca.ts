@@ -317,6 +317,34 @@ export class CalendarCasaBlanca implements OnInit {
     const event = this.eventToDelete();
     if (!event) return;
 
+  // Aquí consumes el servicio que llama al endpoint DELETE en tu API
+  this.catalogosService.deleteEventosIngresoById(event.id).subscribe({ 
+    next: () => {
+      // 1. Actualiza la lista local y notifica al componente padre
+      this.onEventDeleted(event.id);
+
+      // 2. Muestra confirmación visual
+      this.snackBar.open('Evento eliminado exitosamente', 'Cerrar', {
+        duration: 3500,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['snackbar-success']
+      });
+
+      // 3. Cierra el modal y limpia eventToDelete
+      this.cancelDelete();
+    },
+    error: (err) => {
+      console.error('Error al eliminar el evento:', err);
+      this.snackBar.open('Ocurrió un error al eliminar el evento', 'Cerrar', {
+        duration: 4000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom'
+      });
+    }
+  });
+
+
     this.onEventDeleted(event.id);
 
     this.snackBar.open('Evento eliminado exitosamente', 'Cerrar', {
