@@ -2,7 +2,7 @@ export interface EventoAddRequest {
     idInmueble: number;
     idEstatusEvento: number;
     fechaEvento: string;
-    reciboNumero: number;
+    reciboNumero: string;
     fechaPago: string;
     apartado: number;
     liquida: number;

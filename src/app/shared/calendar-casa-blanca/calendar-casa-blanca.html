@@ -98,6 +98,7 @@
           </div>
           }
         </div>
+        
 
       </div>
       }
@@ -145,8 +146,8 @@
             <mat-label>Estatus del Evento *</mat-label>
             <mat-select formControlName="idEstatusEvento">
               <mat-option [value]="0" disabled>Seleccione estatus...</mat-option>
-              @for (est of estatusOptions(); track est.id) {
-              <mat-option [value]="est.id">{{ est.nombre }}</mat-option>
+              @for (est of estatusList(); track est.id) {
+              <mat-option [value]="est.id">{{ est.estatusEvento }}</mat-option>
               }
             </mat-select>
           </mat-form-field>

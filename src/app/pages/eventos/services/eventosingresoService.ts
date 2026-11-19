@@ -8,6 +8,7 @@ import { Ubicacion } from '../Model/ubicacion.interface';
 import { EstatusEvento } from '../Model/estatusEvento.interface';
 import { IEventoIngresoEdit } from '../interface/EventoIngreso.interface';
 import { IEventoIngresoUpdate } from '../interface/eventooingresoUpdate.interface';
+import { JsonPipe } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -26,6 +27,7 @@ export class EventosingresoService {
 
   agregaEvento(eventoDTO: EventoAddRequest): Observable<number> {
     const url = this._apiUrl + 'AddEventoIngreso';
+    console.log(eventoDTO);
     debugger;
     return this._http.post<number>(url, eventoDTO);
   }
@@ -48,6 +50,7 @@ export class EventosingresoService {
   }
 
   updateEventosIngresoById(eventoIngresoUpdate: IEventoIngresoUpdate) {
+    debugger;
     const url = this._apiUrl + 'UpdateEventoingreso';
     return this._http.put<IEventoIngresoUpdate>(url, eventoIngresoUpdate);
   }

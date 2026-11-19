@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 
-import { CalendarEvent  } from '../interfaces/CalendarEvent.interface';
-import { CasasList     } from '../interfaces/ICasasList.interfgace';
-import { SectionOption  } from '../interfaces/SectionOption.interface';
+import { CalendarEvent } from '../interfaces/CalendarEvent.interface';
+import { CasasList } from '../interfaces/ICasasList.interfgace';
+import { SectionOption } from '../interfaces/SectionOption.interface';
 import { EventoCalendarYearMont } from '../interfaces/EventoCalendarYearMont.interface';
 
 import { APP_CONSTANTS } from '../../../Constants/app.constants';
@@ -23,7 +23,7 @@ export class EventosService {
   private readonly _http = inject(HttpClient);
 
   inmuebleSeleccionado = signal<InmuebleEditarDTO | null>(null);
-  eventos : EventoCalendarYearMont[] = [];
+  eventos: EventoCalendarYearMont[] = [];
 
 
   Evento(evento: CalendarEvent): Observable<CalendarEvent> {
@@ -39,10 +39,10 @@ export class EventosService {
   }
 
   // Obtener la lista de casas
-getCasas(sectionId: number): Observable<CasasList[]> {
-  const url = `${this._apiUrl}GetCasasByUbicacion?IdUbicacion=${sectionId}`;
-  return this._http.get<CasasList[]>(url);
-}
+  getCasas(sectionId: number): Observable<CasasList[]> {
+    const url = `${this._apiUrl}GetCasasByUbicacion?IdUbicacion=${sectionId}`;
+    return this._http.get<CasasList[]>(url);
+  }
 
 
 
@@ -63,9 +63,13 @@ getCasas(sectionId: number): Observable<CasasList[]> {
 
 
 
-getCalendarEventsByYearMonth(year: number, month: number): Observable<EventoCalendarYearMont[]> {
-  return this.http.get<EventoCalendarYearMont[]>(`${this._apiUrl}GetEventosCalendario?year=${year}&month=${month}`);
-}
+  getCalendarEventsByYearMonth(year: number, month: number): Observable<EventoCalendarYearMont[]> {
+    const url = `${this._apiUrl}GetEventosCalendario?year=${year}&month=${month}`;
+    debugger;
+    return this.http.get<EventoCalendarYearMont[]>(`${this._apiUrl}GetEventosCalendario?year=${year}&month=${month}`);
+  }
 
+
+  
 
 } // END CLASS

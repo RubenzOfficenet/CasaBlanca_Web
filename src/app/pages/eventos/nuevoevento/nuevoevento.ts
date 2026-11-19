@@ -192,7 +192,7 @@ export class Nuevoevento implements OnInit, AfterViewInit {
       idInmueble: datos.idinmueble,
       idEstatusEvento: datos.idestatusevento,
       fechaEvento: datos.fechaevento,
-      reciboNumero: Number(datos.recibonumero),
+      reciboNumero: datos.recibonumero,
       fechaPago: datos.fechapago,
       apartado: Number(datos.apartado),
       liquida: Number(datos.liquida),

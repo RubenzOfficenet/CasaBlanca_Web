@@ -10,7 +10,6 @@ import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, provideNativeDateAdapter } from '@an
 import { MatSelectModule } from '@angular/material/select';
 import { EventosService } from './services/eventos-service';
 
-import { EstatusOption } from './interfaces/EstatusOption.interace';
 import { SectionOption } from './interfaces/SectionOption.interface';
 import { CasaOption } from './interfaces/CasaOption.interface';
 import { CalendarDay } from './interfaces/CalendarDay.interface';
@@ -21,6 +20,9 @@ import { Ubicacion } from '../../pages/eventos/Model/ubicacion.interface';
 import { EventosingresoService } from '../../pages/eventos/services/eventosingresoService';
 import { InmueblesServices } from '../../pages/inmuebles/services/inmuebles-services';
 import { CasasList } from './interfaces/ICasasList.interfgace';
+import { EstatusEvento } from '../../pages/eventos/Model/estatusEvento.interface';
+import { EventoAddRequest } from '../../pages/eventos/Model/eventoAdd.interface';
+import { IEventoIngresoUpdate } from '../../pages/eventos/interface/eventooingresoUpdate.interface';
 
 @Component({
   selector: 'app-calendar-casa-blanca',
@@ -49,7 +51,9 @@ export class CalendarCasaBlanca implements OnInit {
   private eventosService = inject(EventosService);
   private readonly catalogosService = inject(EventosingresoService);
   private readonly inmueblesServices = inject(InmueblesServices);
+  private readonly eventosingresoService = inject(EventosingresoService);
 
+  aventoReq?: EventoAddRequest;
   ubicacionList: Ubicacion[] = [];
 
   // Inputs opcionales
@@ -70,12 +74,7 @@ export class CalendarCasaBlanca implements OnInit {
   casas = signal<EventoCalendarYearMont[]>([]);
   misEventosDesdeApi = signal<EventoCalendarYearMont[]>([]);
   selectedSectionId = signal<number | null>(null);
-
-  estatusOptions = signal<EstatusOption[]>([
-    { id: 1, nombre: 'Apartado' },
-    { id: 2, nombre: 'Liquidado' },
-    { id: 3, nombre: 'Cancelado' }
-  ]);
+  estatusList = signal<EstatusEvento[]>([]);
 
   // Modales y control de UI
   showModal = signal<boolean>(false);
@@ -126,9 +125,9 @@ export class CalendarCasaBlanca implements OnInit {
     idSeccion: [0, [Validators.required, Validators.min(1)]],
     idInmueble: [{ value: 0, disabled: true }, [Validators.required, Validators.min(1)]],
     idEstatusEvento: [0, [Validators.required, Validators.min(1)]],
-    fechaEvento: [new Date(), [Validators.required]],
+    fechaEvento: [new Date() as Date | null, [Validators.required]],
     reciboNumero: ['', [Validators.required, Validators.maxLength(50)]],
-    fechaPago: [new Date(), [Validators.required]],
+    fechaPago: [new Date() as Date | null, [Validators.required]],
     apartado: [0, [Validators.required, Validators.min(0)]],
     liquida: [0, [Validators.required, Validators.min(0)]],
     luz: [0, [Validators.min(0)]],
@@ -167,7 +166,7 @@ export class CalendarCasaBlanca implements OnInit {
       const inmuebleCtrl = this.eventoForm.get('idInmueble');
       inmuebleCtrl?.setValue(0, { emitEvent: false });
       inmuebleCtrl?.disable({ emitEvent: false });
-debugger;
+
       if (isValid) {
         this.getCasas(sectionId);
       } else {
@@ -178,6 +177,19 @@ debugger;
 
   ngOnInit(): void {
     this.cargarSecciones();
+    this.getStatusEvento();
+  }
+
+  getStatusEvento(): void {
+    this.catalogosService.leeEstatusEvento().subscribe({
+      next: (res: any) => {
+        const lista = Array.isArray(res) ? res : (res?.data ?? res?.result ?? []);
+        this.estatusList.set(lista);
+      },
+      error: (err) => {
+        console.error('Error al cargar los estatus de evento:', err);
+      }
+    });
   }
 
   cargarSecciones(): void {
@@ -197,11 +209,10 @@ debugger;
     this.eventosService.getCasas(sectionId).subscribe({
       next: (res: any) => {
         const lista = Array.isArray(res) ? res : (res?.data ?? res?.result ?? []);
-        debugger;
         this.casasList.set(lista);
 
         const inmuebleCtrl = this.eventoForm.get('idInmueble');
-        if (lista.length > 0) {
+        if (lista.length > 0 && !this.isEditMode()) {
           inmuebleCtrl?.enable({ emitEvent: false });
         } else {
           inmuebleCtrl?.disable({ emitEvent: false });
@@ -268,12 +279,27 @@ debugger;
     return String(value).split('T')[0];
   }
 
-  private parseToDate(value: any): Date {
-    if (!value) return new Date();
-    if (value instanceof Date) return value;
-    const cleanStr = String(value).split('T')[0];
-    const [year, month, day] = cleanStr.split('-').map(Number);
-    return year && month && day ? new Date(year, month - 1, day) : new Date(value);
+  private parseToDate(value: any): Date | null {
+    if (!value) return null;
+    if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+
+    const cleanStr = String(value).trim().split('T')[0];
+    if (!cleanStr || cleanStr.startsWith('0001-01-01')) return null;
+
+    // Formato YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(cleanStr)) {
+      const [year, month, day] = cleanStr.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    // Formato DD/MM/YYYY
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(cleanStr)) {
+      const [day, month, year] = cleanStr.split('/').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? null : parsed;
   }
 
   requestDeleteEvent(event: EventoCalendarYearMont, mouseEvent: MouseEvent): void {
@@ -432,6 +458,7 @@ debugger;
       comentarios: ''
     }, { emitEvent: false });
 
+    this.eventoForm.get('idSeccion')?.enable({ emitEvent: false });
     this.eventoForm.get('idInmueble')?.disable({ emitEvent: false });
     this.showModal.set(true);
   }
@@ -441,11 +468,15 @@ debugger;
     this.isEditMode.set(true);
     this.editingEventId.set(event.id);
 
-    const eventDateStr = this.toDateString(event.fechaEvento);
+    const raw: any = event;
+    const rawFechaEvento = raw.fechaEvento ?? raw.FechaEvento;
+    const rawFechaPago = raw.fechaPago ?? raw.FechaPago ?? raw.fecha_pago;
+
+    const eventDateStr = this.toDateString(rawFechaEvento);
     this.selectedDayDate.set(eventDateStr);
 
-    const houseObj = this.casasList().find(c => Number(c.id) === Number(event.idInmueble));
-    const sectionId = Number(event.idUbicacion) || this.extractSectionId(houseObj);
+    const houseObj = this.casasList().find(c => Number(c.id) === Number(raw.idInmueble ?? raw.IdInmueble));
+    const sectionId = Number(raw.idUbicacion ?? raw.IdUbicacion) || this.extractSectionId(houseObj);
 
     this.selectedSectionId.set(sectionId > 0 ? sectionId : null);
 
@@ -455,19 +486,22 @@ debugger;
 
     this.eventoForm.patchValue({
       idSeccion: sectionId,
-      idInmueble: Number(event.idInmueble),
-      idEstatusEvento: Number(event.idEstatusEvento),
-      fechaEvento: this.parseToDate(event.fechaEvento),
-      reciboNumero: event.reciboNumero,
-      fechaPago: this.parseToDate(event.fechaPago),
-      apartado: event.apartado,
-      liquida: event.liquida,
-      luz: event.luz || 0,
-      depositoGarantia: event.depositoGarantia || 0,
-      limpiezaDomingo: event.limpiezaDomingo || 0,
-      rentaInmobiliario: event.rentaInmobiliario || 0,
-      comentarios: event.comentarios || ''
+      idInmueble: Number(raw.idInmueble ?? raw.IdInmueble ?? 0),
+      idEstatusEvento: Number(raw.idEstatusEvento ?? raw.IdEstatusEvento ?? 0),
+      fechaEvento: this.parseToDate(rawFechaEvento),
+      reciboNumero: raw.reciboNumero ?? raw.ReciboNumero ?? '',
+      fechaPago: this.parseToDate(rawFechaPago),
+      apartado: Number(raw.apartado ?? raw.Apartado ?? 0),
+      liquida: Number(raw.liquida ?? raw.Liquida ?? 0),
+      luz: Number(raw.luz ?? raw.Luz ?? 0),
+      depositoGarantia: Number(raw.depositoGarantia ?? raw.DepositoGarantia ?? raw.deposito ?? raw.Deposito ?? 0),
+      limpiezaDomingo: Number(raw.limpiezaDomingo ?? raw.LimpiezaDomingo ?? raw.limpieza ?? raw.Limpieza ?? 0),
+      rentaInmobiliario: Number(raw.rentaInmobiliario ?? raw.RentaInmobiliario ?? raw.rentainmobiliario ?? raw.renta ?? raw.Renta ?? 0),
+      comentarios: raw.comentarios ?? raw.Comentarios ?? ''
     }, { emitEvent: false });
+
+    this.eventoForm.get('idSeccion')?.disable({ emitEvent: false });
+    this.eventoForm.get('idInmueble')?.disable({ emitEvent: false });
 
     this.showModal.set(true);
   }
@@ -489,45 +523,22 @@ debugger;
     const seccionId = Number(formValues.idSeccion);
     const estatusId = Number(formValues.idEstatusEvento);
 
-    const houseObj = this.casas().find(c => Number(c.id) === inmuebleId);
+    const houseObj = this.casasList().find(c => Number(c.id) === inmuebleId);
     const ubicacionObj = this.ubicacionList.find(u => Number(u.id) === seccionId);
-    const estatusObj = this.estatusOptions().find(e => Number(e.id) === estatusId);
+    const estatusObj = this.estatusList().find(e => Number(e.id) === estatusId);
 
     const fechaEventoStr = this.toDateString(formValues.fechaEvento);
     const fechaPagoStr = this.toDateString(formValues.fechaPago);
 
     if (this.isEditMode() && this.editingEventId() !== null) {
-      const existingEvent = this.misEventosDesdeApi().find(e => e.id === this.editingEventId());
-      if (existingEvent) {
-        const updatedEvent: EventoCalendarYearMont = {
-          ...existingEvent,
-          idInmueble: inmuebleId,
-          idEstatusEvento: estatusId,
-          estatusEvento: estatusObj?.nombre || existingEvent.estatusEvento,
-          fechaEvento: fechaEventoStr,
-          reciboNumero: String(formValues.reciboNumero || ''),
-          fechaPago: fechaPagoStr,
-          apartado: Number(formValues.apartado || 0),
-          liquida: Number(formValues.liquida || 0),
-          luz: Number(formValues.luz || 0),
-          depositoGarantia: Number(formValues.depositoGarantia || 0),
-          limpiezaDomingo: Number(formValues.limpiezaDomingo || 0),
-          rentaInmobiliario: Number(formValues.rentaInmobiliario || 0),
-          comentarios: formValues.comentarios || '',
-          numeroCasa: houseObj?.numeroCasa || existingEvent.numeroCasa,
-          idUbicacion: seccionId || existingEvent.idUbicacion,
-          nombreUbicacion: ubicacionObj?.nombreUbicacion || existingEvent.nombreUbicacion,
-          nombre: houseObj?.nombre ?? existingEvent.nombre
-        };
+      const eventId = this.editingEventId()!;
+      const existingEvent = this.misEventosDesdeApi().find(e => e.id === eventId);
 
-        this.onEventUpdated(updatedEvent);
-      }
-    } else {
-      const newEvent: EventoCalendarYearMont = {
-        id: Date.now(),
+      // 1. Declaración de eventoUpdatePayload
+      const eventoUpdatePayload: IEventoIngresoUpdate = {
+        id: eventId,
         idInmueble: inmuebleId,
         idEstatusEvento: estatusId,
-        estatusEvento: estatusObj?.nombre || '',
         fechaEvento: fechaEventoStr,
         reciboNumero: String(formValues.reciboNumero || ''),
         fechaPago: fechaPagoStr,
@@ -537,27 +548,89 @@ debugger;
         depositoGarantia: Number(formValues.depositoGarantia || 0),
         limpiezaDomingo: Number(formValues.limpiezaDomingo || 0),
         rentaInmobiliario: Number(formValues.rentaInmobiliario || 0),
-        comentarios: formValues.comentarios || '',
-        idCasa: inmuebleId,
-        numeroCasa: houseObj?.numeroCasa || '',
-        idUbicacion: seccionId,
-        nombreUbicacion: ubicacionObj?.nombreUbicacion || '',
-        borrado: false,
-        nombre: houseObj?.nombre || null,
-        apellidos: null
+        comentarios: formValues.comentarios || ''
       };
 
-      this.onEventCreated(newEvent);
+      // 2. Consumo del servicio PUT
+      this.catalogosService.updateEventosIngresoById(eventoUpdatePayload).subscribe({
+        next: () => {
+          const fecha = this.currentDate();
+          this.cargarEventos(fecha.getFullYear(), fecha.getMonth() + 1);
+
+          if (existingEvent) {
+            const updatedEvent: EventoCalendarYearMont = {
+              ...existingEvent,
+              ...eventoUpdatePayload,
+              estatusEvento: estatusObj?.estatusEvento || existingEvent.estatusEvento,
+              numeroCasa: houseObj?.numeroCasa || existingEvent.numeroCasa,
+              idUbicacion: seccionId || existingEvent.idUbicacion,
+              nombreUbicacion: ubicacionObj?.nombreUbicacion || existingEvent.nombreUbicacion
+            };
+            this.onEventUpdated(updatedEvent);
+          }
+
+          this.snackBar.open('El evento se ha actualizado con éxito', 'Cerrar', {
+            duration: 3500,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snackbar-success']
+          });
+
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error('Error al actualizar el evento:', err);
+          this.snackBar.open('Ocurrió un error al actualizar el evento', 'Cerrar', {
+            duration: 4000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom'
+          });
+        }
+      });
+
+    } else {
+      const eventor: EventoAddRequest = {
+        idInmueble: inmuebleId,
+        idEstatusEvento: estatusId,
+        fechaEvento: fechaEventoStr,
+        reciboNumero: String(formValues.reciboNumero || ''),
+        fechaPago: fechaPagoStr,
+        apartado: Number(formValues.apartado || 0),
+        liquida: Number(formValues.liquida || 0),
+        luz: Number(formValues.luz || 0),
+        depositoGarantia: Number(formValues.depositoGarantia || 0),
+        limpiezaDomingo: Number(formValues.limpiezaDomingo || 0),
+        rentaInmobiliario: Number(formValues.rentaInmobiliario || 0),
+        comentarios: formValues.comentarios || ''
+      };
+
+      this.catalogosService.agregaEvento(eventor).subscribe({
+        next: (res: any) => {
+          const nuevoId = typeof res === 'number' ? res : (res?.data ?? res?.result ?? 0);
+          console.log('Evento registrado con ID:', nuevoId);
+
+          const fecha = this.currentDate();
+          this.cargarEventos(fecha.getFullYear(), fecha.getMonth() + 1);
+
+          this.snackBar.open('El evento se ha guardado con éxito', 'Cerrar', {
+            duration: 3500,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            panelClass: ['snackbar-success']
+          });
+
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error('Error al agregar el evento:', err);
+          this.snackBar.open('Ocurrió un error al guardar el evento', 'Cerrar', {
+            duration: 4000,
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom'
+          });
+        }
+      });
     }
-
-    this.snackBar.open('El evento se ha guardado con éxito', 'Cerrar', {
-      duration: 3500,
-      horizontalPosition: 'center',
-      verticalPosition: 'bottom',
-      panelClass: ['snackbar-success']
-    });
-
-    this.closeModal();
   }
 
   closeModal(): void {
