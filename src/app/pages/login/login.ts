@@ -1,5 +1,5 @@
 import { booleanAttribute, Component, inject, signal } from '@angular/core';
-import { FormBuilder, FormsModule, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormsModule, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Loginservices } from './service/loginservices';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -7,7 +7,6 @@ import { LoginRespondeDTO } from './interface/loginResponse.interface';
 import { firstValueFrom } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Changepassword } from './changepassword/changepassword';
-import { required } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-login',
@@ -24,12 +23,17 @@ export class Login {
   private debeCambiarPassword: boolean = true;
   private router = inject(Router);
 
+  // --- NUEVO: Estado y control para la ventana emergente de recuperación ---
+  mostrarModalRecuperar = signal(false);
+  emailRecuperacion = new FormControl('', [Validators.required, Validators.email]);
+  // ------------------------------------------------------------------------
+
   private usuarioResult: LoginRespondeDTO = {
     id: 0,
     email: '',
     password: '',
     debeCambiarPassword: true,
-    idUsuario: 0, // Respeta el nombre de la propiedad C# (si corriges el typo en C# a IdUsuario, cámbialo aquí a idUsuario)
+    idUsuario: 0,
     nombre: '',
     apellidos: '',
     rol: '',
@@ -37,38 +41,69 @@ export class Login {
 
   formularioLogin = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]], // Puedes cambiar la longitud mínima según tus requerimientos
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
+
+  constructor() {}
+
+  // --- NUEVOS MÉTODOS PARA EL MODAL ---
+  abrirModalRecuperar(event: Event) {
+    event.preventDefault(); // Evita que el <a href="#"> recargue o salte la página
+    this.emailRecuperacion.reset();
+    this.mostrarModalRecuperar.set(true);
+  }
+
+  cerrarModalRecuperar() {
+    this.mostrarModalRecuperar.set(false);
+  }
+
+  recuperarPassword() {
+    if (this.emailRecuperacion.invalid) {
+      this.emailRecuperacion.markAsTouched();
+      return;
+    }
+
+    console.log('generando password ', this.emailRecuperacion.value);
+    this.cerrarModalRecuperar();
+
+    this.snackBar.open('Se envio una contraseña temporal para generar una nueva.', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+        });
+
+    // Aquí puedes acceder al correo ingresado con: this.emailRecuperacion.value
+    
+    // Si deseas cerrar la ventana automáticamente después de hacer clic:
+    // this.cerrarModalRecuperar();
+
+  }
+  // ------------------------------------
 
   isFieldInvalid(field: string): boolean {
     const control = this.formularioLogin.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  constructor() {}
-
   async validarDatos() {
     if (this.formularioLogin.invalid) {
-      this.formularioLogin.markAllAsTouched(); // Marca todos los campos para mostrar los errores si intentan enviar sin llenar
+      this.formularioLogin.markAllAsTouched();
       return;
     }
 
     const Pswd = this.formularioLogin.value.password ?? '';
     const Email = this.formularioLogin.value.email ?? '';
 
-    // Pausa la ejecución de la función hasta que el backend responde
     this.usuarioResult = await firstValueFrom(this.loginService.getPassword(Email, Pswd));
-
-    debugger;
 
     if (this.usuarioResult.rol != 'Administrador') {
       this.snackBar.open('Solo Administradores tienen acceso', 'Cerrar', {
-        duration: 4000, // Duración en milisegundos (4 segundos)
-        horizontalPosition: 'center', // 'start' | 'center' | 'end' | 'left' | 'right'
-        verticalPosition: 'bottom', // 'top' | 'bottom'
-        panelClass: ['snackbar-error'], // Clase CSS opcional para darle estilo (ej. fondo rojo)
+        duration: 4000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['snackbar-error'],
       });
-      return ;
+      return;
     }
 
     if (!this.usuarioResult || this.usuarioResult.idUsuario === 0) {
@@ -81,10 +116,8 @@ export class Login {
     } else {
       console.log('usuario :', this.usuarioResult);
 
-      // valida si hay que cambiar el password:
       if (this.usuarioResult.debeCambiarPassword == true) this.abrirPopup();
       else {
-        // guarda datos en el localstorage
         const _nombre: string = this.usuarioResult.nombre + ' ' + this.usuarioResult.apellidos;
         const _rol: string = this.usuarioResult.rol ?? '';
         const _idUsuario = this.usuarioResult.idUsuario;
@@ -97,9 +130,6 @@ export class Login {
           window.location.reload();
         });
       }
-
-      // temporal esta linea
-      //this.router.navigate(['/dashboard']);
     }
   }
 
@@ -116,16 +146,13 @@ export class Login {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        // 1. Abre el SnackBar y guarda la referencia
         const snackBarRef = this.snackBar.open('Contraseña actualizada correctamente', 'Cerrar', {
-          duration: 3000, // Duración en milisegundos (3 segundos)
+          duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'bottom',
         });
 
-        // 2. Escucha el evento cuando se termine el tiempo o se cierre
         snackBarRef.afterDismissed().subscribe(() => {
-          // Esta línea se ejecuta exactamente al finalizar el SnackBar
           this.router.navigate(['/login']).then(() => {
             window.location.reload();
           });
