@@ -2,13 +2,12 @@ import { booleanAttribute, Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Loginservices } from './service/loginservices';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { LoginRespondeDTO } from './interface/loginResponse.interface';
 import { firstValueFrom } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Changepassword } from './changepassword/changepassword';
 import { required } from '@angular/forms/signals';
-
 
 @Component({
   selector: 'app-login',
@@ -18,10 +17,9 @@ import { required } from '@angular/forms/signals';
   styleUrl: './login.css',
 })
 export class Login {
-
   private readonly loginService = inject(Loginservices);
   private readonly dialog = inject(MatDialog);
-  private fb = inject(FormBuilder)
+  private fb = inject(FormBuilder);
   private readonly snackBar = inject(MatSnackBar);
   private debeCambiarPassword: boolean = true;
   private router = inject(Router);
@@ -34,12 +32,12 @@ export class Login {
     idUsuario: 0, // Respeta el nombre de la propiedad C# (si corriges el typo en C# a IdUsuario, cámbialo aquí a idUsuario)
     nombre: '',
     apellidos: '',
-    rol: ''
+    rol: '',
   };
 
-formularioLogin = this.fb.group({
+  formularioLogin = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]] // Puedes cambiar la longitud mínima según tus requerimientos
+    password: ['', [Validators.required, Validators.minLength(8)]], // Puedes cambiar la longitud mínima según tus requerimientos
   });
 
   isFieldInvalid(field: string): boolean {
@@ -47,9 +45,7 @@ formularioLogin = this.fb.group({
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  constructor() { }
-
-  
+  constructor() {}
 
   async validarDatos() {
     if (this.formularioLogin.invalid) {
@@ -63,22 +59,33 @@ formularioLogin = this.fb.group({
     // Pausa la ejecución de la función hasta que el backend responde
     this.usuarioResult = await firstValueFrom(this.loginService.getPassword(Email, Pswd));
 
+    debugger;
+
+    if (this.usuarioResult.rol != 'Administrador') {
+      this.snackBar.open('Solo Administradores tienen acceso', 'Cerrar', {
+        duration: 4000, // Duración en milisegundos (4 segundos)
+        horizontalPosition: 'center', // 'start' | 'center' | 'end' | 'left' | 'right'
+        verticalPosition: 'bottom', // 'top' | 'bottom'
+        panelClass: ['snackbar-error'], // Clase CSS opcional para darle estilo (ej. fondo rojo)
+      });
+      return ;
+    }
+
     if (!this.usuarioResult || this.usuarioResult.idUsuario === 0) {
       console.log('El usuario no existe.');
-      this.snackBar.open(
-        'El usuario no existe.',
-        'Cerrar',
-        { duration: 3000, horizontalPosition: 'center', verticalPosition: 'bottom' }
-      );
+      this.snackBar.open('El usuario no existe.', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+      });
     } else {
       console.log('usuario :', this.usuarioResult);
 
       // valida si hay que cambiar el password:
-      if (this.usuarioResult.debeCambiarPassword == true)
-        this.abrirPopup();
+      if (this.usuarioResult.debeCambiarPassword == true) this.abrirPopup();
       else {
         // guarda datos en el localstorage
-        const _nombre : string = this.usuarioResult.nombre + ' ' + this.usuarioResult.apellidos;
+        const _nombre: string = this.usuarioResult.nombre + ' ' + this.usuarioResult.apellidos;
         const _rol: string = this.usuarioResult.rol ?? '';
         const _idUsuario = this.usuarioResult.idUsuario;
 
@@ -86,21 +93,15 @@ formularioLogin = this.fb.group({
         window.localStorage.setItem('rol-usuario', _rol);
         window.localStorage.setItem('id-usuario', _idUsuario.toString());
 
-        
         this.router.navigate(['/dashboard']).then(() => {
           window.location.reload();
         });
-
-
       }
 
       // temporal esta linea
       //this.router.navigate(['/dashboard']);
-
     }
   }
-
-
 
   abrirPopup() {
     const dialogRef = this.dialog.open(Changepassword, {
@@ -110,17 +111,16 @@ formularioLogin = this.fb.group({
       disableClose: false,
       hasBackdrop: true,
       height: '450px',
-      data: { id: this.usuarioResult.idUsuario }
+      data: { id: this.usuarioResult.idUsuario },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-
         // 1. Abre el SnackBar y guarda la referencia
         const snackBarRef = this.snackBar.open('Contraseña actualizada correctamente', 'Cerrar', {
           duration: 3000, // Duración en milisegundos (3 segundos)
           horizontalPosition: 'center',
-          verticalPosition: 'bottom'
+          verticalPosition: 'bottom',
         });
 
         // 2. Escucha el evento cuando se termine el tiempo o se cierre
@@ -135,6 +135,4 @@ formularioLogin = this.fb.group({
       }
     });
   }
-
-
 }
