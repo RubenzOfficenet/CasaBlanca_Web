@@ -209,6 +209,7 @@ export class Editarusuario {
   }
 
   actualizar(): void {
+    debugger;
     const usuarioUpdate: IUpdateUsuario = {
       id: this.idUsuario,
       nombre: this.usuarioForm.value.nombreUsuario ?? '',

@@ -222,3 +222,20 @@
   color: #000080; /* Azul marino clásico */
   /* color: #001f3f; Azul marino oscuro / Navy */
 }
+
+
+.btn-red {
+    color: #d32f2f; /* Rojo Material estándar */
+}
+
+.btn-red:hover {
+    background-color: rgba(211, 47, 47, 0.08); /* Efecto suave al pasar el mouse */
+}
+
+.btn-green {
+    color: #2e7d32; /* Verde Material estándar */
+}
+
+.btn-green:hover {
+    background-color: rgba(46, 125, 50, 0.08);
+}
