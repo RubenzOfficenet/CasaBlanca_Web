@@ -224,7 +224,7 @@ export class Editarusuario {
 
     this.usuarioService.updateUsuario(usuarioUpdate).subscribe({
       next: (data) => {
-        debugger;
+        
         this.snackBar.open('Usuario actualizado con éxito', 'OK', { duration: 3000 });
         this.dialogRef.close(data); 
       },

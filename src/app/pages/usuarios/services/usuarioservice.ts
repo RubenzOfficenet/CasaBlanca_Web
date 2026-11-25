@@ -38,7 +38,6 @@ export class Usuarioservice {
   }
 
   updateUsuario(usuario: IUpdateUsuario): Observable<IUpdateUsuario> {
-    debugger;
     var url = this._apiUrl + 'UpdateUsuario';
     return this._http.put<IUpdateUsuario>(url, usuario);
   }

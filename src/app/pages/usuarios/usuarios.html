@@ -128,19 +128,10 @@
                 </th>
 
                 <td mat-cell *matCellDef="let usuario" style="text-align:center" class="btn-red">
-                    <!-- <button mat-icon-button color="warn" matTooltip="Borrar usuario"
-                        (click)="borrarUsuario(usuario.id)">
-                        <mat-icon>delete</mat-icon>
-                    </button> -->
                     <button mat-icon-button class="btn-red" matTooltip="Borrar usuario"
                         (click)="borrarUsuario(usuario.id)">
                         <mat-icon>delete</mat-icon>
                     </button>
-
-                    <!-- <button mat-icon-button class="btn-navy-blue" matTooltip="Editar usuario"
-                        (click)="editarUsuario(usuario.id)">
-                        <mat-icon>editar</mat-icon>
-                    </button> -->
 
                     <button mat-icon-button class="btn-green" matTooltip="Editar usuario"
                         (click)="editarUsuario(usuario.id)">
