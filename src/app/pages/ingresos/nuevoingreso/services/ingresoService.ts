@@ -30,17 +30,19 @@ export class IngresosService {
 
   agregaIngreso(ingresoDTO: IIngresoDTO): Observable<number> {
     const url = this._apiUrl + 'AddIngreso';
+    debugger;
     return this._http.post<number>(url, ingresoDTO);
   }
 
   leeIngresoById(Id : number): Observable<IIngresoUpdate> {
     var url = this._apiUrl + 'GetIngresoById/' + Id
-    console.log(url);
     return this._http.get<IIngresoUpdate>(url);
   }
 
 updateIngreso(ingresoToUpdate: IIngresoDataUpdate): Observable<IIngresoDataUpdate> {
   var url = this._apiUrl + 'UpdateIngreso'
+  console.log(JSON.stringify(ingresoToUpdate, null, 2));
+  debugger;
   return this._http.put<IIngresoUpdate>(url, ingresoToUpdate);
 }
 

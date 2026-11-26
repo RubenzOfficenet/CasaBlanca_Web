@@ -242,6 +242,7 @@ export class Ingresos implements OnInit, AfterViewInit {
       width: '40vw',
       maxWidth: '2000px',
       minWidth: '320px',
+      height: '700px',
       disableClose: false,
       hasBackdrop: true
     });
