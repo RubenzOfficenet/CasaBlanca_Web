@@ -10,28 +10,10 @@
                 <div class="form-section">
                     <div class="form-grid">
 
-<!-- Fila 1 -->
-<div class="form-group">
-    <label for="casa">Casa</label>
-    <select id="casa" formControlName="casa">
-        <option [ngValue]="null" disabled>
-            Seleccione una casa
-        </option>
-        @for (casa of casaDatos; track casa.id) {
-        <option [ngValue]="casa.id">
-            {{ casa.casa }}
-        </option>
-        }
-    </select>
-
-    @if (campoInvalido('casa')) {
-    <small class="text-danger">Debe seleccionar una casa.</small>
-    }
-</div>                        
                         <!-- Fila 1 -->
-                        <!-- <div class="form-group">
+                        <div class="form-group">
                             <label for="casa">Casa</label>
-                            <select id="casa" formControlName="casa" (change)="onCasaChange()">
+                            <select id="casa" formControlName="casa">
                                 <option [ngValue]="null" disabled>
                                     Seleccione una casa
                                 </option>
@@ -42,16 +24,11 @@
                                 }
                             </select>
 
-    
                             @if (campoInvalido('casa')) {
                             <small class="text-danger">Debe seleccionar una casa.</small>
                             }
-                        </div> -->
-
-                        <!-- <div class="form-group">
-                            <label>Nombre</label>
-                            <input type="text" formControlName="nombre" readonly>
-                        </div> -->
+                        </div>
+                        <!-- Fila 1 -->
 
                         <!-- Fila 2 -->
                         <div class="form-group">

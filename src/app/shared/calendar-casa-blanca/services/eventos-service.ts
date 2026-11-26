@@ -11,6 +11,7 @@ import { EventoCalendarYearMont } from '../interfaces/EventoCalendarYearMont.int
 import { APP_CONSTANTS } from '../../../Constants/app.constants';
 import { InmuebleEditarDTO } from '../../../Models/InmuebleEditarDTO.model';
 import { InmueblesServices } from '../../../pages/inmuebles/services/inmuebles-services';
+import { EventoCalendarDto } from '../interfaces/EventoCalendarDto.interace';
 
 @Injectable({
   providedIn: 'root',
@@ -63,10 +64,10 @@ export class EventosService {
 
 
 
-  getCalendarEventsByYearMonth(year: number, month: number): Observable<EventoCalendarYearMont[]> {
+  getCalendarEventsByYearMonth(year: number, month: number): Observable<EventoCalendarDto[]> {
     const url = `${this._apiUrl}GetEventosCalendario?year=${year}&month=${month}`;
     debugger;
-    return this.http.get<EventoCalendarYearMont[]>(`${this._apiUrl}GetEventosCalendario?year=${year}&month=${month}`);
+    return this.http.get<EventoCalendarDto[]>(`${this._apiUrl}GetEventosCalendario?year=${year}&month=${month}`);
   }
 
 

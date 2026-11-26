@@ -27,7 +27,7 @@ export class EventosingresoService {
 
   agregaEvento(eventoDTO: EventoAddRequest): Observable<number> {
     const url = this._apiUrl + 'AddEventoIngreso';
-    console.log(eventoDTO);
+    console.log( JSON.stringify(eventoDTO, null, 2));
     debugger;
     return this._http.post<number>(url, eventoDTO);
   }
